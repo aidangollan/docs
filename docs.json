@@ -3,9 +3,9 @@
   "theme": "almond",
   "name": "UGC Inc API Documentation",
   "colors": {
-    "primary": "#FAFAFA",
-    "light": "#EDE8FA",
-    "dark": "#D0C9E8"
+    "primary": "#EDE8FA",
+    "light": "#FAFAFA",
+    "dark": "#E5E5E5"
   },
   "favicon": "/favicon.ico",
   "navigation": {
@@ -60,16 +60,6 @@
           "anchor": "NPM Package",
           "href": "https://www.npmjs.com/package/ugcinc",
           "icon": "npm"
-        },
-        {
-          "anchor": "Dashboard",
-          "href": "https://ugc.inc",
-          "icon": "house"
-        },
-        {
-          "anchor": "Support",
-          "href": "mailto:support@ugc.inc",
-          "icon": "envelope"
         }
       ]
     }
@@ -77,19 +67,6 @@
   "logo": {
     "light": "/logo.png",
     "dark": "/logo.png"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:support@ugc.inc"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://ugc.inc"
-    }
   },
   "contextual": {
     "options": [
