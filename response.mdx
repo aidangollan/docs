@@ -1,0 +1,78 @@
+---
+title: "Response"
+description: "Understanding API responses and error handling"
+---
+
+## Response Format
+
+All API responses follow a consistent, type-safe format that makes error handling straightforward.
+
+### Response Structure
+
+Every API response includes an `ok` field that indicates success or failure:
+
+**Success Response:**
+```json
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": { ... }
+}
+```
+
+**Error Response:**
+```json
+{
+  "ok": false,
+  "code": 400,
+  "message": "Error description"
+}
+```
+
+## Using the Response Pattern
+
+The `ok` field allows you to easily check if the request succeeded:
+
+```typescript
+const response = await client.accounts.getAccounts();
+
+if (response.ok) {
+  // Success - data is available
+  console.log(response.data);
+  response.data.forEach(account => {
+    console.log(account.username);
+  });
+} else {
+  // Error - handle the error
+  console.error(`Error ${response.code}: ${response.message}`);
+}
+```
+
+```python
+response = requests.post(
+    'https://api.ugc.inc/accounts',
+    headers={'Authorization': 'Bearer YOUR_API_KEY'},
+    json={}
+)
+
+data = response.json()
+
+if data['ok']:
+    # Success - data is available
+    print(data['data'])
+else:
+    # Error - handle the error
+    print(f"Error {data['code']}: {data['message']}")
+```
+
+## HTTP Status Codes
+
+Common status codes you may encounter:
+
+- **200** - Success
+- **400** - Bad Request (invalid parameters)
+- **401** - Unauthorized (invalid or missing API key)
+- **404** - Not Found (resource doesn't exist)
+- **500** - Internal Server Error
+

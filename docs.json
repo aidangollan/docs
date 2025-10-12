@@ -12,7 +12,7 @@
     "pages": [
       {
         "group": "Getting Started",
-        "pages": ["index"]
+        "pages": ["index", "response", "data-structures"]
       },
       {
         "group": "Accounts",
@@ -53,16 +53,6 @@
           "anchor": "NPM Package",
           "href": "https://www.npmjs.com/package/ugcinc",
           "icon": "npm"
-        },
-        {
-          "anchor": "Dashboard",
-          "href": "https://ugc.inc",
-          "icon": "house"
-        },
-        {
-          "anchor": "Support",
-          "href": "mailto:support@ugc.inc",
-          "icon": "envelope"
         }
       ]
     }
