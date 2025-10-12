@@ -1,0 +1,207 @@
+---
+title: "Create Slideshow Post"
+api: "POST https://api.ugc.inc/post/slideshow"
+description: "Create a slideshow post from multiple images"
+---
+
+## Overview
+
+Create and schedule a slideshow post from multiple images to be published on TikTok or Instagram. The images will be combined into a slideshow with optional music.
+
+## Request Body
+
+<ParamField body="accountId" type="string" required>
+  Account ID to post from
+</ParamField>
+
+<ParamField body="imageUrls" type="string[]" required>
+  Array of image URLs (must be publicly accessible)
+  
+  - **Minimum:** 1 image
+  - **Maximum:** 35 images (platform limit)
+  - **Formats:** JPG, JPEG, PNG
+  - **Resolution:** 1080x1920 recommended (9:16 aspect ratio)
+  - **File size:** Under 5MB per image
+</ParamField>
+
+<ParamField body="caption" type="string">
+  Post caption/description (max 500 characters)
+  
+  Can include hashtags and emojis
+</ParamField>
+
+<ParamField body="musicPostId" type="string">
+  Music/audio post ID to use for the slideshow
+  
+  This should be a valid TikTok or Instagram music ID
+</ParamField>
+
+<ParamField body="postTime" type="string">
+  When to schedule the post (ISO 8601 format)
+  
+  If omitted, the post will be published immediately
+  
+  Example: `2024-12-31T12:00:00Z`
+</ParamField>
+
+<ParamField body="strict" type="boolean" default={false}>
+  Strict mode for validation
+  
+  When enabled, performs additional validation checks before posting
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="Post">
+  The created post object
+  
+  <Expandable title="Post properties">
+    <ResponseField name="id" type="string">
+      Unique post identifier - use this to track the post status
+    </ResponseField>
+    
+    <ResponseField name="account_id" type="string">
+      ID of the account that will post this
+    </ResponseField>
+    
+    <ResponseField name="type" type="'slideshow'">
+      Post type (always `slideshow` for this endpoint)
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Initial status: `scheduled` or `pending`
+    </ResponseField>
+    
+    <ResponseField name="social_id" type="string | null">
+      Platform post ID (null until posted)
+    </ResponseField>
+    
+    <ResponseField name="caption" type="string | null">
+      Post caption
+    </ResponseField>
+    
+    <ResponseField name="media_urls" type="string[]">
+      Array of image URLs
+    </ResponseField>
+    
+    <ResponseField name="music_post_id" type="string | null">
+      Music/audio ID
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/post/slideshow \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "acc_123456",
+    "imageUrls": [
+      "https://storage.example.com/img1.jpg",
+      "https://storage.example.com/img2.jpg",
+      "https://storage.example.com/img3.jpg"
+    ],
+    "caption": "Check out these amazing photos! 📸 #photography",
+    "musicPostId": "music_xyz789",
+    "postTime": "2024-12-31T12:00:00Z"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/post/slideshow', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accountId: 'acc_123456',
+    imageUrls: [
+      'https://storage.example.com/img1.jpg',
+      'https://storage.example.com/img2.jpg',
+      'https://storage.example.com/img3.jpg'
+    ],
+    caption: 'Check out these amazing photos! 📸 #photography',
+    musicPostId: 'music_xyz789',
+    postTime: '2024-12-31T12:00:00Z'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Slideshow created:', data.data.id);
+  console.log('Status:', data.data.status);
+  console.log('Images:', data.data.media_urls.length);
+}
+```
+
+```typescript NPM Package
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.posts.createSlideshow({
+  accountId: 'acc_123456',
+  imageUrls: [
+    'https://storage.example.com/img1.jpg',
+    'https://storage.example.com/img2.jpg',
+    'https://storage.example.com/img3.jpg'
+  ],
+  caption: 'Check out these amazing photos! 📸 #photography',
+  musicPostId: 'music_xyz789',
+  postTime: '2024-12-31T12:00:00Z'
+});
+
+if (response.ok) {
+  console.log(`Slideshow created with ID: ${response.data.id}`);
+  console.log(`Status: ${response.data.status}`);
+  console.log(`Images: ${response.data.media_urls?.length}`);
+  
+  // Monitor post status
+  const statusResponse = await client.posts.getStatus({
+    postId: response.data.id
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Slideshow post created successfully",
+  "data": {
+    "id": "post_def456",
+    "account_id": "acc_123456",
+    "type": "slideshow",
+    "status": "scheduled",
+    "social_id": null,
+    "caption": "Check out these amazing photos! 📸 #photography",
+    "media_urls": [
+      "https://storage.example.com/img1.jpg",
+      "https://storage.example.com/img2.jpg",
+      "https://storage.example.com/img3.jpg"
+    ],
+    "music_post_id": "music_xyz789"
+  }
+}
+```
+
+```json Error Response
+{
+  "ok": false,
+  "code": 400,
+  "message": "At least one image URL is required"
+}
+```
+
+</ResponseExample>
+

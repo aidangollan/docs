@@ -1,0 +1,160 @@
+---
+title: "Get Account Status"
+api: "POST https://api.ugc.inc/accounts/status"
+description: "Get account status and pending tasks"
+---
+
+## Overview
+
+Retrieve the status and pending tasks for one or more accounts. Use this endpoint to check what tasks are scheduled, pending, or completed for your accounts.
+
+## Request Body
+
+<ParamField body="accountIds" type="string[]">
+  Array of account IDs to check status for. Omit to get all accounts.
+</ParamField>
+
+<ParamField body="includeCompleted" type="boolean" default={false}>
+  Include completed tasks in the response
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="AccountTask[]">
+  Array of account task objects
+  
+  <Expandable title="AccountTask properties">
+    <ResponseField name="id" type="string">
+      Unique task identifier
+    </ResponseField>
+    
+    <ResponseField name="account_id" type="string">
+      ID of the account this task belongs to
+    </ResponseField>
+    
+    <ResponseField name="type" type="string">
+      Task type (e.g., `edit_profile`, `warmup_scroll`)
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Current task status (`scheduled`, `pending`, `complete`, `failed`)
+    </ResponseField>
+    
+    <ResponseField name="scheduled_time" type="string | null">
+      ISO 8601 timestamp when task is scheduled to execute
+    </ResponseField>
+    
+    <ResponseField name="edit_profile_info" type="object | null">
+      Profile update information (only for `edit_profile` tasks)
+      
+      <Expandable title="EditProfileInfo properties">
+        <ResponseField name="avatarUrl" type="string">
+          New avatar URL
+        </ResponseField>
+        <ResponseField name="nickName" type="string">
+          New display name
+        </ResponseField>
+        <ResponseField name="bio" type="string">
+          New bio text
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp when task was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/accounts/status \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountIds": ["acc_123456", "acc_789012"],
+    "includeCompleted": false
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/accounts/status', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accountIds: ['acc_123456', 'acc_789012'],
+    includeCompleted: false
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Account tasks:', data.data);
+}
+```
+
+```typescript NPM Package
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Get status for specific accounts
+const response = await client.accounts.getStatus({
+  accountIds: ['acc_123456', 'acc_789012'],
+  includeCompleted: false
+});
+
+// Get status for all accounts
+const allResponse = await client.accounts.getStatus();
+
+if (response.ok) {
+  response.data.forEach(task => {
+    console.log(`Task ${task.id}: ${task.status}`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "id": "task_abc123",
+      "account_id": "acc_123456",
+      "type": "edit_profile",
+      "status": "scheduled",
+      "scheduled_time": "2024-12-31T12:00:00Z",
+      "edit_profile_info": {
+        "nickName": "New Display Name",
+        "bio": "Updated bio text"
+      },
+      "created_at": "2024-12-25T10:00:00Z"
+    },
+    {
+      "id": "task_def456",
+      "account_id": "acc_789012",
+      "type": "warmup_scroll",
+      "status": "pending",
+      "scheduled_time": "2024-12-26T15:00:00Z",
+      "edit_profile_info": null,
+      "created_at": "2024-12-25T11:00:00Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+

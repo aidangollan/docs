@@ -1,0 +1,155 @@
+---
+title: "Get Accounts"
+api: "POST https://api.ugc.inc/accounts"
+description: "Retrieve accounts with optional filters"
+---
+
+## Overview
+
+Retrieve a list of accounts with optional filtering by tag, organization group, or user group. If no filters are provided, returns all accounts for your organization.
+
+## Request Body
+
+<ParamField body="tag" type="string">
+  Filter accounts by tag
+</ParamField>
+
+<ParamField body="org_group" type="string">
+  Filter accounts by organization group
+</ParamField>
+
+<ParamField body="user_group" type="string">
+  Filter accounts by user group
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="Account[]">
+  Array of account objects matching the filters
+  
+  <Expandable title="Account properties">
+    <ResponseField name="id" type="string">
+      Unique account identifier
+    </ResponseField>
+    
+    <ResponseField name="type" type="string">
+      Account platform type (`tiktok` or `instagram`)
+    </ResponseField>
+    
+    <ResponseField name="tag" type="string | null">
+      Custom tag for categorization
+    </ResponseField>
+    
+    <ResponseField name="org_group" type="string | null">
+      Organization group identifier
+    </ResponseField>
+    
+    <ResponseField name="user_group" type="string | null">
+      User group identifier
+    </ResponseField>
+    
+    <ResponseField name="username" type="string | null">
+      Account username/handle on the platform
+    </ResponseField>
+    
+    <ResponseField name="nick_name" type="string | null">
+      Display name shown on profile
+    </ResponseField>
+    
+    <ResponseField name="pfp_url" type="string | null">
+      URL to account's profile picture
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/accounts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tag": "influencer",
+    "org_group": "group1",
+    "user_group": "users1"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/accounts', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    tag: 'influencer',
+    org_group: 'group1',
+    user_group: 'users1'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Accounts:', data.data);
+}
+```
+
+```typescript NPM Package
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.accounts.getAccounts({
+  tag: 'influencer',
+  org_group: 'group1',
+  user_group: 'users1'
+});
+
+if (response.ok) {
+  console.log('Accounts:', response.data);
+  response.data.forEach(account => {
+    console.log(`${account.username} (${account.type})`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "id": "acc_123456",
+      "type": "tiktok",
+      "tag": "influencer",
+      "org_group": "group1",
+      "user_group": "users1",
+      "username": "coolcreator",
+      "nick_name": "Cool Creator",
+      "pfp_url": "https://storage.example.com/avatar.jpg"
+    },
+    {
+      "id": "acc_789012",
+      "type": "instagram",
+      "tag": "influencer",
+      "org_group": "group1",
+      "user_group": "users1",
+      "username": "awesome_account",
+      "nick_name": "Awesome Account",
+      "pfp_url": "https://storage.example.com/avatar2.jpg"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+

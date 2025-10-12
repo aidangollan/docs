@@ -1,68 +1,54 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "theme": "almond",
+  "name": "UGC Inc API Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#FAFAFA",
+    "light": "#EDE8FA",
+    "dark": "#D0C9E8"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.ico",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
+            "group": "Getting Started",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Accounts",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/endpoint/accounts-get",
+              "api-reference/endpoint/accounts-status",
+              "api-reference/endpoint/accounts-update-info",
+              "api-reference/endpoint/accounts-update-social"
+            ]
+          },
+          {
+            "group": "Statistics",
+            "pages": [
+              "api-reference/endpoint/stats-accounts",
+              "api-reference/endpoint/stats-posts",
+              "api-reference/endpoint/stats-refresh"
+            ]
+          },
+          {
+            "group": "Tasks",
+            "pages": [
+              "api-reference/endpoint/tasks-get"
+            ]
+          },
+          {
+            "group": "Posts",
+            "pages": [
+              "api-reference/endpoint/posts-get",
+              "api-reference/endpoint/posts-create-video",
+              "api-reference/endpoint/posts-create-slideshow",
+              "api-reference/endpoint/posts-status"
             ]
           }
         ]
@@ -71,33 +57,38 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "NPM Package",
+          "href": "https://www.npmjs.com/package/ugcinc",
+          "icon": "npm"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Dashboard",
+          "href": "https://ugc.inc",
+          "icon": "house"
+        },
+        {
+          "anchor": "Support",
+          "href": "mailto:support@ugc.inc",
+          "icon": "envelope"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo.png",
+    "dark": "/logo.png"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@ugc.inc"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://ugc.inc"
     }
   },
   "contextual": {
@@ -111,12 +102,5 @@
      "cursor",
      "vscode"
    ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
   }
 }

@@ -1,0 +1,157 @@
+---
+title: "Refresh Statistics"
+api: "POST https://api.ugc.inc/stats/refresh"
+description: "Fetch live statistics from TikTok/Instagram API"
+---
+
+## Overview
+
+Fetch fresh, real-time statistics directly from TikTok/Instagram API for an account and all its posts. This endpoint creates new stat records in the database with the latest data.
+
+This is useful when you need up-to-date statistics without waiting for the scheduled refresh cycle.
+
+## How It Works
+
+1. Fetches account profile stats (followers, following) from the platform API
+2. Fetches stats for all posts associated with the account
+3. Creates an `account_stats` record with aggregated post metrics
+4. Creates individual `post_stats` records for each post
+5. Returns the newly created statistics
+
+## Request Body
+
+<ParamField body="accountId" type="string" required>
+  Account ID to refresh statistics for
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="RefreshStatsResponse">
+  Response object containing account stats and all post stats
+  
+  <Expandable title="RefreshStatsResponse properties">
+    <ResponseField name="account_stats" type="AccountStat">
+      New account statistics record
+    </ResponseField>
+    
+    <ResponseField name="post_stats" type="PostStat[]">
+      Array of new post statistics records
+    </ResponseField>
+    
+    <ResponseField name="post_stats_count" type="number">
+      Number of posts that were refreshed
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/stats/refresh \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "acc_123456"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/stats/refresh', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accountId: 'acc_123456'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Account Stats:');
+  console.log(`  Followers: ${data.data.account_stats.followers}`);
+  console.log(`  Total Views: ${data.data.account_stats.views}`);
+  console.log(`\nRefreshed ${data.data.post_stats_count} posts`);
+  
+  data.data.post_stats.forEach(stat => {
+    console.log(`Post ${stat.post_id}: ${stat.views} views`);
+  });
+}
+```
+
+```typescript NPM Package
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.stats.refresh({
+  accountId: 'acc_123456'
+});
+
+if (response.ok) {
+  console.log(`Account ${response.data.account_stats.account_id}:`);
+  console.log(`  Followers: ${response.data.account_stats.followers}`);
+  console.log(`  Following: ${response.data.account_stats.following}`);
+  console.log(`  Total Views: ${response.data.account_stats.views}`);
+  console.log(`  Total Likes: ${response.data.account_stats.likes}`);
+  
+  console.log(`\nRefreshed ${response.data.post_stats_count} posts`);
+  
+  response.data.post_stats.forEach(stat => {
+    console.log(`Post ${stat.post_id}: ${stat.views} views, ${stat.likes} likes`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Statistics refreshed successfully",
+  "data": {
+    "account_stats": {
+      "id": "stat_xyz789",
+      "account_id": "acc_123456",
+      "followers": 15680,
+      "following": 345,
+      "views": 1285000,
+      "likes": 91200,
+      "created_at": "2024-12-26T15:30:00Z"
+    },
+    "post_stats": [
+      {
+        "id": "pstat_abc111",
+        "post_id": "post_123456",
+        "views": 128500,
+        "likes": 9120,
+        "comments": 356,
+        "shares": 589,
+        "saves": 1289,
+        "created_at": "2024-12-26T15:30:00Z"
+      },
+      {
+        "id": "pstat_def222",
+        "post_id": "post_789012",
+        "views": 95200,
+        "likes": 6840,
+        "comments": 234,
+        "shares": 412,
+        "saves": 978,
+        "created_at": "2024-12-26T15:30:00Z"
+      }
+    ],
+    "post_stats_count": 2
+  }
+}
+```
+
+</ResponseExample>
+

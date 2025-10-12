@@ -1,0 +1,167 @@
+---
+title: "Get Account Statistics"
+api: "POST https://api.ugc.inc/stats/accounts"
+description: "Retrieve account statistics with filters"
+---
+
+## Overview
+
+Get historical statistics for accounts including follower counts, views, likes, and other metrics. Use this endpoint to track account growth and engagement over time.
+
+## Request Body
+
+<ParamField body="accountIds" type="string[]">
+  Array of account IDs to get stats for. Omit to get all accounts.
+</ParamField>
+
+<ParamField body="startDate" type="string">
+  Start date in ISO 8601 format (e.g., `2024-01-01T00:00:00Z`)
+</ParamField>
+
+<ParamField body="endDate" type="string">
+  End date in ISO 8601 format (e.g., `2024-12-31T23:59:59Z`)
+</ParamField>
+
+<ParamField body="tag" type="string">
+  Filter by account tag
+</ParamField>
+
+<ParamField body="org_group" type="string">
+  Filter by organization group
+</ParamField>
+
+<ParamField body="user_group" type="string">
+  Filter by user group
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="AccountStat[]">
+  Array of account statistics objects
+  
+  <Expandable title="AccountStat properties">
+    <ResponseField name="id" type="string">
+      Unique stat record identifier
+    </ResponseField>
+    
+    <ResponseField name="account_id" type="string">
+      Associated account ID
+    </ResponseField>
+    
+    <ResponseField name="followers" type="number | null">
+      Follower count at the time of recording
+    </ResponseField>
+    
+    <ResponseField name="following" type="number | null">
+      Following count at the time of recording
+    </ResponseField>
+    
+    <ResponseField name="views" type="number | null">
+      Total content views across all posts
+    </ResponseField>
+    
+    <ResponseField name="likes" type="number | null">
+      Total likes received across all posts
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp when stat was recorded
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/stats/accounts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountIds": ["acc_123456", "acc_789012"],
+    "startDate": "2024-01-01T00:00:00Z",
+    "endDate": "2024-12-31T23:59:59Z"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/stats/accounts', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accountIds: ['acc_123456', 'acc_789012'],
+    startDate: '2024-01-01T00:00:00Z',
+    endDate: '2024-12-31T23:59:59Z'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  data.data.forEach(stat => {
+    console.log(`Account ${stat.account_id}:`);
+    console.log(`  Followers: ${stat.followers}`);
+    console.log(`  Total Views: ${stat.views}`);
+  });
+}
+```
+
+```typescript NPM Package
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.stats.getAccountStats({
+  accountIds: ['acc_123456', 'acc_789012'],
+  startDate: '2024-01-01T00:00:00Z',
+  endDate: '2024-12-31T23:59:59Z'
+});
+
+if (response.ok) {
+  response.data.forEach(stat => {
+    console.log(`Account ${stat.account_id}:`);
+    console.log(`  Followers: ${stat.followers}`);
+    console.log(`  Views: ${stat.views}`);
+    console.log(`  Likes: ${stat.likes}`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "id": "stat_abc123",
+      "account_id": "acc_123456",
+      "followers": 15420,
+      "following": 342,
+      "views": 1250000,
+      "likes": 89500,
+      "created_at": "2024-12-25T10:00:00Z"
+    },
+    {
+      "id": "stat_def456",
+      "account_id": "acc_123456",
+      "followers": 15680,
+      "following": 345,
+      "views": 1285000,
+      "likes": 91200,
+      "created_at": "2024-12-26T10:00:00Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+

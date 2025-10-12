@@ -1,0 +1,131 @@
+---
+title: "Update Account Info"
+api: "POST https://api.ugc.inc/accounts/update-info"
+description: "Update account metadata (tag, groups)"
+---
+
+## Overview
+
+Update account metadata including tag, organization group, and user group. This endpoint updates the internal categorization and grouping of accounts without modifying the social media profile itself.
+
+## Request Body
+
+<ParamField body="accountId" type="string" required>
+  Account ID to update
+</ParamField>
+
+<ParamField body="tag" type="string">
+  New tag value for categorization
+</ParamField>
+
+<ParamField body="org_group" type="string">
+  New organization group identifier
+</ParamField>
+
+<ParamField body="user_group" type="string">
+  New user group identifier
+</ParamField>
+
+<Note>
+  At least one of `tag`, `org_group`, or `user_group` must be provided.
+</Note>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Response object containing success message and updated account
+  
+  <Expandable title="Response properties">
+    <ResponseField name="message" type="string">
+      Success message
+    </ResponseField>
+    
+    <ResponseField name="account" type="Account">
+      Updated account object with new values
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/accounts/update-info \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "acc_123456",
+    "tag": "premium",
+    "org_group": "marketing",
+    "user_group": "team_alpha"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/accounts/update-info', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accountId: 'acc_123456',
+    tag: 'premium',
+    org_group: 'marketing',
+    user_group: 'team_alpha'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Updated account:', data.data.account);
+}
+```
+
+```typescript NPM Package
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.accounts.updateInfo({
+  accountId: 'acc_123456',
+  tag: 'premium',
+  org_group: 'marketing',
+  user_group: 'team_alpha'
+});
+
+if (response.ok) {
+  console.log('Account updated:', response.data.message);
+  console.log('New tag:', response.data.account.tag);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Account info updated successfully",
+  "data": {
+    "message": "Account info updated successfully",
+    "account": {
+      "id": "acc_123456",
+      "type": "tiktok",
+      "tag": "premium",
+      "org_group": "marketing",
+      "user_group": "team_alpha",
+      "username": "coolcreator",
+      "nick_name": "Cool Creator",
+      "pfp_url": "https://storage.example.com/avatar.jpg"
+    }
+  }
+}
+```
+
+</ResponseExample>
+
