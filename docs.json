@@ -25,6 +25,15 @@
         ]
       },
       {
+        "group": "Posts",
+        "pages": [
+          "api-reference/endpoint/posts-get",
+          "api-reference/endpoint/posts-create-video",
+          "api-reference/endpoint/posts-create-slideshow",
+          "api-reference/endpoint/posts-status"
+        ]
+      },
+      {
         "group": "Accounts",
         "pages": [
           "api-reference/endpoint/accounts-get",
@@ -45,15 +54,6 @@
         "group": "Tasks",
         "pages": [
           "api-reference/endpoint/tasks-get"
-        ]
-      },
-      {
-        "group": "Posts",
-        "pages": [
-          "api-reference/endpoint/posts-get",
-          "api-reference/endpoint/posts-create-video",
-          "api-reference/endpoint/posts-create-slideshow",
-          "api-reference/endpoint/posts-status"
         ]
       }
     ],

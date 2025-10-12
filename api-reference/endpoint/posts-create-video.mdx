@@ -31,15 +31,24 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
 </ParamField>
 
 <ParamField body="caption" type="string">
-  Post caption/description (max 500 characters)
+  Post caption/description
   
   Can include hashtags and emojis
+  
+  **Limit:** Maximum 500 characters
 </ParamField>
 
 <ParamField body="musicPostId" type="string">
-  Music/audio post ID to use for the video
+  ID of a post that uses the song you want to attach
   
-  This should be a valid TikTok or Instagram music ID
+  <Note>
+    **Music Support:**
+    - ✅ **TikTok:** Fully supported
+    - ❌ **Instagram:** Not yet supported
+  </Note>
+  
+  **How to use:**
+  To add music to your video, provide the ID of any post that already uses the song you want. For example, if you want to use the song from this TikTok: `https://www.tiktok.com/music/The-Fate-of-Ophelia-7556815852168759313`, find a video that uses that song (e.g., `https://www.tiktok.com/@taylorswift/video/7559313483398008095`) and provide its ID: `7559313483398008095` as the `musicPostId`.
 </ParamField>
 
 <ParamField body="postTime" type="string">
