@@ -3,9 +3,9 @@
   "theme": "almond",
   "name": "UGC Inc API Documentation",
   "colors": {
-    "primary": "#EDE8FA",
-    "light": "#EDE8FA",
-    "dark": "#EDE8FA"
+    "primary": "#8B5CF6",
+    "light": "#A78BFA",
+    "dark": "#6D28D9"
   },
   "favicon": "/favicon.ico",
   "navigation": {
