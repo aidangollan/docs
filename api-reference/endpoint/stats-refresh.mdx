@@ -1,45 +1,63 @@
 ---
 title: "Refresh Statistics"
 api: "POST https://api.ugc.inc/stats/refresh"
-description: "Fetch live statistics from TikTok/Instagram API"
+description: "Fetch live statistics from TikTok/Instagram API for all accounts in your organization"
 ---
 
 ## Overview
 
-Fetch fresh, real-time statistics directly from TikTok/Instagram API for an account and all its posts. This endpoint creates new stat records in the database with the latest data.
+Fetch fresh, real-time statistics directly from TikTok/Instagram API for all accounts in your organization (or a specific org_group). This endpoint creates new stat records in the database with the latest data for each account and all their posts.
 
-This is useful when you need up-to-date statistics without waiting for the scheduled refresh cycle.
+This is useful when you need up-to-date statistics for multiple accounts without waiting for the scheduled refresh cycle.
+
+<Warning>
+  **Rate Limit:** Stats can only be refreshed **once per hour** per organization (or per org_group if specified). If you attempt to refresh before the cooldown period has elapsed, you'll receive an error with details about when the next refresh is allowed.
+</Warning>
 
 ## How It Works
 
-1. Fetches account profile stats (followers, following) from the platform API
-2. Fetches stats for all posts associated with the account
-3. Creates an `account_stats` record with aggregated post metrics
-4. Creates individual `post_stats` records for each post
-5. Returns the newly created statistics
+1. Fetches all accounts in your organization (optionally filtered by org_group)
+2. For each account with username and type configured:
+   - Fetches account profile stats (followers, following) from the platform API
+   - Fetches stats for all posts associated with the account
+   - Creates an `account_stats` record with aggregated post metrics
+   - Creates individual `post_stats` records for each post
+3. Returns aggregated results with success/error information for each account
 
 ## Request Body
 
-<ParamField body="accountId" type="string" required>
-  Account ID to refresh statistics for
+<ParamField body="org_group" type="string">
+  Optional. If provided, only refreshes accounts in this specific org_group
 </ParamField>
 
 ## Response
 
 <ResponseField name="data" type="RefreshStatsResponse">
-  Response object containing account stats and all post stats
+  Response object containing refresh results for all accounts
   
   <Expandable title="RefreshStatsResponse properties">
-    <ResponseField name="account_stats" type="AccountStat">
-      New account statistics record
+    <ResponseField name="accounts_refreshed" type="number">
+      Number of accounts successfully refreshed
     </ResponseField>
     
-    <ResponseField name="post_stats" type="PostStat[]">
-      Array of new post statistics records
+    <ResponseField name="accounts_failed" type="number">
+      Number of accounts that failed to refresh
+    </ResponseField>
+    
+    <ResponseField name="total_accounts" type="number">
+      Total number of valid accounts processed
+    </ResponseField>
+    
+    <ResponseField name="account_stats" type="AccountStat[]">
+      Array of new account statistics records (one per account)
     </ResponseField>
     
     <ResponseField name="post_stats_count" type="number">
-      Number of posts that were refreshed
+      Total number of post stats created across all accounts
+    </ResponseField>
+    
+    <ResponseField name="errors" type="object[]">
+      Optional. Array of error details for accounts that failed (only included if there were errors)
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -47,36 +65,69 @@ This is useful when you need up-to-date statistics without waiting for the sched
 <RequestExample>
 
 ```bash cURL
+# Refresh all accounts in organization
+curl -X POST https://api.ugc.inc/stats/refresh \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+# Refresh only accounts in a specific org_group
 curl -X POST https://api.ugc.inc/stats/refresh \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "accountId": "acc_123456"
+    "org_group": "influencers"
   }'
 ```
 
+```python Python
+import requests
+
+# Refresh all accounts
+response = requests.post(
+    'https://api.ugc.inc/stats/refresh',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={}
+)
+
+data = response.json()
+
+if data['ok']:
+    print(f"Successfully refreshed {data['data']['accounts_refreshed']} accounts")
+    print(f"Failed: {data['data']['accounts_failed']}")
+    print(f"Total posts refreshed: {data['data']['post_stats_count']}")
+    
+    for stat in data['data']['account_stats']:
+        print(f"\nAccount {stat['account_id']}:")
+        print(f"  Followers: {stat['followers']}")
+        print(f"  Views: {stat['views']}")
+```
+
 ```javascript JavaScript
+// Refresh all accounts
 const response = await fetch('https://api.ugc.inc/stats/refresh', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY',
     'Content-Type': 'application/json'
   },
-  body: JSON.stringify({
-    accountId: 'acc_123456'
-  })
+  body: JSON.stringify({})
 });
 
 const data = await response.json();
 
 if (data.ok) {
-  console.log('Account Stats:');
-  console.log(`  Followers: ${data.data.account_stats.followers}`);
-  console.log(`  Total Views: ${data.data.account_stats.views}`);
-  console.log(`\nRefreshed ${data.data.post_stats_count} posts`);
+  console.log(`Successfully refreshed ${data.data.accounts_refreshed} accounts`);
+  console.log(`Failed: ${data.data.accounts_failed}`);
+  console.log(`Total posts refreshed: ${data.data.post_stats_count}`);
   
-  data.data.post_stats.forEach(stat => {
-    console.log(`Post ${stat.post_id}: ${stat.views} views`);
+  data.data.account_stats.forEach(stat => {
+    console.log(`\nAccount ${stat.account_id}:`);
+    console.log(`  Followers: ${stat.followers}`);
+    console.log(`  Views: ${stat.views}`);
   });
 }
 ```
@@ -88,22 +139,30 @@ const client = new UGCClient({
   apiKey: 'YOUR_API_KEY'
 });
 
-const response = await client.stats.refresh({
-  accountId: 'acc_123456'
-});
+// Refresh all accounts
+const response = await client.stats.refresh({});
+
+// Or refresh only specific org_group
+// const response = await client.stats.refresh({ org_group: 'influencers' });
 
 if (response.ok) {
-  console.log(`Account ${response.data.account_stats.account_id}:`);
-  console.log(`  Followers: ${response.data.account_stats.followers}`);
-  console.log(`  Following: ${response.data.account_stats.following}`);
-  console.log(`  Total Views: ${response.data.account_stats.views}`);
-  console.log(`  Total Likes: ${response.data.account_stats.likes}`);
+  console.log(`Successfully refreshed ${response.data.accounts_refreshed} accounts`);
+  console.log(`Failed: ${response.data.accounts_failed}`);
+  console.log(`Total posts refreshed: ${response.data.post_stats_count}`);
   
-  console.log(`\nRefreshed ${response.data.post_stats_count} posts`);
-  
-  response.data.post_stats.forEach(stat => {
-    console.log(`Post ${stat.post_id}: ${stat.views} views, ${stat.likes} likes`);
+  response.data.account_stats.forEach(stat => {
+    console.log(`\nAccount ${stat.account_id}:`);
+    console.log(`  Followers: ${stat.followers}`);
+    console.log(`  Following: ${stat.following}`);
+    console.log(`  Views: ${stat.views}`);
   });
+  
+  if (response.data.errors) {
+    console.log('\nErrors:');
+    response.data.errors.forEach(err => {
+      console.log(`  Account ${err.accountId} (${err.username}): ${err.error}`);
+    });
+  }
 }
 ```
 
@@ -115,41 +174,114 @@ if (response.ok) {
 {
   "ok": true,
   "code": 200,
-  "message": "Statistics refreshed successfully",
+  "message": "Stats refresh completed",
   "data": {
-    "account_stats": {
-      "id": "stat_xyz789",
-      "account_id": "acc_123456",
-      "followers": 15680,
-      "following": 345,
-      "views": 1285000,
-      "likes": 91200,
-      "created_at": "2024-12-26T15:30:00Z"
-    },
-    "post_stats": [
+    "accounts_refreshed": 3,
+    "accounts_failed": 0,
+    "total_accounts": 3,
+    "account_stats": [
       {
-        "id": "pstat_abc111",
-        "post_id": "post_123456",
-        "views": 128500,
-        "likes": 9120,
-        "comments": 356,
-        "shares": 589,
-        "saves": 1289,
+        "id": "stat_xyz789",
+        "account_id": "acc_123456",
+        "followers": 15680,
+        "following": 345,
+        "views": 1285000,
+        "likes": 91200,
+        "comments": 12500,
+        "shares": 8900,
+        "saves": 0,
         "created_at": "2024-12-26T15:30:00Z"
       },
       {
-        "id": "pstat_def222",
-        "post_id": "post_789012",
-        "views": 95200,
-        "likes": 6840,
-        "comments": 234,
-        "shares": 412,
-        "saves": 978,
+        "id": "stat_abc123",
+        "account_id": "acc_789012",
+        "followers": 28900,
+        "following": 500,
+        "views": 2100000,
+        "likes": 156000,
+        "comments": 18700,
+        "shares": 12400,
+        "saves": 0,
+        "created_at": "2024-12-26T15:30:00Z"
+      },
+      {
+        "id": "stat_def456",
+        "account_id": "acc_345678",
+        "followers": 9200,
+        "following": 200,
+        "views": 480000,
+        "likes": 34500,
+        "comments": 5600,
+        "shares": 3200,
+        "saves": 0,
         "created_at": "2024-12-26T15:30:00Z"
       }
     ],
-    "post_stats_count": 2
+    "post_stats_count": 47
   }
+}
+```
+
+```json Success Response with Errors
+{
+  "ok": true,
+  "code": 200,
+  "message": "Stats refresh completed",
+  "data": {
+    "accounts_refreshed": 2,
+    "accounts_failed": 1,
+    "total_accounts": 3,
+    "account_stats": [
+      {
+        "id": "stat_xyz789",
+        "account_id": "acc_123456",
+        "followers": 15680,
+        "following": 345,
+        "views": 1285000,
+        "likes": 91200,
+        "comments": 12500,
+        "shares": 8900,
+        "saves": 0,
+        "created_at": "2024-12-26T15:30:00Z"
+      },
+      {
+        "id": "stat_abc123",
+        "account_id": "acc_789012",
+        "followers": 28900,
+        "following": 500,
+        "views": 2100000,
+        "likes": 156000,
+        "comments": 18700,
+        "shares": 12400,
+        "saves": 0,
+        "created_at": "2024-12-26T15:30:00Z"
+      }
+    ],
+    "post_stats_count": 32,
+    "errors": [
+      {
+        "accountId": "acc_999999",
+        "username": "failed_account",
+        "error": "Failed to fetch profile stats from social API"
+      }
+    ]
+  }
+}
+```
+
+```json Rate Limit Error
+{
+  "ok": false,
+  "code": 400,
+  "message": "Stats can only be refreshed once per hour. Last refresh was 45 minutes ago. You can refresh again in 15 minute(s) at 2024-12-26T16:30:00.000Z"
+}
+```
+
+```json Rate Limit Error (org_group)
+{
+  "ok": false,
+  "code": 400,
+  "message": "Stats can only be refreshed once per hour for org_group \"influencers\". Last refresh was 30 minutes ago. You can refresh again in 30 minute(s) at 2024-12-26T16:00:00.000Z"
 }
 ```
 

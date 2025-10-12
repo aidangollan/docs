@@ -48,6 +48,31 @@ curl -X POST https://api.ugc.inc/post/status \
   }'
 ```
 
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/post/status',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'postId': 'post_abc123'
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print(f"Post status: {data['data']['status']}")
+    
+    if data['data']['status'] == 'complete':
+        print('Post was successfully published!')
+    elif data['data']['status'] == 'failed':
+        print('Post failed to publish.')
+```
+
 ```javascript JavaScript
 const response = await fetch('https://api.ugc.inc/post/status', {
   method: 'POST',

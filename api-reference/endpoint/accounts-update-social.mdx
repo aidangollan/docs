@@ -17,6 +17,16 @@ Update the social media profile of an account including avatar, nickname (displa
   If you attempt to update a field before its cooldown period has elapsed, you'll receive an error with details about when the next update is allowed.
 </Warning>
 
+<Warning>
+  **Avatar Image Requirements:**
+  - **Aspect Ratio:** Avatar images must have a **1:1 aspect ratio** (square images)
+  - **Minimum Dimensions:** At least **250x250 pixels**
+  - **Supported Formats:** JPEG, PNG, WebP
+  - **Accessibility:** URL must be publicly accessible
+  
+  If the image does not meet these requirements, the request will be rejected with an error showing the actual dimensions.
+</Warning>
+
 ## Request Body
 
 <ParamField body="accountId" type="string" required>
@@ -24,7 +34,7 @@ Update the social media profile of an account including avatar, nickname (displa
 </ParamField>
 
 <ParamField body="avatarUrl" type="string">
-  New avatar/profile picture URL (must be publicly accessible)
+  New avatar/profile picture URL (must be publicly accessible, have a 1:1 aspect ratio, and be at least 250x250 pixels)
 </ParamField>
 
 <ParamField body="nickName" type="string">
@@ -61,6 +71,31 @@ curl -X POST https://api.ugc.inc/accounts/update-social \
     "bio": "Content creator 🎥 | Follow for daily tips",
     "avatarUrl": "https://storage.example.com/new-avatar.jpg"
   }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/accounts/update-social',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'accountId': 'acc_123456',
+        'nickName': 'Cool Creator ✨',
+        'bio': 'Content creator 🎥 | Follow for daily tips',
+        'avatarUrl': 'https://storage.example.com/new-avatar.jpg'
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print('Profile update scheduled:', data['data']['message'])
+else:
+    print('Error:', data['message'])
 ```
 
 ```javascript JavaScript
@@ -137,6 +172,22 @@ if (response.ok) {
   "ok": false,
   "code": 400,
   "message": "Avatar can only be updated once every 24 hours. Last update was 12 hours ago. You can update again in 12 hour(s) on 2024-12-26"
+}
+```
+
+```json Invalid Aspect Ratio Error
+{
+  "ok": false,
+  "code": 400,
+  "message": "Avatar image must have a 1:1 aspect ratio. Current image is 1920x1080 (1.78:1)"
+}
+```
+
+```json Minimum Dimensions Error
+{
+  "ok": false,
+  "code": 400,
+  "message": "Avatar image must be at least 250x250 pixels. Current image is 100x100"
 }
 ```
 
