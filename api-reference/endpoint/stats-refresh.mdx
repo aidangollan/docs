@@ -57,6 +57,10 @@ This is useful when you need up-to-date statistics for multiple accounts without
       Array of new account statistics records (one per account)
     </ResponseField>
     
+    <ResponseField name="post_stats" type="PostStat[]">
+      Array of new post statistics records for all posts across all accounts
+    </ResponseField>
+    
     <ResponseField name="post_stats_count" type="number">
       Total number of post stats created across all accounts
     </ResponseField>
@@ -162,6 +166,12 @@ if (response.ok) {
     console.log(`  Views: ${stat.views}`);
   });
   
+  // Access individual post stats
+  response.data.post_stats.forEach(stat => {
+    console.log(`\nPost ${stat.post_id}:`);
+    console.log(`  Views: ${stat.views}, Likes: ${stat.likes}`);
+  });
+  
   if (response.data.errors) {
     console.log('\nErrors:');
     response.data.errors.forEach(err => {
@@ -222,6 +232,28 @@ if (response.ok) {
         "created_at": "2024-12-26T15:30:00Z"
       }
     ],
+    "post_stats": [
+      {
+        "id": "pstat_001",
+        "post_id": "post_123",
+        "views": 45000,
+        "likes": 3200,
+        "comments": 450,
+        "shares": 280,
+        "saves": 0,
+        "created_at": "2024-12-26T15:30:00Z"
+      },
+      {
+        "id": "pstat_002",
+        "post_id": "post_124",
+        "views": 82000,
+        "likes": 6100,
+        "comments": 890,
+        "shares": 520,
+        "saves": 0,
+        "created_at": "2024-12-26T15:30:00Z"
+      }
+    ],
     "post_stats_count": 47
   }
 }
@@ -258,6 +290,18 @@ if (response.ok) {
         "likes": 156000,
         "comments": 18700,
         "shares": 12400,
+        "saves": 0,
+        "created_at": "2024-12-26T15:30:00Z"
+      }
+    ],
+    "post_stats": [
+      {
+        "id": "pstat_001",
+        "post_id": "post_123",
+        "views": 45000,
+        "likes": 3200,
+        "comments": 450,
+        "shares": 280,
         "saves": 0,
         "created_at": "2024-12-26T15:30:00Z"
       }
