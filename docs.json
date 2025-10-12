@@ -12,7 +12,17 @@
     "pages": [
       {
         "group": "Getting Started",
-        "pages": ["index", "response", "data-structures"]
+        "pages": ["index", "response"]
+      },
+      {
+        "group": "Data Structures",
+        "pages": [
+          "data-structures/account",
+          "data-structures/post",
+          "data-structures/task",
+          "data-structures/account-stat",
+          "data-structures/post-stat"
+        ]
       },
       {
         "group": "Accounts",

@@ -1,0 +1,71 @@
+---
+title: "Task"
+description: "Account-level task data structure"
+---
+
+## Overview
+
+Represents an account-level task such as profile updates or warmup activities.
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique task identifier |
+| `account_id` | `string` | ID of the account this task belongs to |
+| `type` | `TaskType` | Task type (see task types below) |
+| `status` | `string` | Current status: `'scheduled'`, `'pending'`, `'complete'`, or `'failed'` |
+| `scheduled_time` | `string \| null` | ISO 8601 timestamp when task should execute |
+| `duration` | `number \| null` | Task duration in seconds (for warmup tasks) |
+| `keywords` | `string \| null` | Keywords for search tasks (text string) |
+| `edit_profile_info` | `object \| null` | Profile update details (for `edit_profile` tasks) |
+| `created_at` | `string` | ISO 8601 timestamp when task was created |
+
+## Task Types
+
+| Type | Description |
+|------|-------------|
+| `warmup_scroll` | Account scrolling activity to maintain authenticity |
+| `warmup_search_term` | Search for specific terms |
+| `warmup_search_profile` | Search for profiles |
+| `edit_profile` | Update profile (nickname, avatar, bio) |
+| `update_posts` | Refresh post data |
+
+## Task Status Values
+
+| Status | Description |
+|--------|-------------|
+| `scheduled` | Task is scheduled to run at a future time |
+| `pending` | Task is currently being executed |
+| `complete` | Task completed successfully |
+| `failed` | Task failed to execute |
+
+## Edit Profile Info
+
+For `edit_profile` tasks, the `edit_profile_info` object may contain:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `avatarUrl` | `string` | New avatar/profile picture URL |
+| `nickName` | `string` | New display name |
+| `bio` | `string` | New bio text |
+
+## Example Response
+
+```json
+{
+  "id": "task_abc123",
+  "account_id": "acc_123456",
+  "type": "edit_profile",
+  "status": "scheduled",
+  "scheduled_time": "2024-12-31T12:00:00Z",
+  "duration": null,
+  "keywords": null,
+  "edit_profile_info": {
+    "nickName": "New Display Name",
+    "bio": "Updated bio text"
+  },
+  "created_at": "2024-12-25T10:00:00Z"
+}
+```
+

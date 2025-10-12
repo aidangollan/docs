@@ -1,0 +1,78 @@
+---
+title: "Post Stat"
+description: "Post statistics data structure"
+---
+
+## Overview
+
+Represents engagement statistics for an individual post at a specific point in time.
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique stat record identifier |
+| `post_id` | `string` | Associated post ID |
+| `views` | `number \| null` | View count at the time of recording |
+| `likes` | `number \| null` | Like count at the time of recording |
+| `comments` | `number \| null` | Comment count at the time of recording |
+| `shares` | `number \| null` | Share count at the time of recording |
+| `saves` | `number \| null` | Save/bookmark count at the time of recording |
+| `created_at` | `string` | ISO 8601 timestamp when stat was recorded |
+
+## How Post Stats Work
+
+<Note>
+  Post stats are snapshots in time. Multiple stat records may exist for a single post, allowing you to track performance over time.
+</Note>
+
+### Creating Stats
+
+Post stats are automatically created when you use the `/stats/refresh` endpoint:
+
+1. Fetches fresh statistics from TikTok/Instagram API
+2. Creates a new `post_stats` record for each post
+3. Each record includes a timestamp for historical tracking
+
+### Time-Series Data
+
+The time-series nature of post stats allows you to:
+
+- Track how a post performs over its lifetime
+- Identify viral growth patterns
+- Compare early vs. late performance
+- Generate trend reports
+
+## Engagement Metrics
+
+| Metric | Description |
+|--------|-------------|
+| `views` | Number of times the post was viewed |
+| `likes` | Number of likes/hearts the post received |
+| `comments` | Number of comments on the post |
+| `shares` | Number of times the post was shared |
+| `saves` | Number of times the post was saved/bookmarked |
+
+## Example Response
+
+```json
+{
+  "id": "pstat_abc123",
+  "post_id": "post_123456",
+  "views": 125000,
+  "likes": 8950,
+  "comments": 342,
+  "shares": 567,
+  "saves": 1234,
+  "created_at": "2024-12-25T10:00:00Z"
+}
+```
+
+## Use Cases
+
+- Monitor individual post performance
+- Track engagement growth over time
+- Identify top-performing content
+- Calculate engagement rates
+- Generate performance reports
+

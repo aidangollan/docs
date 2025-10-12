@@ -1,0 +1,55 @@
+---
+title: "Post"
+description: "Video or slideshow post data structure"
+---
+
+## Overview
+
+Represents a video or slideshow post on a social media account.
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique post identifier |
+| `account_id` | `string` | ID of the account that created this post |
+| `type` | `'video' \| 'slideshow'` | Type of post content |
+| `status` | `string` | Current status: `'scheduled'`, `'pending'`, `'complete'`, or `'failed'` |
+| `social_id` | `string \| null` | Platform-specific post ID (TikTok video ID or Instagram reel code, available after posting) |
+| `caption` | `string \| null` | Post caption/description text (max 500 characters) |
+| `media_urls` | `string[] \| null` | Array of URLs to video/image files used in the post |
+| `music_post_id` | `string \| null` | ID of the music/audio track used in the post |
+
+## Post Status Values
+
+| Status | Description |
+|--------|-------------|
+| `scheduled` | Post is scheduled to be published at a future time |
+| `pending` | Post is currently being processed/published |
+| `complete` | Post was successfully published to the platform |
+| `failed` | Post failed to publish (check error logs) |
+
+## Post Types
+
+| Type | Description |
+|------|-------------|
+| `video` | Single video post |
+| `slideshow` | Multiple images with music/audio |
+
+## Example Response
+
+```json
+{
+  "id": "post_abc123",
+  "account_id": "acc_123456",
+  "type": "video",
+  "status": "complete",
+  "social_id": "7234567890123456789",
+  "caption": "Check out this awesome video! 🎥 #viral",
+  "media_urls": [
+    "https://storage.example.com/video1.mp4"
+  ],
+  "music_post_id": "music_xyz789"
+}
+```
+

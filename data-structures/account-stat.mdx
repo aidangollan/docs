@@ -1,0 +1,61 @@
+---
+title: "Account Stat"
+description: "Account statistics data structure"
+---
+
+## Overview
+
+Represents statistics for an account at a specific point in time.
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique stat record identifier |
+| `account_id` | `string` | Associated account ID |
+| `followers` | `number \| null` | Follower count at the time of recording |
+| `following` | `number \| null` | Following count at the time of recording |
+| `views` | `number \| null` | Total content views across all posts |
+| `likes` | `number \| null` | Total likes received across all posts |
+| `created_at` | `string` | ISO 8601 timestamp when stat was recorded |
+
+## How Account Stats Work
+
+<Note>
+  Account stats are created by aggregating post-level metrics. The `views` and `likes` fields represent totals across all posts associated with the account.
+</Note>
+
+### Creating Stats
+
+Use the `/stats/refresh` endpoint to fetch fresh statistics from the TikTok/Instagram API:
+
+1. Fetches account profile stats (followers, following)
+2. Fetches stats for all posts associated with the account
+3. Creates an `account_stats` record with aggregated post metrics
+4. Creates individual `post_stats` records for each post
+
+### Time-Series Data
+
+Multiple stat records can exist for a single account, allowing you to track growth and performance over time. Each record includes a `created_at` timestamp indicating when the snapshot was taken.
+
+## Example Response
+
+```json
+{
+  "id": "stat_abc123",
+  "account_id": "acc_123456",
+  "followers": 15420,
+  "following": 342,
+  "views": 1250000,
+  "likes": 89500,
+  "created_at": "2024-12-25T10:00:00Z"
+}
+```
+
+## Use Cases
+
+- Track follower growth over time
+- Monitor total engagement across all content
+- Compare performance across accounts
+- Generate analytics reports
+

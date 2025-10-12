@@ -7,6 +7,10 @@ description: "Understanding API responses and error handling"
 
 All API responses follow a consistent, type-safe format that makes error handling straightforward.
 
+<Note>
+  **Type Safety:** When `response.ok` is `true`, the `data` field is **guaranteed to be defined**. When `response.ok` is `false`, the `data` field will **not be defined**. This pattern enables type-safe response handling.
+</Note>
+
 ### Response Structure
 
 Every API response includes an `ok` field that indicates success or failure:

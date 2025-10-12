@@ -1,0 +1,75 @@
+---
+title: "Account"
+description: "Social media account data structure"
+---
+
+## Overview
+
+Represents a social media account (TikTok or Instagram) that you can manage through the API.
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique account identifier |
+| `type` | `string` | Platform type: `'tiktok'` or `'instagram'` |
+| `tag` | `string \| null` | Custom tag for categorization |
+| `org_group` | `string \| null` | Organization group identifier |
+| `user_group` | `string \| null` | User group identifier |
+| `username` | `string \| null` | Account username/handle on the platform |
+| `nick_name` | `string \| null` | Display name shown on profile |
+| `pfp_url` | `string \| null` | URL to account's profile picture |
+
+## Account Organization
+
+The `org_group` and `user_group` fields allow you to organize and subdivide accounts:
+
+### Organization Groups (`org_group`)
+
+- Group accounts by department, campaign, or purpose
+- Examples: `"marketing"`, `"sales"`, `"influencer_campaign_2024"`
+- Use for filtering accounts by business unit or project
+- Multiple accounts can share the same org_group
+
+### User Groups (`user_group`)
+
+- Assign accounts to specific team members or users
+- Examples: `"john_smith"`, `"team_alpha"`, `"content_creator_1"`
+- Use for access control and responsibility assignment
+- Allows filtering accounts by assigned user/team
+
+## Example Use Cases
+
+```typescript
+// Filter accounts by organization group
+const marketingAccounts = await client.accounts.getAccounts({
+  org_group: 'marketing'
+});
+
+// Filter accounts by user assignment
+const johnsAccounts = await client.accounts.getAccounts({
+  user_group: 'john_smith'
+});
+
+// Combine filters
+const campaignAccounts = await client.accounts.getAccounts({
+  org_group: 'holiday_campaign_2024',
+  user_group: 'content_team'
+});
+```
+
+## Example Response
+
+```json
+{
+  "id": "acc_123456",
+  "type": "tiktok",
+  "tag": "influencer",
+  "org_group": "marketing",
+  "user_group": "john_smith",
+  "username": "coolcreator",
+  "nick_name": "Cool Creator",
+  "pfp_url": "https://storage.example.com/avatar.jpg"
+}
+```
+
