@@ -1,0 +1,524 @@
+---
+title: "Render Video"
+description: "Programmatically render a video from an Editor configuration"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/video/render
+```
+
+## Overview
+
+Create a custom video by composing multiple layers of video clips, images, text, and audio. The Editor structure provides pixel-perfect control over timing, positioning, effects, and transitions.
+
+**Use cases:**
+- Generate automated video content at scale
+- Add dynamic text overlays to video templates
+- Compose multi-layer video effects
+- Create slideshow-style videos with custom timing
+- Build video editors within your application
+
+## Request Body
+
+<ParamField body="editor" type="Editor" required>
+  Video composition configuration
+  
+  See the [Editor data structure](/data-structures/editor) for complete details.
+  
+  <Expandable title="Editor structure">
+    <ParamField body="editor.width" type="number" required>
+      Output video width in pixels (e.g., 1080)
+    </ParamField>
+    
+    <ParamField body="editor.height" type="number" required>
+      Output video height in pixels (e.g., 1920)
+    </ParamField>
+    
+    <ParamField body="editor.fps" type="number" required>
+      Frames per second (typically 30)
+    </ParamField>
+    
+    <ParamField body="editor.duration" type="number">
+      Total duration in milliseconds
+      
+      If omitted, calculated automatically from segments
+    </ParamField>
+    
+    <ParamField body="editor.channels" type="Channel[]" required>
+      Array of channels containing segments
+      
+      Each channel represents a layer in the composition
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <ResponseField name="video_url" type="string">
+    Public URL to the rendered video file
+    
+    The video is ready for download or posting
+    
+    Format: MP4 with H.264 video and AAC audio
+  </ResponseField>
+</ResponseField>
+
+## Processing Time
+
+Video rendering is CPU-intensive and processing time varies based on:
+- **Duration:** Longer videos take more time
+- **Complexity:** Number of segments and effects
+- **Resolution:** Higher resolution requires more processing
+
+**Typical processing times:**
+- 5 second video: 10-30 seconds
+- 15 second video: 30-90 seconds
+- 30 second video: 60-180 seconds
+
+<Tip>
+For production use, consider rendering videos asynchronously and polling for completion status.
+</Tip>
+
+## Segment Types
+
+The editor supports multiple segment types:
+
+| Type | Description | Example Use |
+|------|-------------|-------------|
+| `video` | Video clip with playback control | Background footage, clips |
+| `image` | Static or animated images | Logos, GIFs, overlays |
+| `text` | Rich text with full typography | Captions, titles, subtitles |
+| `audio` | Background audio or music | Voiceover, soundtrack |
+| `editor` | Nested composition | Reusable templates, effects |
+
+## Request Examples
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/video/render \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "editor": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "duration": 5000,
+      "channels": [
+        {
+          "id": "background",
+          "segments": [
+            {
+              "id": "bg-video",
+              "type": "video",
+              "source": "https://example.com/background.mp4",
+              "order": 0,
+              "offset": { "type": "absolute", "value": 0 },
+              "startTrim": 0,
+              "endTrim": 0,
+              "xOffset": 0,
+              "yOffset": 0,
+              "width": 1080,
+              "height": 1920,
+              "zIndex": 0,
+              "scale": 1,
+              "rotation": 0,
+              "fit": "cover",
+              "speed": 1,
+              "opacity": 100,
+              "volume": 50
+            }
+          ]
+        },
+        {
+          "id": "text-layer",
+          "segments": [
+            {
+              "id": "title",
+              "type": "text",
+              "source": "",
+              "order": 0,
+              "offset": { "type": "absolute", "value": 500 },
+              "startTrim": 0,
+              "endTrim": 0,
+              "duration": { "type": "absolute", "value": 4000 },
+              "xOffset": 90,
+              "yOffset": 800,
+              "width": 900,
+              "height": 320,
+              "zIndex": 10,
+              "scale": 1,
+              "rotation": 0,
+              "text": "Hello World! 🎉",
+              "alignment": "center",
+              "verticalAlign": "middle",
+              "direction": "ltr",
+              "padding": 20,
+              "fontType": "tiktok",
+              "fontSize": 80,
+              "fontWeight": "bold",
+              "lineHeight": 1.2,
+              "letterSpacing": 0,
+              "textWrap": "word",
+              "wordBreak": "break-word",
+              "hyphenation": "none",
+              "maxLines": 0,
+              "textOverflow": "clip",
+              "ellipsis": "...",
+              "color": "#FFFFFF",
+              "backgroundColor": "#00000080",
+              "strokeColor": "#000000",
+              "strokeWidth": 4
+            }
+          ]
+        }
+      ]
+    }
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/video/render',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'editor': {
+            'width': 1080,
+            'height': 1920,
+            'fps': 30,
+            'duration': 5000,
+            'channels': [
+                {
+                    'id': 'background',
+                    'segments': [{
+                        'id': 'bg-video',
+                        'type': 'video',
+                        'source': 'https://example.com/background.mp4',
+                        'order': 0,
+                        'offset': {'type': 'absolute', 'value': 0},
+                        'startTrim': 0,
+                        'endTrim': 0,
+                        'xOffset': 0,
+                        'yOffset': 0,
+                        'width': 1080,
+                        'height': 1920,
+                        'zIndex': 0,
+                        'scale': 1,
+                        'rotation': 0,
+                        'fit': 'cover',
+                        'speed': 1,
+                        'opacity': 100,
+                        'volume': 50
+                    }]
+                },
+                {
+                    'id': 'text-layer',
+                    'segments': [{
+                        'id': 'title',
+                        'type': 'text',
+                        'source': '',
+                        'order': 0,
+                        'offset': {'type': 'absolute', 'value': 500},
+                        'startTrim': 0,
+                        'endTrim': 0,
+                        'duration': {'type': 'absolute', 'value': 4000},
+                        'xOffset': 90,
+                        'yOffset': 800,
+                        'width': 900,
+                        'height': 320,
+                        'zIndex': 10,
+                        'scale': 1,
+                        'rotation': 0,
+                        'text': 'Hello World! 🎉',
+                        'alignment': 'center',
+                        'verticalAlign': 'middle',
+                        'direction': 'ltr',
+                        'padding': 20,
+                        'fontType': 'tiktok',
+                        'fontSize': 80,
+                        'fontWeight': 'bold',
+                        'lineHeight': 1.2,
+                        'letterSpacing': 0,
+                        'textWrap': 'word',
+                        'wordBreak': 'break-word',
+                        'hyphenation': 'none',
+                        'maxLines': 0,
+                        'textOverflow': 'clip',
+                        'ellipsis': '...',
+                        'color': '#FFFFFF',
+                        'backgroundColor': '#00000080',
+                        'strokeColor': '#000000',
+                        'strokeWidth': 4
+                    }]
+                }
+            ]
+        }
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print('Video rendered:', data['data']['video_url'])
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/video/render', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    editor: {
+      width: 1080,
+      height: 1920,
+      fps: 30,
+      duration: 5000,
+      channels: [
+        {
+          id: 'background',
+          segments: [{
+            id: 'bg-video',
+            type: 'video',
+            source: 'https://example.com/background.mp4',
+            order: 0,
+            offset: { type: 'absolute', value: 0 },
+            startTrim: 0,
+            endTrim: 0,
+            xOffset: 0,
+            yOffset: 0,
+            width: 1080,
+            height: 1920,
+            zIndex: 0,
+            scale: 1,
+            rotation: 0,
+            fit: 'cover',
+            speed: 1,
+            opacity: 100,
+            volume: 50
+          }]
+        },
+        {
+          id: 'text-layer',
+          segments: [{
+            id: 'title',
+            type: 'text',
+            source: '',
+            order: 0,
+            offset: { type: 'absolute', value: 500 },
+            startTrim: 0,
+            endTrim: 0,
+            duration: { type: 'absolute', value: 4000 },
+            xOffset: 90,
+            yOffset: 800,
+            width: 900,
+            height: 320,
+            zIndex: 10,
+            scale: 1,
+            rotation: 0,
+            text: 'Hello World! 🎉',
+            alignment: 'center',
+            verticalAlign: 'middle',
+            direction: 'ltr',
+            padding: 20,
+            fontType: 'tiktok',
+            fontSize: 80,
+            fontWeight: 'bold',
+            lineHeight: 1.2,
+            letterSpacing: 0,
+            textWrap: 'word',
+            wordBreak: 'break-word',
+            hyphenation: 'none',
+            maxLines: 0,
+            textOverflow: 'clip',
+            ellipsis: '...',
+            color: '#FFFFFF',
+            backgroundColor: '#00000080',
+            strokeColor: '#000000',
+            strokeWidth: 4
+          }]
+        }
+      ]
+    }
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Video rendered:', data.data.video_url);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.video.render({
+  editor: {
+    width: 1080,
+    height: 1920,
+    fps: 30,
+    duration: 5000,
+    channels: [
+      {
+        id: 'background',
+        segments: [{
+          id: 'bg-video',
+          type: 'video',
+          source: 'https://example.com/background.mp4',
+          order: 0,
+          offset: { type: 'absolute', value: 0 },
+          startTrim: 0,
+          endTrim: 0,
+          xOffset: 0,
+          yOffset: 0,
+          width: 1080,
+          height: 1920,
+          zIndex: 0,
+          scale: 1,
+          rotation: 0,
+          fit: 'cover',
+          speed: 1,
+          opacity: 100,
+          volume: 50
+        }]
+      },
+      {
+        id: 'text-layer',
+        segments: [{
+          id: 'title',
+          type: 'text',
+          source: '',
+          order: 0,
+          offset: { type: 'absolute', value: 500 },
+          startTrim: 0,
+          endTrim: 0,
+          duration: { type: 'absolute', value: 4000 },
+          xOffset: 90,
+          yOffset: 800,
+          width: 900,
+          height: 320,
+          zIndex: 10,
+          scale: 1,
+          rotation: 0,
+          text: 'Hello World! 🎉',
+          alignment: 'center',
+          verticalAlign: 'middle',
+          direction: 'ltr',
+          padding: 20,
+          fontType: 'tiktok',
+          fontSize: 80,
+          fontWeight: 'bold',
+          lineHeight: 1.2,
+          letterSpacing: 0,
+          textWrap: 'word',
+          wordBreak: 'break-word',
+          hyphenation: 'none',
+          maxLines: 0,
+          textOverflow: 'clip',
+          ellipsis: '...',
+          color: '#FFFFFF',
+          backgroundColor: '#00000080',
+          strokeColor: '#000000',
+          strokeWidth: 4
+        }]
+      }
+    ]
+  }
+});
+
+if (response.ok) {
+  console.log(`Video rendered: ${response.data.video_url}`);
+  
+  // Use the rendered video in a post
+  const postResponse = await client.posts.createVideo({
+    accountId: 'acc_123456',
+    videoUrl: response.data.video_url,
+    caption: 'Check out my custom video! 🎬'
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Video rendered successfully",
+  "data": {
+    "video_url": "https://storage.geelark.com/files/rendered-video-abc123.mp4"
+  }
+}
+```
+
+```json Error Response
+{
+  "ok": false,
+  "code": 400,
+  "message": "Invalid editor configuration: missing required field 'width'"
+}
+```
+
+</ResponseExample>
+
+## Advanced Features
+
+### Nested Compositions
+
+Use `editor` segments to create reusable templates:
+
+```json
+{
+  "type": "editor",
+  "editor": {
+    "width": 1080,
+    "height": 300,
+    "fps": 30,
+    "channels": [/* nested composition */]
+  }
+}
+```
+
+### Time-based Animations
+
+Combine `offset` and `duration` for precise timing:
+
+```json
+{
+  "offset": { "type": "absolute", "value": 1000 },
+  "duration": { "type": "absolute", "value": 2000 }
+}
+```
+
+### Multi-layer Effects
+
+Stack segments with different `zIndex` values:
+- Background video: `zIndex: 0`
+- Image overlay: `zIndex: 5`
+- Text caption: `zIndex: 10`
+
+<Warning>
+**Performance Considerations:**
+- Rendering is CPU-intensive - expect 2-4x processing time vs video duration
+- Keep segment count reasonable (< 50 per composition)
+- Use optimized source media (compressed videos, appropriate resolutions)
+- For high-volume use, implement queuing and rate limiting
+</Warning>
+

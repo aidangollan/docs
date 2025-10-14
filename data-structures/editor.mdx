@@ -1,0 +1,227 @@
+---
+title: "Editor"
+description: "Video composition editor data structure"
+---
+
+## Overview
+
+The Editor structure defines a complete video composition with multiple layers, channels, and segments. It's used for programmatically creating videos with precise control over timing, positioning, and effects.
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `width` | `number` | Width of the output video in pixels (e.g., 1080) |
+| `height` | `number` | Height of the output video in pixels (e.g., 1920) |
+| `fps` | `number` | Frames per second of the output video (e.g., 30) |
+| `duration` | `number \| undefined` | Total duration in milliseconds. If undefined, calculated from segments |
+| `channels` | `Channel[]` | Array of channels containing segments |
+
+## Channel Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique identifier for the channel |
+| `segments` | `Segment[]` | Array of segments in this channel |
+
+## Segment Types
+
+### Base Segment Properties
+
+All segments share these properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Unique segment identifier |
+| `type` | `'video' \| 'image' \| 'text' \| 'audio' \| 'editor'` | Type of segment |
+| `source` | `string` | Public URL to media (empty for text/editor) |
+| `order` | `number` | Sequence order within channel |
+| `offset` | `TimeValue` | Delay after previous segment |
+| `startTrim` | `number` | Trim from start (milliseconds) |
+| `endTrim` | `number` | Trim from end (milliseconds) |
+| `duration` | `TimeValue \| undefined` | Override duration |
+
+### Video Segment
+
+Extends base with visual properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `xOffset` | `number` | X position in pixels |
+| `yOffset` | `number` | Y position in pixels |
+| `width` | `number` | Width in pixels |
+| `height` | `number` | Height in pixels |
+| `zIndex` | `number` | Layer order (higher = front) |
+| `scale` | `number` | Scale multiplier (1.0 = 100%) |
+| `rotation` | `number` | Rotation in degrees |
+| `fit` | `'cover' \| 'contain' \| 'fill'` | How to fit the video |
+| `speed` | `number` | Playback speed (1.0 = normal) |
+| `opacity` | `number` | Opacity 0-100 |
+| `volume` | `number` | Audio volume 0-100 |
+
+### Image Segment
+
+Similar to video segment:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `loop` | `boolean` | Loop animated images (GIFs) |
+| _(all visual properties)_ | | Same as video segment |
+
+### Text Segment
+
+Rich text overlay with full typography control:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `text` | `string` | The actual text content |
+| `fontType` | `'arial' \| 'tiktok' \| 'apple'` | Font family |
+| `fontSize` | `number` | Font size in pixels |
+| `fontWeight` | `'normal' \| 'bold'` | Font weight |
+| `color` | `string` | Text color (hex) |
+| `backgroundColor` | `string` | Background color (hex with alpha) |
+| `strokeColor` | `string \| undefined` | Outline color |
+| `strokeWidth` | `number \| undefined` | Outline width |
+| `alignment` | `'left' \| 'center' \| 'right' \| 'justify'` | Horizontal alignment |
+| `verticalAlign` | `'top' \| 'middle' \| 'bottom'` | Vertical alignment |
+| `lineHeight` | `number` | Line height multiplier |
+| `letterSpacing` | `number` | Letter spacing in pixels |
+| `padding` | `number` | Inner padding in pixels |
+| _(all visual properties)_ | | Same positioning as video |
+
+### Audio Segment
+
+Background audio or music:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| _(base properties only)_ | | No visual properties |
+
+### Editor Segment
+
+Nested composition (editor within editor):
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `editor` | `Editor` | Nested editor configuration |
+| `fit` | `'cover' \| 'contain' \| 'fill'` | How to fit rendered video |
+| `opacity` | `number` | Opacity 0-100 |
+| `speed` | `number` | Playback speed |
+| `volume` | `number` | Audio volume 0-100 |
+| _(visual properties)_ | | Same positioning as video |
+
+## Time Value
+
+Time can be specified as absolute or relative:
+
+```typescript
+// Absolute time (500 milliseconds)
+{ type: "absolute", value: 500 }
+
+// Relative time (50% of total duration)
+{ type: "relative", value: 0.5 }
+```
+
+## Example Structure
+
+```json
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 5000,
+  "channels": [
+    {
+      "id": "background",
+      "segments": [
+        {
+          "id": "bg-video",
+          "type": "video",
+          "source": "https://example.com/video.mp4",
+          "order": 0,
+          "offset": { "type": "absolute", "value": 0 },
+          "startTrim": 0,
+          "endTrim": 0,
+          "xOffset": 0,
+          "yOffset": 0,
+          "width": 1080,
+          "height": 1920,
+          "zIndex": 0,
+          "scale": 1,
+          "rotation": 0,
+          "fit": "cover",
+          "speed": 1,
+          "opacity": 100,
+          "volume": 50
+        }
+      ]
+    },
+    {
+      "id": "text-layer",
+      "segments": [
+        {
+          "id": "title",
+          "type": "text",
+          "source": "",
+          "order": 0,
+          "offset": { "type": "absolute", "value": 500 },
+          "startTrim": 0,
+          "endTrim": 0,
+          "duration": { "type": "absolute", "value": 4000 },
+          "xOffset": 90,
+          "yOffset": 800,
+          "width": 900,
+          "height": 320,
+          "zIndex": 10,
+          "scale": 1,
+          "rotation": 0,
+          "text": "Hello World! 🎉",
+          "alignment": "center",
+          "verticalAlign": "middle",
+          "direction": "ltr",
+          "padding": 20,
+          "fontType": "tiktok",
+          "fontSize": 80,
+          "fontWeight": "bold",
+          "lineHeight": 1.2,
+          "letterSpacing": 0,
+          "textWrap": "word",
+          "wordBreak": "break-word",
+          "hyphenation": "none",
+          "maxLines": 0,
+          "textOverflow": "clip",
+          "ellipsis": "...",
+          "color": "#FFFFFF",
+          "backgroundColor": "#00000080",
+          "strokeColor": "#000000",
+          "strokeWidth": 4
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Best Practices
+
+### Layering
+- Use `zIndex` to control which elements appear on top
+- Background videos typically use `zIndex: 0`
+- Text overlays use higher `zIndex` values (e.g., 10)
+
+### Performance
+- Keep segment count reasonable (< 50 per video)
+- Use appropriate resolutions (1080x1920 for TikTok/Instagram)
+- Optimize source media file sizes
+
+### Timing
+- Use `offset` to create sequential animations
+- Combine absolute and relative time values for flexible layouts
+- Test with different durations to ensure smooth playback
+
+### Text Rendering
+- Use contrasting colors for readability
+- Add stroke/outline for text on video backgrounds
+- Test different font sizes for mobile viewing
+- Keep text concise (< 3 lines recommended)
+

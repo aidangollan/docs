@@ -21,7 +21,14 @@
           "data-structures/post",
           "data-structures/task",
           "data-structures/account-stat",
-          "data-structures/post-stat"
+          "data-structures/post-stat",
+          "data-structures/editor"
+        ]
+      },
+      {
+        "group": "Video Rendering",
+        "pages": [
+          "api-reference/endpoint/video-render"
         ]
       },
       {
