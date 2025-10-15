@@ -1,0 +1,150 @@
+---
+title: "Edit API Key"
+description: "Update an API key's name"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/org/api-key/edit
+```
+
+## Overview
+
+Update the name of an existing API key. This endpoint allows you to rename API keys for better organization and identification. The API key itself remains unchanged.
+
+## Request Body
+
+<ParamField body="apiKeyId" type="string" required>
+  ID of the API key to edit
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  New name for the API key
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Updated API key object
+  
+  <Expandable title="Response properties">
+    <ResponseField name="id" type="string">
+      API key identifier
+    </ResponseField>
+    
+    <ResponseField name="name" type="string">
+      Updated name of the API key
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of when the key was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/org/api-key/edit \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "apiKeyId": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Updated Production Key"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/org/api-key/edit',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'apiKeyId': '550e8400-e29b-41d4-a716-446655440000',
+        'name': 'Updated Production Key'
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print('API key updated:', data['data'])
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/org/api-key/edit', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    apiKeyId: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Updated Production Key'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('API key updated:', data.data);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.org.editApiKey({
+  apiKeyId: '550e8400-e29b-41d4-a716-446655440000',
+  name: 'Updated Production Key'
+});
+
+if (response.ok) {
+  console.log('Updated API key:', response.data.name);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Updated Production Key",
+    "created_at": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+```json Error Response - Not Found
+{
+  "ok": false,
+  "code": 404,
+  "message": "API key not found"
+}
+```
+
+```json Error Response - Missing Parameter
+{
+  "ok": false,
+  "code": 400,
+  "message": "name is required"
+}
+```
+
+</ResponseExample>
+

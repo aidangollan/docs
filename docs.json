@@ -22,6 +22,7 @@
           "data-structures/task",
           "data-structures/account-stat",
           "data-structures/post-stat",
+          "data-structures/api-key",
           "data-structures/editor"
         ]
       },
@@ -52,15 +53,17 @@
         ]
       },
       {
-        "group": "Organization",
-        "pages": [
-          "api-reference/endpoint/org-api-keys"
-        ]
-      },
-      {
         "group": "Tasks",
         "pages": [
           "api-reference/endpoint/tasks-get"
+        ]
+      },
+      {
+        "group": "Organization",
+        "pages": [
+          "api-reference/endpoint/org-api-keys-list",
+          "api-reference/endpoint/org-api-keys-edit",
+          "api-reference/endpoint/org-api-keys-delete"
         ]
       }
     ],

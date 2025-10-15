@@ -1,0 +1,86 @@
+---
+title: "API Key"
+description: "API key data structure for authentication"
+---
+
+## Overview
+
+Represents an API key that can be used to authenticate requests to the UGC Inc API. API keys are scoped to your organization and can be managed through the organization endpoints.
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique API key identifier (UUID format) |
+| `name` | `string` | Human-readable name for the API key |
+| `created_at` | `string` | ISO 8601 timestamp of when the key was created |
+
+<Note>
+  The actual API key value is only returned when the key is first created. For security reasons, it cannot be retrieved later. If you lose an API key, you'll need to create a new one.
+</Note>
+
+## Key Management
+
+### Naming Best Practices
+
+Give your API keys descriptive names to help you identify their purpose:
+
+- **Environment-based**: `"Production API Key"`, `"Development Key"`, `"Staging Environment"`
+- **Service-based**: `"Backend Service Key"`, `"Mobile App Key"`, `"Analytics Dashboard"`
+- **Team-based**: `"Marketing Team Key"`, `"Engineering Key"`, `"Partner Integration"`
+
+### Security Recommendations
+
+<Warning>
+  - Never commit API keys to version control
+  - Store keys securely using environment variables or secrets managers
+  - Rotate keys regularly
+  - Delete unused keys immediately
+  - Use separate keys for different environments (dev, staging, production)
+</Warning>
+
+## Example Use Cases
+
+```typescript
+// List all API keys for your organization
+const response = await client.org.getApiKeys();
+
+if (response.ok) {
+  response.data.forEach(key => {
+    console.log(`${key.name} (ID: ${key.id})`);
+    console.log(`Created: ${key.created_at}`);
+  });
+}
+
+// Rename an API key for clarity
+await client.org.editApiKey({
+  apiKeyId: 'key_id_here',
+  name: 'Updated Production Key - Q1 2024'
+});
+
+// Delete an old or compromised key
+await client.org.deleteApiKey({
+  apiKeyId: 'old_key_id_here'
+});
+```
+
+## Example Response
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Production API Key",
+  "created_at": "2024-01-15T10:30:00.000Z"
+}
+```
+
+## Authentication
+
+To use an API key, include it in the `Authorization` header of your requests:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+All API endpoints (except admin endpoints) require a valid API key for authentication.
+
