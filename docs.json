@@ -26,12 +26,6 @@
         ]
       },
       {
-        "group": "Video Rendering",
-        "pages": [
-          "api-reference/endpoint/video-render"
-        ]
-      },
-      {
         "group": "Posts",
         "pages": [
           "api-reference/endpoint/posts-get",
