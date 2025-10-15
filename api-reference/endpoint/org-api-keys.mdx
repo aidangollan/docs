@@ -1,0 +1,127 @@
+---
+title: "Get Organization API Keys"
+description: "Retrieve all API keys for your organization"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/org/api-key
+```
+
+## Overview
+
+Retrieve a list of all API keys associated with your organization. For security reasons, the actual key values are not returned - only the key IDs and creation timestamps are provided.
+
+## Request Body
+
+This endpoint does not require any request body parameters. Authentication is handled via the API key in the Authorization header.
+
+## Response
+
+<ResponseField name="data" type="ApiKey[]">
+  Array of API key objects for your organization
+  
+  <Expandable title="ApiKey properties">
+    <ResponseField name="id" type="string">
+      Unique identifier for the API key
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of when the key was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/org/api-key \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/org/api-key',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    }
+)
+
+data = response.json()
+
+if data.get('code') == 200:
+    print('API Keys:', data['data'])
+    for key in data['data']:
+        print(f"Key ID: {key['id']}, Created: {key['created_at']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/org/api-key', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  }
+});
+
+const data = await response.json();
+
+if (data.code === 200) {
+  console.log('API Keys:', data.data);
+  data.data.forEach(key => {
+    console.log(`Key ID: ${key.id}, Created: ${key.created_at}`);
+  });
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.org.getApiKeys();
+
+if (response.ok) {
+  console.log('API Keys:', response.data);
+  response.data.forEach(key => {
+    console.log(`Key ID: ${key.id}, Created: ${key.created_at}`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "code": 200,
+  "data": [
+    {
+      "id": "key_abc123def456",
+      "created_at": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "id": "key_xyz789ghi012",
+      "created_at": "2024-02-20T14:45:30.000Z"
+    }
+  ]
+}
+```
+
+```json Error Response
+{
+  "code": 401,
+  "message": "Unauthorized"
+}
+```
+
+</ResponseExample>
+

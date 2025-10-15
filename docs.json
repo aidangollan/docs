@@ -52,6 +52,12 @@
         ]
       },
       {
+        "group": "Organization",
+        "pages": [
+          "api-reference/endpoint/org-api-keys"
+        ]
+      },
+      {
         "group": "Tasks",
         "pages": [
           "api-reference/endpoint/tasks-get"
