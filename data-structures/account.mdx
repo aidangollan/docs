@@ -20,6 +20,8 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `nick_name` | `string \| null` | Display name shown on profile |
 | `pfp_url` | `string \| null` | URL to account's profile picture |
 | `warmup_enabled` | `boolean \| null` | Whether warmup tasks are enabled for this account |
+| `keywords` | `string \| null` | Search keywords used for warmup tasks (comma-separated) |
+| `profiles` | `string \| null` | Profile usernames to search for warmup tasks (comma-separated) |
 
 ## Account Organization
 
@@ -71,7 +73,9 @@ const campaignAccounts = await client.accounts.getAccounts({
   "username": "coolcreator",
   "nick_name": "Cool Creator",
   "pfp_url": "https://storage.example.com/avatar.jpg",
-  "warmup_enabled": true
+  "warmup_enabled": true,
+  "keywords": "fitness,workout,health",
+  "profiles": "fitnessguru,healthcoach"
 }
 ```
 

@@ -68,6 +68,14 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
     <ResponseField name="warmup_enabled" type="boolean | null">
       Whether warmup tasks are enabled for this account
     </ResponseField>
+    
+    <ResponseField name="keywords" type="string | null">
+      Search keywords used for warmup tasks (comma-separated)
+    </ResponseField>
+    
+    <ResponseField name="profiles" type="string | null">
+      Profile usernames to search for warmup tasks (comma-separated)
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -167,7 +175,9 @@ if (response.ok) {
       "username": "coolcreator",
       "nick_name": "Cool Creator",
       "pfp_url": "https://storage.example.com/avatar.jpg",
-      "warmup_enabled": true
+      "warmup_enabled": true,
+      "keywords": "fitness,workout,health",
+      "profiles": "fitnessguru,healthcoach"
     },
     {
       "id": "acc_789012",
@@ -178,7 +188,9 @@ if (response.ok) {
       "username": "awesome_account",
       "nick_name": "Awesome Account",
       "pfp_url": "https://storage.example.com/avatar2.jpg",
-      "warmup_enabled": false
+      "warmup_enabled": false,
+      "keywords": null,
+      "profiles": null
     }
   ]
 }
