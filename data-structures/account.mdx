@@ -19,6 +19,7 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `username` | `string \| null` | Account username/handle on the platform |
 | `nick_name` | `string \| null` | Display name shown on profile |
 | `pfp_url` | `string \| null` | URL to account's profile picture |
+| `warmup_enabled` | `boolean \| null` | Whether warmup tasks are enabled for this account |
 
 ## Account Organization
 
@@ -69,7 +70,8 @@ const campaignAccounts = await client.accounts.getAccounts({
   "user_group": "john_smith",
   "username": "coolcreator",
   "nick_name": "Cool Creator",
-  "pfp_url": "https://storage.example.com/avatar.jpg"
+  "pfp_url": "https://storage.example.com/avatar.jpg",
+  "warmup_enabled": true
 }
 ```
 

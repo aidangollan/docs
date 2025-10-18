@@ -64,6 +64,10 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
     <ResponseField name="pfp_url" type="string | null">
       URL to account's profile picture
     </ResponseField>
+    
+    <ResponseField name="warmup_enabled" type="boolean | null">
+      Whether warmup tasks are enabled for this account
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -162,7 +166,8 @@ if (response.ok) {
       "user_group": "users1",
       "username": "coolcreator",
       "nick_name": "Cool Creator",
-      "pfp_url": "https://storage.example.com/avatar.jpg"
+      "pfp_url": "https://storage.example.com/avatar.jpg",
+      "warmup_enabled": true
     },
     {
       "id": "acc_789012",
@@ -172,7 +177,8 @@ if (response.ok) {
       "user_group": "users1",
       "username": "awesome_account",
       "nick_name": "Awesome Account",
-      "pfp_url": "https://storage.example.com/avatar2.jpg"
+      "pfp_url": "https://storage.example.com/avatar2.jpg",
+      "warmup_enabled": false
     }
   ]
 }
