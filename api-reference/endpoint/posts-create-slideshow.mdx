@@ -103,6 +103,10 @@ Create and schedule a slideshow post from multiple images to be published on Tik
     <ResponseField name="music_post_id" type="string | null">
       Music/audio ID
     </ResponseField>
+    
+    <ResponseField name="scheduled_at" type="string | null">
+      When the post is scheduled to be published (ISO 8601 format)
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -236,7 +240,8 @@ if (response.ok) {
       "https://storage.example.com/img2.jpg",
       "https://storage.example.com/img3.jpg"
     ],
-    "music_post_id": "music_xyz789"
+    "music_post_id": "music_xyz789",
+    "scheduled_at": "2024-12-31T12:00:00Z"
   }
 }
 ```

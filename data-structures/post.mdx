@@ -19,6 +19,7 @@ Represents a video or slideshow post on a social media account.
 | `caption` | `string \| null` | Post caption/description text (max 500 characters) |
 | `media_urls` | `string[] \| null` | Array of URLs to video/image files used in the post |
 | `music_post_id` | `string \| null` | ID of the music/audio track used in the post |
+| `scheduled_at` | `string \| null` | When the post is scheduled to be published (ISO 8601 format) |
 
 ## Post Status Values
 
@@ -49,7 +50,8 @@ Represents a video or slideshow post on a social media account.
   "media_urls": [
     "https://storage.example.com/video1.mp4"
   ],
-  "music_post_id": "music_xyz789"
+  "music_post_id": "music_xyz789",
+  "scheduled_at": "2024-01-15T14:30:00Z"
 }
 ```
 

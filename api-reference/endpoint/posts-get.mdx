@@ -64,6 +64,10 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
     <ResponseField name="music_post_id" type="string | null">
       ID of the music/audio track used in the post
     </ResponseField>
+    
+    <ResponseField name="scheduled_at" type="string | null">
+      When the post is scheduled to be published (ISO 8601 format)
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -169,7 +173,8 @@ if (response.ok) {
       "media_urls": [
         "https://storage.example.com/video1.mp4"
       ],
-      "music_post_id": "music_xyz789"
+      "music_post_id": "music_xyz789",
+      "scheduled_at": "2024-01-15T14:30:00Z"
     },
     {
       "id": "post_def456",
@@ -183,7 +188,8 @@ if (response.ok) {
         "https://storage.example.com/img2.jpg",
         "https://storage.example.com/img3.jpg"
       ],
-      "music_post_id": "music_abc123"
+      "music_post_id": "music_abc123",
+      "scheduled_at": "2024-01-20T10:00:00Z"
     }
   ]
 }
