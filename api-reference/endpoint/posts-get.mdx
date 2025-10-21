@@ -19,6 +19,10 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
   Array of account IDs to filter posts by. Omit to get all posts.
 </ParamField>
 
+<ParamField body="postIds" type="string[]">
+  Array of specific post IDs to retrieve. Use this to fetch specific posts by their IDs.
+</ParamField>
+
 <ParamField body="startDate" type="string">
   Start date in ISO 8601 format (e.g., `2024-01-01T00:00:00Z`)
 </ParamField>
@@ -67,6 +71,12 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
     
     <ResponseField name="scheduled_at" type="string | null">
       When the post is scheduled to be published (ISO 8601 format)
+    </ResponseField>
+    
+    <ResponseField name="postUrl" type="string | undefined">
+      Direct URL to the post on the social media platform. Only available when status is `complete` and the post has been published.
+      - **TikTok**: `https://www.tiktok.com/@username/video/{social_id}`
+      - **Instagram**: `https://www.instagram.com/p/{social_id}/`
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -137,10 +147,16 @@ const client = new UGCClient({
   apiKey: 'YOUR_API_KEY'
 });
 
+// Get posts by account IDs and date range
 const response = await client.posts.getPosts({
   accountIds: ['acc_123456'],
   startDate: '2024-01-01T00:00:00Z',
   endDate: '2024-12-31T23:59:59Z'
+});
+
+// Or get specific posts by ID
+const specificPosts = await client.posts.getPosts({
+  postIds: ['post_abc123', 'post_def456']
 });
 
 if (response.ok) {
@@ -149,6 +165,11 @@ if (response.ok) {
     console.log(`  Type: ${post.type}`);
     console.log(`  Status: ${post.status}`);
     console.log(`  Caption: ${post.caption}`);
+    
+    // postUrl is available for completed posts
+    if (post.postUrl) {
+      console.log(`  URL: ${post.postUrl}`);
+    }
   });
 }
 ```
@@ -174,7 +195,8 @@ if (response.ok) {
         "https://storage.example.com/video1.mp4"
       ],
       "music_post_id": "music_xyz789",
-      "scheduled_at": "2024-01-15T14:30:00Z"
+      "scheduled_at": "2024-01-15T14:30:00Z",
+      "postUrl": "https://www.tiktok.com/@username/video/7234567890123456789"
     },
     {
       "id": "post_def456",

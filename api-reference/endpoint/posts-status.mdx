@@ -39,6 +39,12 @@ Check the current status of a specific post. Use this endpoint to monitor whethe
     <ResponseField name="status" type="string">
       Current status of the post
     </ResponseField>
+    
+    <ResponseField name="postUrl" type="string | undefined">
+      Direct URL to the post on the social media platform. Only available when status is `complete`.
+      - **TikTok**: `https://www.tiktok.com/@username/video/{social_id}`
+      - **Instagram**: `https://www.instagram.com/p/{social_id}/`
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -74,6 +80,8 @@ if data['ok']:
     
     if data['data']['status'] == 'complete':
         print('Post was successfully published!')
+        if 'postUrl' in data['data']:
+            print(f"View at: {data['data']['postUrl']}")
     elif data['data']['status'] == 'failed':
         print('Post failed to publish.')
 ```
@@ -97,6 +105,9 @@ if (data.ok) {
   
   if (data.data.status === 'complete') {
     console.log('Post was successfully published!');
+    if (data.data.postUrl) {
+      console.log(`View at: ${data.data.postUrl}`);
+    }
   } else if (data.data.status === 'failed') {
     console.log('Post failed to publish.');
   }
@@ -126,6 +137,9 @@ if (response.ok) {
       break;
     case 'complete':
       console.log('Post was successfully published!');
+      if (response.data.postUrl) {
+        console.log(`View at: ${response.data.postUrl}`);
+      }
       break;
     case 'failed':
       console.log('Post failed to publish');
@@ -138,14 +152,28 @@ if (response.ok) {
 
 <ResponseExample>
 
-```json Success Response (Complete)
+```json Success Response (Complete - TikTok)
 {
   "ok": true,
   "code": 200,
   "message": "Success",
   "data": {
     "post_id": "post_abc123",
-    "status": "complete"
+    "status": "complete",
+    "postUrl": "https://www.tiktok.com/@username/video/7234567890123456789"
+  }
+}
+```
+
+```json Success Response (Complete - Instagram)
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "post_id": "post_def456",
+    "status": "complete",
+    "postUrl": "https://www.instagram.com/p/ABC123xyz/"
   }
 }
 ```
