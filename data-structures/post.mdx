@@ -24,12 +24,17 @@ Represents a video or slideshow post on a social media account.
 
 ## Post Status Values
 
-| Status | Description |
-|--------|-------------|
-| `scheduled` | Post is scheduled to be published at a future time |
-| `pending` | Post is currently being processed/published |
-| `complete` | Post was successfully published to the platform |
-| `failed` | Post failed to publish (check error logs) |
+| Status | Description | Can Delete? |
+|--------|-------------|-------------|
+| `scheduled` | Post is scheduled to be published at a future time | ✅ Yes |
+| `pending` | Post is currently being processed/published | ✅ Yes |
+| `complete` | Post was successfully published to the platform | ❌ No |
+| `failed` | Post failed to publish (check error logs) | ✅ Yes |
+| `retrying` | Post is being retried after a previous failure | ✅ Yes |
+
+<Note>
+  Posts with status `complete` (already published) cannot be deleted via the API to prevent accidental removal of live content. Only unpublished, pending, or failed posts can be deleted using the [Delete Posts](/api-reference/endpoint/posts-delete) endpoint.
+</Note>
 
 ## Post Types
 
