@@ -33,7 +33,8 @@
           "api-reference/endpoint/posts-create-video",
           "api-reference/endpoint/posts-create-slideshow",
           "api-reference/endpoint/posts-status",
-          "api-reference/endpoint/posts-delete"
+          "api-reference/endpoint/posts-delete",
+          "api-reference/endpoint/posts-retry"
         ]
       },
       {
