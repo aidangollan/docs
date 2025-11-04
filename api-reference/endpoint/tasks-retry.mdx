@@ -1,0 +1,256 @@
+---
+title: "Retry Tasks"
+description: "Retry one or more failed tasks"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/tasks/retry
+```
+
+## Overview
+
+Retry one or more failed tasks by resetting their status to `scheduled` and setting their scheduled time to now. This allows you to re-attempt tasks that previously failed (warmup activities, profile edits, etc.).
+
+<Warning>
+  **Important Restrictions:**
+  - You can **only** retry tasks with status `failed`
+  - Tasks with other statuses (`scheduled`, `pending`, `complete`) **cannot** be retried using this endpoint
+  - The retry will reset the scheduled time to the current time and change the status to `scheduled`
+</Warning>
+
+## Request Body
+
+<ParamField body="taskIds" type="string[]" required>
+  Array of task IDs to retry
+  
+  All tasks must belong to your organization and must have status `failed`
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Retry result information
+  
+  <Expandable title="Result properties">
+    <ResponseField name="retried" type="number">
+      Number of tasks successfully retried
+    </ResponseField>
+    
+    <ResponseField name="ids" type="string[]">
+      Array of retried task IDs
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error Cases
+
+- **400 Bad Request**: Attempting to retry tasks that are not in failed status
+- **404 Not Found**: Some tasks don't exist or don't belong to your organization
+- **400 Bad Request**: No task IDs provided
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/tasks/retry \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "taskIds": ["task_abc123", "task_def456"]
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/tasks/retry',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'taskIds': ['task_abc123', 'task_def456']
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print(f"Retried {data['data']['retried']} tasks")
+    print("Tasks will be reattempted shortly")
+else:
+    print(f"Error: {data['message']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/tasks/retry', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    taskIds: ['task_abc123', 'task_def456']
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log(`Retried ${data.data.retried} tasks`);
+  console.log('Tasks will be reattempted shortly');
+} else {
+  console.error(`Error: ${data.message}`);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Retry multiple failed tasks
+const response = await client.tasks.retryTasks({
+  taskIds: ['task_abc123', 'task_def456']
+});
+
+if (response.ok) {
+  console.log(`Successfully retried ${response.data.retried} tasks`);
+  console.log('Retried IDs:', response.data.ids);
+  console.log('Tasks will be reattempted shortly');
+} else {
+  console.error(`Error: ${response.message}`);
+  // Common errors:
+  // - "Some tasks not found or don't belong to your organization"
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Successfully retried 2 task(s)",
+  "data": {
+    "retried": 2,
+    "ids": [
+      "task_abc123",
+      "task_def456"
+    ]
+  }
+}
+```
+
+```json Error - Not Found
+{
+  "ok": false,
+  "code": 404,
+  "message": "Some tasks not found or don't belong to your organization"
+}
+```
+
+```json Error - No Task IDs
+{
+  "ok": false,
+  "code": 400,
+  "message": "No task IDs provided"
+}
+```
+
+</ResponseExample>
+
+## What Happens When You Retry
+
+When you retry a failed task, the system:
+
+1. **Updates the status** from `failed` to `scheduled`
+2. **Sets the scheduled time** to the current time (now)
+3. **Resets the retry count** to 0
+4. **Clears the old task ID** to allow re-execution
+5. **Queues the task** for immediate processing
+
+The task will be picked up by the task execution system and attempted again shortly.
+
+## Best Practices
+
+<Tip>
+  **Check task status before retrying:**
+  
+  Always verify that tasks have failed before attempting to retry them. Use the [Get Tasks](/api-reference/endpoint/tasks-get) endpoint to check task statuses first.
+</Tip>
+
+<Steps>
+  <Step title="Fetch tasks">
+    Use the Get Tasks endpoint to retrieve tasks and check their status
+  </Step>
+  <Step title="Filter failed tasks">
+    Filter out tasks with status `failed` from your task list
+  </Step>
+  <Step title="Retry tasks">
+    Call the retry endpoint with the filtered task IDs
+  </Step>
+  <Step title="Monitor status">
+    Use the [Get Tasks](/api-reference/endpoint/tasks-get) endpoint to track the retry attempt
+  </Step>
+</Steps>
+
+### Example: Automatic Retry Workflow
+
+```typescript
+// Get all tasks
+const tasksResponse = await client.tasks.getTasks();
+
+if (tasksResponse.ok) {
+  // Filter tasks that failed
+  const failedTasks = tasksResponse.data.filter(
+    task => task.status === 'failed'
+  );
+  
+  if (failedTasks.length > 0) {
+    console.log(`Found ${failedTasks.length} failed tasks`);
+    
+    const retryResponse = await client.tasks.retryTasks({
+      taskIds: failedTasks.map(t => t.id)
+    });
+    
+    if (retryResponse.ok) {
+      console.log(`Retried ${retryResponse.data.retried} tasks`);
+      
+      // Wait a bit and check status
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      const updatedResponse = await client.tasks.getTasks({
+        taskIds: retryResponse.data.ids
+      });
+      
+      if (updatedResponse.ok) {
+        updatedResponse.data.forEach(task => {
+          console.log(`Task ${task.id} status: ${task.status}`);
+        });
+      }
+    }
+  }
+}
+```
+
+## Common Task Failure Reasons
+
+Tasks typically fail for reasons such as:
+
+- **Temporary network issues** - Retry usually succeeds
+- **Account authentication expired** - May need account re-authorization
+- **Platform rate limits** - Retry after waiting period
+- **Invalid parameters** - Check task configuration
+- **Account not ready** - Ensure account is properly initialized
+
+<Note>
+  If a task continues to fail after multiple retries, check the task details to identify the underlying issue. Some failures may require manual intervention or account re-configuration.
+</Note>
+

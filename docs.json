@@ -57,7 +57,9 @@
       {
         "group": "Tasks",
         "pages": [
-          "api-reference/endpoint/tasks-get"
+          "api-reference/endpoint/tasks-get",
+          "api-reference/endpoint/tasks-retry",
+          "api-reference/endpoint/tasks-delete"
         ]
       },
       {

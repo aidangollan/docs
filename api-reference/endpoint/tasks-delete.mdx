@@ -1,0 +1,302 @@
+---
+title: "Delete Tasks"
+description: "Delete one or more scheduled or failed tasks"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/tasks/delete
+```
+
+## Overview
+
+Delete one or more tasks from your task queue. This is useful for removing tasks that are no longer needed or clearing failed tasks that you don't want to retry.
+
+<Warning>
+  **Important Restrictions:**
+  - You can **only** delete tasks with status `scheduled` or `failed`
+  - Tasks with other statuses (`pending`, `complete`) **cannot** be deleted using this endpoint
+  - **Deletion is permanent and cannot be undone**
+</Warning>
+
+## Request Body
+
+<ParamField body="taskIds" type="string[]" required>
+  Array of task IDs to delete
+  
+  All tasks must belong to your organization and must have status `scheduled` or `failed`
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Deletion result information
+  
+  <Expandable title="Result properties">
+    <ResponseField name="deleted" type="number">
+      Number of tasks successfully deleted
+    </ResponseField>
+    
+    <ResponseField name="ids" type="string[]">
+      Array of deleted task IDs
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error Cases
+
+- **400 Bad Request**: Attempting to delete tasks that are not in scheduled or failed status
+- **404 Not Found**: Some tasks don't exist or don't belong to your organization
+- **400 Bad Request**: No task IDs provided
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/tasks/delete \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "taskIds": ["task_abc123", "task_def456"]
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/tasks/delete',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'taskIds': ['task_abc123', 'task_def456']
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print(f"Deleted {data['data']['deleted']} tasks")
+else:
+    print(f"Error: {data['message']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/tasks/delete', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    taskIds: ['task_abc123', 'task_def456']
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log(`Deleted ${data.data.deleted} tasks`);
+} else {
+  console.error(`Error: ${data.message}`);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Delete multiple tasks
+const response = await client.tasks.deleteTasks({
+  taskIds: ['task_abc123', 'task_def456']
+});
+
+if (response.ok) {
+  console.log(`Successfully deleted ${response.data.deleted} tasks`);
+  console.log('Deleted IDs:', response.data.ids);
+} else {
+  console.error(`Error: ${response.message}`);
+  // Common errors:
+  // - "Cannot delete X task(s) that are not in scheduled or failed status"
+  // - "Some tasks not found or don't belong to your organization"
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Successfully deleted 2 task(s)",
+  "data": {
+    "deleted": 2,
+    "ids": [
+      "task_abc123",
+      "task_def456"
+    ]
+  }
+}
+```
+
+```json Error - Invalid Status
+{
+  "ok": false,
+  "code": 400,
+  "message": "Cannot delete 1 task(s) that are not in scheduled or failed status"
+}
+```
+
+```json Error - Not Found
+{
+  "ok": false,
+  "code": 404,
+  "message": "Some tasks not found or don't belong to your organization"
+}
+```
+
+```json Error - No Task IDs
+{
+  "ok": false,
+  "code": 400,
+  "message": "No task IDs provided"
+}
+```
+
+</ResponseExample>
+
+## When to Delete Tasks
+
+Consider deleting tasks in these scenarios:
+
+1. **Scheduled tasks no longer needed** - Plans changed, account was removed, etc.
+2. **Failed tasks you don't want to retry** - Task configuration was incorrect
+3. **Cleanup after testing** - Remove test tasks from your queue
+4. **Bulk task management** - Clear out old or irrelevant tasks
+
+<Warning>
+  **Deletion is permanent!**
+  
+  Once a task is deleted, it cannot be recovered. Make sure you really want to delete the task before calling this endpoint.
+</Warning>
+
+## Best Practices
+
+<Tip>
+  **Check task status before deleting:**
+  
+  Always verify that tasks are in `scheduled` or `failed` status before attempting to delete them. Use the [Get Tasks](/api-reference/endpoint/tasks-get) endpoint to check task statuses first.
+</Tip>
+
+<Steps>
+  <Step title="Fetch tasks">
+    Use the Get Tasks endpoint to retrieve tasks and check their status
+  </Step>
+  <Step title="Filter eligible tasks">
+    Filter out tasks with status `scheduled` or `failed`
+  </Step>
+  <Step title="Confirm deletion">
+    Ensure you want to permanently delete these tasks
+  </Step>
+  <Step title="Delete tasks">
+    Call the delete endpoint with the filtered task IDs
+  </Step>
+</Steps>
+
+### Example: Cleanup Failed Tasks
+
+```typescript
+// Get all tasks
+const tasksResponse = await client.tasks.getTasks();
+
+if (tasksResponse.ok) {
+  // Filter tasks that failed and are older than 7 days
+  const oldFailedTasks = tasksResponse.data.filter(task => {
+    if (task.status !== 'failed') return false;
+    
+    const taskDate = new Date(task.created_at);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    return taskDate < weekAgo;
+  });
+  
+  if (oldFailedTasks.length > 0) {
+    console.log(`Found ${oldFailedTasks.length} old failed tasks`);
+    
+    // Confirm with user (in a real app)
+    const confirmed = confirm(
+      `Delete ${oldFailedTasks.length} old failed tasks?`
+    );
+    
+    if (confirmed) {
+      const deleteResponse = await client.tasks.deleteTasks({
+        taskIds: oldFailedTasks.map(t => t.id)
+      });
+      
+      if (deleteResponse.ok) {
+        console.log(`Deleted ${deleteResponse.data.deleted} tasks`);
+      }
+    }
+  }
+}
+```
+
+### Example: Cancel Scheduled Task
+
+```typescript
+// You scheduled a warmup task but need to cancel it
+const taskId = 'task_xyz789';
+
+// First check the task status
+const tasksResponse = await client.tasks.getTasks();
+
+if (tasksResponse.ok) {
+  const task = tasksResponse.data.find(t => t.id === taskId);
+  
+  if (task && task.status === 'scheduled') {
+    // Task is scheduled and can be deleted
+    const deleteResponse = await client.tasks.deleteTasks({
+      taskIds: [taskId]
+    });
+    
+    if (deleteResponse.ok) {
+      console.log('Task cancelled successfully');
+    }
+  } else if (task && task.status === 'pending') {
+    console.log('Task is already running, cannot delete');
+  } else if (task && task.status === 'complete') {
+    console.log('Task already completed, cannot delete');
+  }
+}
+```
+
+## Cannot Delete Running or Completed Tasks
+
+<Note>
+  **Status restrictions:**
+  
+  - `pending` tasks (currently running) cannot be deleted
+  - `complete` tasks cannot be deleted
+  
+  Only `scheduled` (not yet started) and `failed` tasks can be deleted.
+</Note>
+
+If you need to cancel a running task, you'll need to wait for it to complete or fail. There is no way to interrupt a task that is currently executing.
+
+## Comparison with Retry
+
+| Action | Delete | Retry |
+|--------|--------|-------|
+| **Purpose** | Permanently remove task | Re-execute failed task |
+| **Allowed statuses** | `scheduled`, `failed` | `failed` only |
+| **Reversible?** | No | No (but task runs again) |
+| **Use when** | Don't need the task | Want to try again |
+
