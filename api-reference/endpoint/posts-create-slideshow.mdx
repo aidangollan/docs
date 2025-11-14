@@ -15,8 +15,26 @@ Create and schedule a slideshow post from multiple images to be published on Tik
 
 ## Request Body
 
-<ParamField body="accountId" type="string" required>
-  Account ID to post from
+<ParamField body="accountId" type="string | null" required>
+  Account ID to post from, or `null` for automatic account selection
+  
+  **Auto-Selection Behavior:**
+  - Set to `null` to automatically select an account
+  - With `strict: true`: Selects the least recently posted account
+  - With `strict: false`: Selects the account with the closest available time slot to your requested `postTime`
+  - Can be filtered using `tag`, `user_group`, and `org_group` parameters
+</ParamField>
+
+<ParamField body="tag" type="string">
+  Filter accounts by tag (only used when `accountId` is `null`)
+</ParamField>
+
+<ParamField body="user_group" type="string">
+  Filter accounts by user group (only used when `accountId` is `null`)
+</ParamField>
+
+<ParamField body="org_group" type="string">
+  Filter accounts by organization group (only used when `accountId` is `null`)
 </ParamField>
 
 <ParamField body="imageUrls" type="string[]" required>
@@ -61,9 +79,17 @@ Create and schedule a slideshow post from multiple images to be published on Tik
 </ParamField>
 
 <ParamField body="strict" type="boolean" default={false}>
-  Strict mode for validation
+  Scheduling mode - controls timing behavior
   
-  When enabled, performs additional validation checks before posting
+  **When `strict: true`:**
+  - Post must be scheduled at the exact requested time
+  - If using auto-selection (`accountId: null`), picks the least recently posted account
+  - Will return an error if the account cannot post at the exact time
+  
+  **When `strict: false`:**
+  - Post will be scheduled at the nearest available time
+  - If using auto-selection (`accountId: null`), picks the account that can post closest to the requested time
+  - Automatically adjusts to the next available slot if requested time is unavailable
 </ParamField>
 
 ## Response
@@ -195,6 +221,7 @@ const client = new UGCClient({
   apiKey: 'YOUR_API_KEY'
 });
 
+// Standard: Post with specific account
 const response = await client.posts.createSlideshow({
   accountId: 'acc_123456',
   imageUrls: [
@@ -207,15 +234,30 @@ const response = await client.posts.createSlideshow({
   postTime: '2024-12-31T12:00:00Z'
 });
 
+// Auto-select with strict=true: picks least recently posted account
+const autoResponse1 = await client.posts.createSlideshow({
+  accountId: null,  // Auto-select
+  imageUrls: ['img1.jpg', 'img2.jpg', 'img3.jpg'],
+  caption: 'Auto-posted at exact time',
+  postTime: '2024-12-31T10:00:00Z',
+  strict: true,  // Must post at exactly 10:00 AM
+  tag: 'production'  // Only consider accounts with this tag
+});
+
+// Auto-select with strict=false: picks account with closest available slot
+const autoResponse2 = await client.posts.createSlideshow({
+  accountId: null,  // Auto-select
+  imageUrls: ['img1.jpg', 'img2.jpg'],
+  caption: 'Auto-posted at nearest time',
+  postTime: '2024-12-31T14:00:00Z',
+  strict: false,  // Posts at nearest available time
+  org_group: 'team-a'  // Only consider accounts in this org group
+});
+
 if (response.ok) {
   console.log(`Slideshow created with ID: ${response.data.id}`);
-  console.log(`Status: ${response.data.status}`);
-  console.log(`Images: ${response.data.media_urls?.length}`);
-  
-  // Monitor post status
-  const statusResponse = await client.posts.getStatus({
-    postId: response.data.id
-  });
+  console.log(`Account used: ${response.data.account_id}`);
+  console.log(`Scheduled for: ${response.data.scheduled_at}`);
 }
 ```
 
