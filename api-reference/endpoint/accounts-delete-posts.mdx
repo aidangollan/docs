@@ -1,0 +1,202 @@
+---
+title: "Delete All Posts"
+description: "Delete all posts from one or more accounts"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/accounts/delete-posts
+```
+
+## Overview
+
+Delete all posts from one or more accounts. This endpoint creates a `clear_posts` task for each account that automatically:
+- Finds all complete posts with a social_id
+- Deletes them one by one from the platform
+- Verifies each deletion using the platform API
+- Continues until all posts are deleted
+
+The deletion process runs asynchronously. Posts are marked as "deleting" during the process and "deleted" once confirmed removed from the platform.
+
+## Request Body
+
+<ParamField body="accountIds" type="string[]" required>
+  Array of account IDs to delete posts from
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Response object containing deletion task results
+  
+  <Expandable title="Response properties">
+    <ResponseField name="message" type="string">
+      Summary message describing the operation
+    </ResponseField>
+    
+    <ResponseField name="successful" type="number">
+      Number of accounts where deletion tasks were successfully created
+    </ResponseField>
+    
+    <ResponseField name="failed" type="number">
+      Number of accounts where deletion tasks failed to create
+    </ResponseField>
+    
+    <ResponseField name="errors" type="array">
+      Array of error objects (only present if there were failures)
+      
+      <Expandable title="Error object">
+        <ResponseField name="accountId" type="string">
+          Account ID that failed
+        </ResponseField>
+        
+        <ResponseField name="error" type="string">
+          Error message describing why the task failed
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Deletion Process
+
+1. A `clear_posts` task is created for each account
+2. The task finds the first complete post with a social_id
+3. A deletion flow is triggered on the platform
+4. Once the platform confirms deletion, the system verifies using the scrape API
+5. If verified, the post is marked as "deleted" and the next post is found
+6. Steps 3-5 repeat until no more posts exist
+7. The task is marked as complete
+
+<Note>
+  - Accounts must have a GeeLark phone ID configured
+  - Only posts with status "complete" and a social_id are deleted
+  - The deletion process is automatic and continues until all posts are removed
+  - You can monitor progress using the `/accounts/status` endpoint
+</Note>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/accounts/delete-posts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountIds": ["acc_123456", "acc_789012"]
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/accounts/delete-posts',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'accountIds': ['acc_123456', 'acc_789012']
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print(f"Successfully scheduled deletion for {data['data']['successful']} account(s)")
+    if data['data'].get('errors'):
+        print(f"Failed for {data['data']['failed']} account(s)")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/accounts/delete-posts', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accountIds: ['acc_123456', 'acc_789012']
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log(`Deletion scheduled for ${data.data.successful} account(s)`);
+  if (data.data.errors) {
+    console.log(`Failed for ${data.data.failed} account(s)`);
+  }
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.accounts.deleteAllPosts({
+  accountIds: ['acc_123456', 'acc_789012']
+});
+
+if (response.ok) {
+  console.log(`Deletion tasks created: ${response.data.successful}`);
+  console.log(`Failed: ${response.data.failed}`);
+  
+  if (response.data.errors) {
+    response.data.errors.forEach(err => {
+      console.log(`Error for ${err.accountId}: ${err.error}`);
+    });
+  }
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Scheduled post deletion for 2 account(s)",
+  "data": {
+    "message": "Scheduled post deletion for 2 account(s)",
+    "successful": 2,
+    "failed": 0
+  }
+}
+```
+
+```json Partial Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Scheduled post deletion for 1 account(s), 1 failed",
+  "data": {
+    "message": "Scheduled post deletion for 1 account(s), 1 failed",
+    "successful": 1,
+    "failed": 1,
+    "errors": [
+      {
+        "accountId": "acc_789012",
+        "error": "Account does not have a GeeLark phone ID configured"
+      }
+    ]
+  }
+}
+```
+
+```json Error Response
+{
+  "ok": false,
+  "code": 400,
+  "message": "Account IDs are required"
+}
+```
+
+</ResponseExample>
+

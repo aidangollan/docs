@@ -11,21 +11,28 @@ POST https://api.ugc.inc/post/delete
 
 ## Overview
 
-Delete one or more posts from your organization. This endpoint allows you to remove scheduled or failed posts.
+Delete one or more posts from your organization. This endpoint handles both scheduled posts and published posts:
 
-<Warning>
-  **Important Restrictions:**
-  - You can **only** delete posts with status `scheduled`, `pending`, `failed`, or `retrying`
-  - Posts with status `complete` (already posted to social media) **cannot** be deleted
-  - This prevents accidental deletion of live content
-</Warning>
+- **Unpublished posts** (`scheduled`, `pending`, `failed`, `retrying`) are deleted immediately from the database
+- **Published posts** (`complete`) trigger a deletion flow that removes the post from the social media platform (TikTok/Instagram) and then marks it as `deleted`
+
+<Info>
+  **Published Post Deletion:**
+  
+  When deleting a `complete` post, the API will:
+  1. Trigger a GeeLark automation to delete the post from the social media platform
+  2. Set the post status to `deleting` while the deletion is in progress
+  3. Automatically update to `deleted` once the platform deletion completes
+  
+  You can check the status using the [Get Post Status](/api-reference/endpoint/posts-status) endpoint.
+</Info>
 
 ## Request Body
 
 <ParamField body="postIds" type="string[]" required>
   Array of post IDs to delete
   
-  All posts must belong to your organization and must not have status `complete`
+  All posts must belong to your organization. Posts can be in any status.
 </ParamField>
 
 ## Response
@@ -35,20 +42,42 @@ Delete one or more posts from your organization. This endpoint allows you to rem
   
   <Expandable title="Result properties">
     <ResponseField name="deleted" type="number">
-      Number of posts successfully deleted
+      Number of posts deleted immediately (unpublished posts)
     </ResponseField>
     
-    <ResponseField name="ids" type="string[]">
-      Array of deleted post IDs
+    <ResponseField name="deletedIds" type="string[]">
+      Array of post IDs that were deleted immediately
+    </ResponseField>
+    
+    <ResponseField name="deleting" type="number">
+      Number of published posts queued for deletion from the platform
+    </ResponseField>
+    
+    <ResponseField name="deletingIds" type="string[]">
+      Array of post IDs that are being deleted from the platform (status changed to `deleting`)
+    </ResponseField>
+    
+    <ResponseField name="errors" type="array" optional>
+      Array of errors for posts that failed to delete
+      
+      <Expandable title="Error object">
+        <ResponseField name="postId" type="string">
+          ID of the post that failed
+        </ResponseField>
+        
+        <ResponseField name="error" type="string">
+          Error message
+        </ResponseField>
+      </Expandable>
     </ResponseField>
   </Expandable>
 </ResponseField>
 
 ## Error Cases
 
-- **400 Bad Request**: Attempting to delete posts that have already been posted (status `complete`)
 - **404 Not Found**: Some posts don't exist or don't belong to your organization
 - **400 Bad Request**: No post IDs provided
+- **Partial errors**: Some posts may fail to delete while others succeed (returned in `errors` array)
 
 <RequestExample>
 
@@ -98,7 +127,11 @@ const response = await fetch('https://api.ugc.inc/post/delete', {
 const data = await response.json();
 
 if (data.ok) {
-  console.log(`Deleted ${data.data.deleted} posts`);
+  console.log(`Immediately deleted ${data.data.deleted} posts`);
+  console.log(`Queued for deletion: ${data.data.deleting} posts`);
+  if (data.data.errors && data.data.errors.length > 0) {
+    console.log(`Failed: ${data.data.errors.length} posts`);
+  }
 } else {
   console.error(`Error: ${data.message}`);
 }
@@ -117,12 +150,21 @@ const response = await client.posts.deletePosts({
 });
 
 if (response.ok) {
-  console.log(`Successfully deleted ${response.data.deleted} posts`);
-  console.log('Deleted IDs:', response.data.ids);
+  console.log(`Immediately deleted: ${response.data.deleted} posts`);
+  console.log('Deleted IDs:', response.data.deletedIds);
+  
+  if (response.data.deleting > 0) {
+    console.log(`Queued for deletion: ${response.data.deleting} published posts`);
+    console.log('Deleting IDs:', response.data.deletingIds);
+    console.log('These posts will be removed from the platform shortly.');
+  }
+  
+  if (response.data.errors && response.data.errors.length > 0) {
+    console.error('Some posts failed to delete:', response.data.errors);
+  }
 } else {
   console.error(`Error: ${response.message}`);
   // Common errors:
-  // - "Cannot delete X post(s) that have already been posted"
   // - "Some posts not found or don't belong to your organization"
 }
 ```
@@ -131,26 +173,57 @@ if (response.ok) {
 
 <ResponseExample>
 
-```json Success Response
+```json Success - Unpublished Posts Deleted
 {
   "ok": true,
   "code": 200,
-  "message": "Successfully deleted 2 post(s)",
+  "message": "Successfully processed deletion request",
   "data": {
     "deleted": 2,
-    "ids": [
+    "deleting": 0,
+    "deletedIds": [
       "post_abc123",
       "post_def456"
+    ],
+    "deletingIds": []
+  }
+}
+```
+
+```json Success - Published Posts Queued for Deletion
+{
+  "ok": true,
+  "code": 200,
+  "message": "Successfully processed deletion request",
+  "data": {
+    "deleted": 0,
+    "deleting": 2,
+    "deletedIds": [],
+    "deletingIds": [
+      "post_xyz789",
+      "post_uvw012"
     ]
   }
 }
 ```
 
-```json Error - Already Posted
+```json Success - Mixed (Some Deleted, Some Queued)
 {
-  "ok": false,
-  "code": 400,
-  "message": "Cannot delete 2 post(s) that have already been posted"
+  "ok": true,
+  "code": 200,
+  "message": "Successfully processed deletion request",
+  "data": {
+    "deleted": 1,
+    "deleting": 1,
+    "deletedIds": ["post_abc123"],
+    "deletingIds": ["post_xyz789"],
+    "errors": [
+      {
+        "postId": "post_bad999",
+        "error": "Account has no GeeLark phone ID"
+      }
+    ]
+  }
 }
 ```
 
@@ -175,43 +248,69 @@ if (response.ok) {
 ## Best Practices
 
 <Tip>
-  **Check post status before deleting:**
+  **Deleting published posts:**
   
-  Always verify that posts are not yet published before attempting to delete them. Use the [Get Posts](/api-reference/endpoint/posts-get) endpoint to check post statuses first.
+  When you delete a post that has already been published (`complete` status), the API triggers an automation to remove it from the social media platform. The post status changes to `deleting` and then to `deleted` once the platform deletion completes. Use the [Get Post Status](/api-reference/endpoint/posts-status) endpoint to monitor the deletion progress.
 </Tip>
 
 <Steps>
-  <Step title="Fetch posts">
-    Use the Get Posts endpoint to retrieve posts and check their status
-  </Step>
-  <Step title="Filter deletable posts">
-    Filter out posts with status `complete` from your deletion list
-  </Step>
   <Step title="Delete posts">
-    Call the delete endpoint with the filtered post IDs
+    Call the delete endpoint with the post IDs you want to remove
+  </Step>
+  <Step title="Check response">
+    The response tells you which posts were deleted immediately vs. queued for platform deletion
+  </Step>
+  <Step title="Monitor status (for published posts)">
+    For posts being deleted from the platform, monitor their status until it changes to `deleted`
   </Step>
 </Steps>
 
-### Example: Safe Bulk Delete
+### Example: Bulk Delete with Status Monitoring
 
 ```typescript
-// Get all posts
-const postsResponse = await client.posts.getPosts();
+// Delete multiple posts (mix of published and unpublished)
+const deleteResponse = await client.posts.deletePosts({
+  postIds: ['post_abc123', 'post_xyz789', 'post_uvw012']
+});
 
-if (postsResponse.ok) {
-  // Filter posts that can be deleted (not yet posted)
-  const deletablePosts = postsResponse.data.filter(
-    post => post.status !== 'complete'
-  );
+if (deleteResponse.ok) {
+  // Handle immediately deleted posts
+  if (deleteResponse.data.deleted > 0) {
+    console.log(`✓ Deleted ${deleteResponse.data.deleted} unpublished posts`);
+  }
   
-  if (deletablePosts.length > 0) {
-    const deleteResponse = await client.posts.deletePosts({
-      postIds: deletablePosts.map(p => p.id)
-    });
+  // Monitor posts being deleted from platform
+  if (deleteResponse.data.deleting > 0) {
+    console.log(`⏳ Deleting ${deleteResponse.data.deleting} published posts from platform...`);
     
-    if (deleteResponse.ok) {
-      console.log(`Deleted ${deleteResponse.data.deleted} posts`);
+    // Poll status until deletion completes
+    for (const postId of deleteResponse.data.deletingIds) {
+      const checkStatus = async () => {
+        const statusResponse = await client.posts.getStatus({ postId });
+        
+        if (statusResponse.ok) {
+          if (statusResponse.data.status === 'deleted') {
+            console.log(`✓ Post ${postId} deleted from platform`);
+            return true;
+          } else if (statusResponse.data.status === 'failed') {
+            console.error(`✗ Post ${postId} deletion failed`);
+            return true;
+          }
+        }
+        return false;
+      };
+      
+      // Check every 10 seconds until complete
+      const interval = setInterval(async () => {
+        const done = await checkStatus();
+        if (done) clearInterval(interval);
+      }, 10000);
     }
+  }
+  
+  // Handle any errors
+  if (deleteResponse.data.errors && deleteResponse.data.errors.length > 0) {
+    console.error('Some posts failed to delete:', deleteResponse.data.errors);
   }
 }
 ```
