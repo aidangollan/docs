@@ -70,6 +70,14 @@
           "api-reference/endpoint/org-api-keys-edit",
           "api-reference/endpoint/org-api-keys-delete"
         ]
+      },
+      {
+        "group": "Render",
+        "pages": [
+          "api-reference/endpoint/render-submit",
+          "api-reference/endpoint/render-status",
+          "api-reference/endpoint/render-download"
+        ]
       }
     ],
     "global": {

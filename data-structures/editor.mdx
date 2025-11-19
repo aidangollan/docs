@@ -1,135 +1,497 @@
 ---
 title: "Editor"
-description: "Video composition editor data structure"
+description: "Complete timeline editor reference for video and image composition"
 ---
 
 ## Overview
 
-The Editor structure defines a complete video composition with multiple layers, channels, and segments. It's used for programmatically creating videos with precise control over timing, positioning, and effects.
+The Editor structure defines a complete video or image composition with multiple layers, channels, and segments. It provides frame-accurate control over timing, positioning, effects, and layering.
 
-## Fields
+<Note>
+**Video vs Image Output:**
+- **Video Rendering**: Supports all segment types (video, audio, text, image, nested editors)
+- **Image Rendering**: Only supports text and image segments (renders a static frame at time 0)
+</Note>
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `width` | `number` | Width of the output video in pixels (e.g., 1080) |
-| `height` | `number` | Height of the output video in pixels (e.g., 1920) |
-| `fps` | `number` | Frames per second of the output video (e.g., 30) |
-| `duration` | `number \| undefined` | Total duration in milliseconds. If undefined, calculated from segments |
-| `channels` | `Channel[]` | Array of channels containing segments |
+## Editor Configuration
 
-## Channel Structure
+### Root Properties
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Unique identifier for the channel |
-| `segments` | `Segment[]` | Array of segments in this channel |
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `width` | `number` | ✅ | Canvas width in pixels (e.g., `1080` for TikTok/Instagram) |
+| `height` | `number` | ✅ | Canvas height in pixels (e.g., `1920` for vertical video) |
+| `fps` | `number` | ✅ | Frames per second (typically `30` or `60`) |
+| `duration` | `number` | ✅ | Total duration in milliseconds (can be auto-calculated from segments) |
+| `channels` | `Channel[]` | ✅ | Array of channels, each containing segments |
+
+### Channel Structure
+
+Channels are independent layers that can contain multiple segments. All segments within a channel play sequentially, while segments across different channels play simultaneously.
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | `string` | ✅ | Unique channel identifier (e.g., `"background"`, `"text-layer"`) |
+| `segments` | `Segment[]` | ✅ | Array of segments in this channel |
 
 ## Segment Types
 
 ### Base Segment Properties
 
-All segments share these properties:
+All segment types inherit these properties:
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `id` | `string` | Unique segment identifier |
-| `type` | `'video' \| 'image' \| 'text' \| 'audio' \| 'editor'` | Type of segment |
-| `source` | `string` | Public URL to media (empty for text/editor) |
-| `order` | `number` | Sequence order within channel |
-| `offset` | `TimeValue` | Delay after previous segment |
-| `startTrim` | `number` | Trim from start (milliseconds) |
-| `endTrim` | `number` | Trim from end (milliseconds) |
-| `duration` | `TimeValue \| undefined` | Override duration |
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | `string` | ✅ | Unique segment identifier |
+| `type` | `string` | ✅ | Segment type: `video`, `image`, `text`, `audio`, or `editor` |
+| `source` | `string` | ✅ | Public URL to media file (empty `""` for text segments) |
+| `order` | `number` | ✅ | Sequence order within channel (0-based) |
+| `offset` | `TimeValue` | ✅ | Delay after previous segment starts |
+| `startTrim` | `number` | ⚪ | Trim from start in milliseconds (default: `0`) |
+| `endTrim` | `number` | ⚪ | Trim from end in milliseconds (default: `0`) |
+| `duration` | `TimeValue` | ⚪ | Override segment duration (auto-calculated if omitted) |
 
-### Video Segment
+### Visual Segment Properties
 
-Extends base with visual properties:
+Video, image, text, and editor segments include these positioning properties:
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `xOffset` | `number` | X position in pixels |
-| `yOffset` | `number` | Y position in pixels |
-| `width` | `number` | Width in pixels |
-| `height` | `number` | Height in pixels |
-| `zIndex` | `number` | Layer order (higher = front) |
-| `scale` | `number` | Scale multiplier (1.0 = 100%) |
-| `rotation` | `number` | Rotation in degrees |
-| `fit` | `'cover' \| 'contain' \| 'fill'` | How to fit the video |
-| `speed` | `number` | Playback speed (1.0 = normal) |
-| `opacity` | `number` | Opacity 0-100 |
-| `volume` | `number` | Audio volume 0-100 |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `xOffset` | `number` | `0` | Horizontal position from left edge in pixels |
+| `yOffset` | `number` | `0` | Vertical position from top edge in pixels |
+| `width` | `number` | Required | Width in pixels |
+| `height` | `number` | Required | Height in pixels |
+| `zIndex` | `number` | `0` | Stacking order (higher values appear on top) |
+| `scale` | `number` | `1` | Scale multiplier (`1.0` = 100%, `2.0` = 200%) |
+| `rotation` | `number` | `0` | Rotation in degrees (clockwise) |
+| `opacity` | `number` | `100` | Opacity percentage (0 = transparent, 100 = opaque) |
 
-### Image Segment
+---
 
-Similar to video segment:
+## Video Segment
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `loop` | `boolean` | Loop animated images (GIFs) |
-| _(all visual properties)_ | | Same as video segment |
+Displays video content with optional audio.
 
-### Text Segment
+**Additional Properties:**
 
-Rich text overlay with full typography control:
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `fit` | `'cover' \| 'contain' \| 'fill'` | `'cover'` | How the video fits in the bounds<br/>• `cover`: Fill entire area, crop overflow<br/>• `contain`: Fit entire video, may have letterboxing<br/>• `fill`: Stretch to fill, may distort |
+| `speed` | `number` | `1` | Playback speed multiplier (`0.5` = half speed, `2.0` = double speed) |
+| `volume` | `number` | `100` | Audio volume percentage (0 = muted, 100 = full volume) |
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `text` | `string` | The actual text content |
-| `fontType` | `'arial' \| 'tiktok' \| 'apple'` | Font family |
-| `fontSize` | `number` | Font size in pixels |
-| `fontWeight` | `'normal' \| 'bold'` | Font weight |
-| `color` | `string` | Text color (hex) |
-| `backgroundColor` | `string` | Background color (hex with alpha) |
-| `strokeColor` | `string \| undefined` | Outline color |
-| `strokeWidth` | `number \| undefined` | Outline width |
-| `alignment` | `'left' \| 'center' \| 'right' \| 'justify'` | Horizontal alignment |
-| `verticalAlign` | `'top' \| 'middle' \| 'bottom'` | Vertical alignment |
-| `lineHeight` | `number` | Line height multiplier |
-| `letterSpacing` | `number` | Letter spacing in pixels |
-| `padding` | `number` | Inner padding in pixels |
-| _(all visual properties)_ | | Same positioning as video |
-
-### Audio Segment
-
-Background audio or music:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| _(base properties only)_ | | No visual properties |
-
-### Editor Segment
-
-Nested composition (editor within editor):
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `editor` | `Editor` | Nested editor configuration |
-| `fit` | `'cover' \| 'contain' \| 'fill'` | How to fit rendered video |
-| `opacity` | `number` | Opacity 0-100 |
-| `speed` | `number` | Playback speed |
-| `volume` | `number` | Audio volume 0-100 |
-| _(visual properties)_ | | Same positioning as video |
-
-## Time Value
-
-Time can be specified as absolute or relative:
-
-```typescript
-// Absolute time (500 milliseconds)
-{ type: "absolute", value: 500 }
-
-// Relative time (50% of total duration)
-{ type: "relative", value: 0.5 }
+**Example:**
+```json
+{
+  "id": "main-video",
+  "type": "video",
+  "source": "https://example.com/video.mp4",
+  "order": 0,
+  "offset": { "type": "absolute", "value": 0 },
+  "startTrim": 1000,
+  "endTrim": 500,
+  "xOffset": 0,
+  "yOffset": 0,
+  "width": 1080,
+  "height": 1920,
+  "zIndex": 0,
+  "scale": 1,
+  "rotation": 0,
+  "fit": "cover",
+  "speed": 1,
+  "opacity": 100,
+  "volume": 50
+}
 ```
 
-## Example Structure
+---
+
+## Image Segment
+
+Displays static images or animated GIFs.
+
+**Additional Properties:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `fit` | `'cover' \| 'contain' \| 'fill'` | `'contain'` | How the image fits in the bounds |
+| `loop` | `boolean` | `false` | Loop animated GIFs (only affects GIFs) |
+
+**Example:**
+```json
+{
+  "id": "logo",
+  "type": "image",
+  "source": "https://example.com/logo.png",
+  "order": 0,
+  "offset": { "type": "absolute", "value": 0 },
+  "duration": { "type": "absolute", "value": 5000 },
+  "xOffset": 90,
+  "yOffset": 100,
+  "width": 300,
+  "height": 300,
+  "zIndex": 5,
+  "scale": 1,
+  "rotation": 0,
+  "fit": "contain",
+  "opacity": 100
+}
+```
+
+---
+
+## Text Segment
+
+Rich text overlays with full typography and styling control.
+
+**Typography Properties:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `text` | `string` | Required | The text content (supports emojis) |
+| `fontType` | `'arial' \| 'tiktok' \| 'apple'` | `'tiktok'` | Font family |
+| `fontSize` | `number` | `40` | Font size in pixels |
+| `fontWeight` | `'normal' \| 'bold'` | `'normal'` | Font weight |
+| `lineHeight` | `number` | `1.2` | Line height multiplier |
+| `letterSpacing` | `number` | `0` | Letter spacing in pixels |
+
+**Alignment Properties:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `alignment` | `'left' \| 'center' \| 'right' \| 'justify'` | `'left'` | Horizontal text alignment |
+| `verticalAlign` | `'top' \| 'middle' \| 'bottom'` | `'top'` | Vertical alignment within bounds |
+| `direction` | `'ltr' \| 'rtl'` | `'ltr'` | Text direction (left-to-right or right-to-left) |
+| `padding` | `number` | `0` | Inner padding in pixels |
+
+**Text Wrapping Properties:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `textWrap` | `'word' \| 'char' \| 'none'` | `'word'` | How text wraps to new lines |
+| `wordBreak` | `'normal' \| 'break-all' \| 'break-word'` | `'normal'` | How words break across lines |
+| `hyphenation` | `'none' \| 'auto'` | `'none'` | Automatic hyphenation |
+| `maxLines` | `number` | `0` | Maximum lines (0 = unlimited) |
+| `textOverflow` | `'clip' \| 'ellipsis'` | `'clip'` | How overflow is handled |
+| `ellipsis` | `string` | `'...'` | Ellipsis string for overflow |
+
+**Color Properties:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `color` | `string` | `'#FFFFFF'` | Text color in hex format (e.g., `#FF0000` for red) |
+| `backgroundColor` | `string` | `'transparent'` | Background color with optional alpha (e.g., `#00000080` for 50% black) |
+| `strokeColor` | `string` | `undefined` | Text outline color (e.g., `#000000` for black outline) |
+| `strokeWidth` | `number` | `0` | Outline width in pixels |
+
+**Example:**
+```json
+{
+  "id": "title-text",
+  "type": "text",
+  "source": "",
+  "order": 0,
+  "offset": { "type": "absolute", "value": 500 },
+  "duration": { "type": "absolute", "value": 4000 },
+  "xOffset": 90,
+  "yOffset": 800,
+  "width": 900,
+  "height": 320,
+  "zIndex": 10,
+  "text": "Hello World! 🎉",
+  "alignment": "center",
+  "verticalAlign": "middle",
+  "direction": "ltr",
+  "padding": 20,
+  "fontType": "tiktok",
+  "fontSize": 80,
+  "fontWeight": "bold",
+  "lineHeight": 1.2,
+  "letterSpacing": 0,
+  "textWrap": "word",
+  "wordBreak": "break-word",
+  "hyphenation": "none",
+  "maxLines": 0,
+  "textOverflow": "clip",
+  "ellipsis": "...",
+  "color": "#FFFFFF",
+  "backgroundColor": "#00000080",
+  "strokeColor": "#000000",
+  "strokeWidth": 4,
+  "scale": 1,
+  "rotation": 0,
+  "opacity": 100
+}
+```
+
+---
+
+## Audio Segment
+
+Background audio or music tracks. Audio segments don't have visual properties.
+
+**Properties:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| _(base properties)_ | | | All base segment properties apply |
+| `volume` | `number` | `100` | Audio volume percentage (0 = muted, 100 = full) |
+
+**Example:**
+```json
+{
+  "id": "background-music",
+  "type": "audio",
+  "source": "https://example.com/music.mp3",
+  "order": 0,
+  "offset": { "type": "absolute", "value": 0 },
+  "startTrim": 0,
+  "endTrim": 0,
+  "duration": { "type": "absolute", "value": 5000 },
+  "volume": 80
+}
+```
+
+---
+
+## Editor Segment (Nested Composition)
+
+Nest entire editor configurations within segments for complex compositions.
+
+**Additional Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `editor` | `Editor` | Complete nested editor configuration |
+| _(all visual properties)_ | | Same as video segments |
+
+**Example:**
+```json
+{
+  "id": "nested-composition",
+  "type": "editor",
+  "source": "",
+  "order": 0,
+  "offset": { "type": "absolute", "value": 1000 },
+  "editor": {
+    "width": 540,
+    "height": 960,
+    "fps": 30,
+    "duration": 3000,
+    "channels": [/* nested channels */]
+  },
+  "xOffset": 270,
+  "yOffset": 480,
+  "width": 540,
+  "height": 960,
+  "zIndex": 5,
+  "fit": "contain",
+  "opacity": 100,
+  "speed": 1,
+  "volume": 100
+}
+```
+
+---
+
+## Time Value Format
+
+Time values can be specified as absolute (milliseconds) or relative (percentage):
+
+```typescript
+// Absolute - exact time in milliseconds
+{
+  "type": "absolute",
+  "value": 500  // 500ms
+}
+
+// Relative - percentage of total duration
+{
+  "type": "relative",
+  "value": 0.25  // 25% of total duration
+}
+```
+
+**Usage Examples:**
+- **Offset**: `{ type: "absolute", value: 1000 }` = start 1 second after previous segment
+- **Duration**: `{ type: "relative", value: 0.5 }` = last for 50% of total video duration
+
+---
+
+## Timing & Duration Calculation
+
+### How Segment Timing Works
+
+1. **Sequential within channels**: Segments in the same channel play one after another
+2. **Parallel across channels**: Segments in different channels play simultaneously
+3. **Offset delays**: Each segment can delay relative to the previous one
+
+### Duration Calculation Rules
+
+```typescript
+// Segment duration is calculated as:
+const segmentDuration = 
+  mediaDuration - startTrim - endTrim + (duration override if specified)
+
+// Segment start time is calculated as:
+const startTime = 
+  previousSegmentStartTime + offset.value
+```
+
+### Example Timeline
+
+```json
+{
+  "channels": [
+    {
+      "id": "channel1",
+      "segments": [
+        {
+          "id": "seg1",
+          "offset": { "type": "absolute", "value": 0 },
+          // Starts at 0ms
+        },
+        {
+          "id": "seg2",
+          "offset": { "type": "absolute", "value": 1000 },
+          // Starts at 1000ms (1 second after seg1 starts)
+        },
+        {
+          "id": "seg3",
+          "offset": { "type": "absolute", "value": 500 },
+          // Starts at 1500ms (500ms after seg2 starts)
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Positioning & Transform Properties
+
+### Position
+
+| Property | Description | Example |
+|----------|-------------|---------|
+| `xOffset` | Distance from left edge in pixels | `540` centers a 1080px-wide element in a 1920px canvas |
+| `yOffset` | Distance from top edge in pixels | `0` places at the top |
+
+### Size
+
+| Property | Description | Notes |
+|----------|-------------|-------|
+| `width` | Element width in pixels | Combined with `fit` mode for media |
+| `height` | Element height in pixels | Combined with `fit` mode for media |
+
+### Transforms
+
+| Property | Range | Description |
+|----------|-------|-------------|
+| `scale` | `0.1` - `10` | Size multiplier (`1` = original size, `2` = 200%, `0.5` = 50%) |
+| `rotation` | `0` - `360` | Rotation in degrees (clockwise) |
+| `opacity` | `0` - `100` | Transparency (`0` = invisible, `100` = fully opaque) |
+| `zIndex` | any integer | Layer order (higher numbers appear on top) |
+
+---
+
+## Fit Modes
+
+Controls how media (video/image) fits within specified width/height bounds.
+
+### `cover` (Default for video)
+- **Behavior**: Fills entire area, crops overflow
+- **Use case**: Full-screen backgrounds
+- **Aspect ratio**: Maintained
+- **Example**: 16:9 video in 9:16 canvas → sides cropped
+
+### `contain` (Default for image)
+- **Behavior**: Fits entire media, may have letterboxing
+- **Use case**: Logos, overlays that must be fully visible
+- **Aspect ratio**: Maintained
+- **Example**: Square image in rectangular area → bars on sides or top/bottom
+
+### `fill`
+- **Behavior**: Stretches to fill entire area
+- **Use case**: Rare - usually avoid as it distorts
+- **Aspect ratio**: Not maintained
+- **Example**: Any aspect ratio → stretched to match bounds exactly
+
+---
+
+## Text Styling Reference
+
+### Font Options
+
+| `fontType` | Description |
+|------------|-------------|
+| `'tiktok'` | TikTok Sans font family (default, recommended) |
+| `'apple'` | SF Pro font (Apple system font) |
+| `'arial'` | Arial fallback font |
+
+### Font Weight Options
+
+| `fontWeight` | Rendering |
+|--------------|-----------|
+| `'normal'` | Regular weight |
+| `'bold'` | Bold weight |
+
+### Text Alignment
+
+| `alignment` | Effect |
+|-------------|--------|
+| `'left'` | Align to left edge |
+| `'center'` | Center horizontally |
+| `'right'` | Align to right edge |
+| `'justify'` | Justify text (stretch to fill width) |
+
+| `verticalAlign` | Effect |
+|-----------------|--------|
+| `'top'` | Align to top edge |
+| `'middle'` | Center vertically |
+| `'bottom'` | Align to bottom edge |
+
+### Text Wrapping Modes
+
+| `textWrap` | Behavior |
+|------------|----------|
+| `'word'` | Break at word boundaries (recommended) |
+| `'char'` | Break at any character |
+| `'none'` | No wrapping, text may overflow |
+
+| `wordBreak` | Behavior |
+|-------------|----------|
+| `'normal'` | Break at normal word boundaries |
+| `'break-all'` | Break between any two characters |
+| `'break-word'` | Break long words if necessary |
+
+### Color Format
+
+All colors use hex format with optional alpha channel:
+
+```typescript
+"#RRGGBB"      // RGB (e.g., "#FF0000" = red)
+"#RRGGBBAA"    // RGBA (e.g., "#FF000080" = 50% transparent red)
+```
+
+**Examples:**
+- `#FFFFFF` - White
+- `#000000` - Black
+- `#FF0000` - Red
+- `#00000080` - 50% transparent black
+- `#FFFFFF00` - Fully transparent white
+
+---
+
+## Complete Example: Multi-Layer Video
 
 ```json
 {
   "width": 1080,
   "height": 1920,
   "fps": 30,
-  "duration": 5000,
+  "duration": 10000,
   "channels": [
     {
       "id": "background",
@@ -137,7 +499,7 @@ Time can be specified as absolute or relative:
         {
           "id": "bg-video",
           "type": "video",
-          "source": "https://example.com/video.mp4",
+          "source": "https://example.com/background.mp4",
           "order": 0,
           "offset": { "type": "absolute", "value": 0 },
           "startTrim": 0,
@@ -152,7 +514,127 @@ Time can be specified as absolute or relative:
           "fit": "cover",
           "speed": 1,
           "opacity": 100,
+          "volume": 30
+        }
+      ]
+    },
+    {
+      "id": "overlay-images",
+      "segments": [
+        {
+          "id": "logo",
+          "type": "image",
+          "source": "https://example.com/logo.png",
+          "order": 0,
+          "offset": { "type": "absolute", "value": 0 },
+          "duration": { "type": "absolute", "value": 10000 },
+          "xOffset": 50,
+          "yOffset": 50,
+          "width": 200,
+          "height": 200,
+          "zIndex": 5,
+          "fit": "contain",
+          "opacity": 90
+        }
+      ]
+    },
+    {
+      "id": "text-overlays",
+      "segments": [
+        {
+          "id": "intro-text",
+          "type": "text",
+          "source": "",
+          "order": 0,
+          "offset": { "type": "absolute", "value": 500 },
+          "duration": { "type": "absolute", "value": 3000 },
+          "xOffset": 90,
+          "yOffset": 800,
+          "width": 900,
+          "height": 320,
+          "zIndex": 10,
+          "text": "Welcome! 👋",
+          "alignment": "center",
+          "verticalAlign": "middle",
+          "fontType": "tiktok",
+          "fontSize": 80,
+          "fontWeight": "bold",
+          "color": "#FFFFFF",
+          "backgroundColor": "#00000080",
+          "strokeColor": "#000000",
+          "strokeWidth": 4,
+          "padding": 20,
+          "opacity": 100
+        },
+        {
+          "id": "cta-text",
+          "type": "text",
+          "source": "",
+          "order": 1,
+          "offset": { "type": "absolute", "value": 4000 },
+          "duration": { "type": "absolute", "value": 2500 },
+          "xOffset": 90,
+          "yOffset": 1400,
+          "width": 900,
+          "height": 200,
+          "zIndex": 10,
+          "text": "Follow for more! 🚀",
+          "alignment": "center",
+          "verticalAlign": "middle",
+          "fontType": "tiktok",
+          "fontSize": 60,
+          "fontWeight": "bold",
+          "color": "#FFD700",
+          "strokeColor": "#000000",
+          "strokeWidth": 3,
+          "opacity": 100
+        }
+      ]
+    },
+    {
+      "id": "audio-layer",
+      "segments": [
+        {
+          "id": "background-music",
+          "type": "audio",
+          "source": "https://example.com/music.mp3",
+          "order": 0,
+          "offset": { "type": "absolute", "value": 0 },
+          "duration": { "type": "absolute", "value": 10000 },
           "volume": 50
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Complete Example: Static Image
+
+```json
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 1000,
+  "channels": [
+    {
+      "id": "background",
+      "segments": [
+        {
+          "id": "bg-image",
+          "type": "image",
+          "source": "https://example.com/background.jpg",
+          "order": 0,
+          "offset": { "type": "absolute", "value": 0 },
+          "xOffset": 0,
+          "yOffset": 0,
+          "width": 1080,
+          "height": 1920,
+          "zIndex": 0,
+          "fit": "cover"
         }
       ]
     },
@@ -164,37 +646,21 @@ Time can be specified as absolute or relative:
           "type": "text",
           "source": "",
           "order": 0,
-          "offset": { "type": "absolute", "value": 500 },
-          "startTrim": 0,
-          "endTrim": 0,
-          "duration": { "type": "absolute", "value": 4000 },
+          "offset": { "type": "absolute", "value": 0 },
           "xOffset": 90,
           "yOffset": 800,
           "width": 900,
           "height": 320,
           "zIndex": 10,
-          "scale": 1,
-          "rotation": 0,
-          "text": "Hello World! 🎉",
+          "text": "Thumbnail Title",
           "alignment": "center",
           "verticalAlign": "middle",
-          "direction": "ltr",
-          "padding": 20,
           "fontType": "tiktok",
-          "fontSize": 80,
+          "fontSize": 100,
           "fontWeight": "bold",
-          "lineHeight": 1.2,
-          "letterSpacing": 0,
-          "textWrap": "word",
-          "wordBreak": "break-word",
-          "hyphenation": "none",
-          "maxLines": 0,
-          "textOverflow": "clip",
-          "ellipsis": "...",
           "color": "#FFFFFF",
-          "backgroundColor": "#00000080",
           "strokeColor": "#000000",
-          "strokeWidth": 4
+          "strokeWidth": 5
         }
       ]
     }
@@ -202,26 +668,129 @@ Time can be specified as absolute or relative:
 }
 ```
 
+---
+
 ## Best Practices
 
 ### Layering
-- Use `zIndex` to control which elements appear on top
-- Background videos typically use `zIndex: 0`
-- Text overlays use higher `zIndex` values (e.g., 10)
+- Use `zIndex` to control stacking order
+- Background elements: `zIndex: 0`
+- Mid-layer elements: `zIndex: 5`
+- Text/overlays: `zIndex: 10+`
+- Keep zIndex values spaced for easy insertion
 
 ### Performance
-- Keep segment count reasonable (< 50 per video)
-- Use appropriate resolutions (1080x1920 for TikTok/Instagram)
-- Optimize source media file sizes
+- Limit segments: < 50 per composition
+- Optimize source media: compress before upload
+- Use appropriate resolutions:
+  - TikTok/Instagram: 1080x1920 (9:16)
+  - YouTube Shorts: 1080x1920 (9:16)
+  - Square: 1080x1080 (1:1)
 
 ### Timing
-- Use `offset` to create sequential animations
-- Combine absolute and relative time values for flexible layouts
-- Test with different durations to ensure smooth playback
+- Use `offset` for staggered animations
+- Combine absolute and relative times for flexibility
+- Test edge cases (segment boundaries, overlaps)
 
 ### Text Rendering
-- Use contrasting colors for readability
-- Add stroke/outline for text on video backgrounds
-- Test different font sizes for mobile viewing
-- Keep text concise (< 3 lines recommended)
+- **Readability**: Use high contrast (white text on dark bg or vice versa)
+- **Stroke**: Add `strokeWidth: 3-5` for text on video backgrounds
+- **Font size**: Minimum 40px for mobile readability
+- **Line count**: Keep under 3 lines for best engagement
+- **Emojis**: Fully supported, render correctly
 
+### Color Selection
+- **Text on video**: White with black stroke (`color: "#FFFFFF"`, `strokeColor: "#000000"`)
+- **Backgrounds**: Use semi-transparent (`#00000080` for 50% black)
+- **Highlights**: Brand colors with full opacity
+- **Test**: Verify colors on different screens/backgrounds
+
+### Media Sources
+- **URLs must be publicly accessible**: No auth required
+- **Supported formats**:
+  - Video: MP4, MOV, WebM
+  - Image: PNG, JPEG, GIF, WebP
+  - Audio: MP3, WAV, OGG
+- **HTTPS required**: All source URLs must use HTTPS
+- **CORS**: Ensure proper CORS headers on your media server
+
+---
+
+## Common Patterns
+
+### Full-Screen Video Background
+```json
+{
+  "xOffset": 0,
+  "yOffset": 0,
+  "width": 1080,
+  "height": 1920,
+  "fit": "cover",
+  "zIndex": 0
+}
+```
+
+### Centered Logo Overlay
+```json
+{
+  "xOffset": 440,
+  "yOffset": 860,
+  "width": 200,
+  "height": 200,
+  "fit": "contain",
+  "zIndex": 5
+}
+```
+
+### Bottom-Third Text Banner
+```json
+{
+  "xOffset": 90,
+  "yOffset": 1400,
+  "width": 900,
+  "height": 200,
+  "alignment": "center",
+  "verticalAlign": "middle",
+  "zIndex": 10
+}
+```
+
+### Fade In Effect (Manual)
+```json
+// Show multiple text segments with increasing opacity
+[
+  { "opacity": 0, "duration": 100 },
+  { "opacity": 25, "duration": 100 },
+  { "opacity": 50, "duration": 100 },
+  { "opacity": 75, "duration": 100 },
+  { "opacity": 100, "duration": 3000 }
+]
+```
+
+---
+
+## Troubleshooting
+
+### Text Not Appearing
+- Check `zIndex` - must be higher than background elements
+- Verify `opacity` is > 0
+- Ensure `color` contrasts with background
+- Check timing - verify segment is active during playback
+
+### Media Not Loading
+- Verify URL is publicly accessible (test in browser)
+- Check CORS headers on media server
+- Ensure HTTPS (not HTTP)
+- Verify file format is supported
+
+### Unexpected Timing
+- Review `offset` values - they're relative to previous segment
+- Check `startTrim` and `endTrim` values
+- Verify `duration` overrides if specified
+- Remember: segments in same channel are sequential, different channels are parallel
+
+### Quality Issues
+- Use higher resolution source media
+- Avoid over-scaling (`scale` > 2.0)
+- Use `fit: 'contain'` instead of `fill` to avoid distortion
+- Ensure FPS matches source media (typically 30fps)

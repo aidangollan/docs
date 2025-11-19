@@ -1,0 +1,221 @@
+---
+title: "Get Render Status"
+description: "Check the status of a render job"
+---
+
+## Endpoint
+
+```
+GET https://api.ugc.inc/render/status?job_id={job_id}
+```
+
+## Overview
+
+Check the status of a render job submitted via `/render/submit`. Poll this endpoint until the status is `completed` or `failed`.
+
+## Query Parameters
+
+<ParamField query="job_id" type="string" required>
+  The job ID returned from the submit endpoint
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Job status information
+  
+  <Expandable title="Status properties">
+    <ResponseField name="job_id" type="string">
+      The job identifier
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Current job status
+      - `pending`: Job queued, waiting to start
+      - `processing`: Job is currently rendering
+      - `completed`: Job finished successfully
+      - `failed`: Job encountered an error
+    </ResponseField>
+    
+    <ResponseField name="output_type" type="'video' | 'image'">
+      Type of output being rendered
+    </ResponseField>
+    
+    <ResponseField name="progress" type="number">
+      Progress percentage (0-100)
+    </ResponseField>
+    
+    <ResponseField name="message" type="string">
+      Status message describing current state
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="number">
+      Job creation timestamp (Unix time)
+    </ResponseField>
+    
+    <ResponseField name="updated_at" type="number">
+      Last update timestamp (Unix time)
+    </ResponseField>
+    
+    <ResponseField name="download_url" type="string">
+      Download URL for the rendered file (only present when `status: 'completed'`)
+    </ResponseField>
+    
+    <ResponseField name="size_bytes" type="number">
+      File size in bytes (only present when completed)
+    </ResponseField>
+    
+    <ResponseField name="duration_ms" type="number">
+      Total render time in milliseconds (only present when completed, video only)
+    </ResponseField>
+    
+    <ResponseField name="stats" type="object">
+      Detailed timing breakdown (only present when completed)
+      
+      <Expandable title="Stats properties">
+        <ResponseField name="preload_ms" type="number">
+          Time spent loading media files
+        </ResponseField>
+        
+        <ResponseField name="audio_ms" type="number">
+          Time spent mixing audio
+        </ResponseField>
+        
+        <ResponseField name="render_ms" type="number">
+          Time spent rendering frames
+        </ResponseField>
+        
+        <ResponseField name="encode_ms" type="number">
+          Time spent encoding final output
+        </ResponseField>
+        
+        <ResponseField name="total_ms" type="number">
+          Total processing time
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="completed_at" type="number">
+      Completion timestamp (only present when completed)
+    </ResponseField>
+    
+    <ResponseField name="error" type="string">
+      Error message (only present when failed)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl https://api.ugc.inc/render/status?job_id=550e8400-e29b-41d4-a716-446655440000 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```typescript TypeScript
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+
+const status = await client.render.getStatus(jobId);
+
+if (status.ok) {
+  console.log('Status:', status.data.status);
+  console.log('Progress:', status.data.progress);
+  
+  if (status.data.status === 'completed') {
+    console.log('Download URL:', status.data.download_url);
+    console.log('File size:', status.data.size_bytes, 'bytes');
+  }
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Processing
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "job_id": "550e8400-e29b-41d4-a716-446655440000",
+    "status": "processing",
+    "output_type": "video",
+    "progress": 45,
+    "message": "Rendering frames...",
+    "created_at": 1700000000.123,
+    "updated_at": 1700000015.456
+  }
+}
+```
+
+```json Completed - Video
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "job_id": "550e8400-e29b-41d4-a716-446655440000",
+    "status": "completed",
+    "output_type": "video",
+    "progress": 100,
+    "message": "Video rendered successfully",
+    "download_url": "https://aidangollan--ugcinc-video-renderer-download-video.modal.run?job_id=550e8400-e29b-41d4-a716-446655440000",
+    "size_bytes": 2456789,
+    "duration_ms": 15234,
+    "stats": {
+      "preload_ms": 2000,
+      "audio_ms": 500,
+      "render_ms": 10000,
+      "encode_ms": 2734,
+      "total_ms": 15234
+    },
+    "created_at": 1700000000.123,
+    "updated_at": 1700000015.789,
+    "completed_at": 1700000015.789
+  }
+}
+```
+
+```json Completed - Image
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "job_id": "7a3b2c1d-e4f5-6789-abcd-ef0123456789",
+    "status": "completed",
+    "output_type": "image",
+    "progress": 100,
+    "message": "Image rendered successfully",
+    "download_url": "https://aidangollan--ugcinc-video-renderer-download-video.modal.run?job_id=7a3b2c1d-e4f5-6789-abcd-ef0123456789",
+    "size_bytes": 456789,
+    "created_at": 1700000000.123,
+    "updated_at": 1700000003.456,
+    "completed_at": 1700000003.456
+  }
+}
+```
+
+```json Failed
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "job_id": "550e8400-e29b-41d4-a716-446655440000",
+    "status": "failed",
+    "output_type": "video",
+    "progress": 0,
+    "message": "Failed to load video source",
+    "error": "Failed to load video source",
+    "created_at": 1700000000.123,
+    "updated_at": 1700000005.789
+  }
+}
+```
+
+</ResponseExample>
+
