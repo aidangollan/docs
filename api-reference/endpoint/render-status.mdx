@@ -6,16 +6,16 @@ description: "Check the status of a render job"
 ## Endpoint
 
 ```
-GET https://api.ugc.inc/render/status?job_id={job_id}
+POST https://api.ugc.inc/render/status
 ```
 
 ## Overview
 
 Check the status of a render job submitted via `/render/submit`. Poll this endpoint until the status is `completed` or `failed`.
 
-## Query Parameters
+## Request Body
 
-<ParamField query="job_id" type="string" required>
+<ParamField body="job_id" type="string" required>
   The job ID returned from the submit endpoint
 </ParamField>
 
@@ -108,8 +108,10 @@ Check the status of a render job submitted via `/render/submit`. Poll this endpo
 <RequestExample>
 
 ```bash cURL
-curl https://api.ugc.inc/render/status?job_id=550e8400-e29b-41d4-a716-446655440000 \
-  -H "Authorization: Bearer YOUR_API_KEY"
+curl -X POST https://api.ugc.inc/render/status \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"job_id": "550e8400-e29b-41d4-a716-446655440000"}'
 ```
 
 ```typescript TypeScript

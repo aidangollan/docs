@@ -6,16 +6,16 @@ description: "Download a rendered video or image"
 ## Endpoint
 
 ```
-GET https://api.ugc.inc/render/download?job_id={job_id}
+POST https://api.ugc.inc/render/download
 ```
 
 ## Overview
 
 Download the rendered video (MP4) or image (PNG/JPEG) file from a completed render job. This endpoint streams the binary file directly.
 
-## Query Parameters
+## Request Body
 
-<ParamField query="job_id" type="string" required>
+<ParamField body="job_id" type="string" required>
   The job ID from a completed render job
 </ParamField>
 
@@ -28,8 +28,10 @@ Returns the rendered file as binary data with appropriate content type:
 <RequestExample>
 
 ```bash cURL
-curl https://api.ugc.inc/render/download?job_id=550e8400-e29b-41d4-a716-446655440000 \
+curl -X POST https://api.ugc.inc/render/download \
   -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"job_id": "550e8400-e29b-41d4-a716-446655440000"}' \
   --output video.mp4
 ```
 
@@ -38,18 +40,12 @@ import { UGCClient } from 'ugcinc';
 
 const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
 
-// Get the download URL
-const downloadUrl = client.render.getDownloadUrl(jobId);
-
 // Download the file
-const response = await fetch(downloadUrl, {
-  headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
-});
+const file = await client.render.download(jobId);
 
-if (response.ok) {
-  const blob = await response.blob();
+if (file.ok) {
   // Use the blob (e.g., create a download link)
-  const url = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(file.data);
   const a = document.createElement('a');
   a.href = url;
   a.download = 'rendered-video.mp4';
