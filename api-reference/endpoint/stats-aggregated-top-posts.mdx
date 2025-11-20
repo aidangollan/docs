@@ -1,0 +1,209 @@
+---
+title: "Get Top Posts"
+description: "Get the highest-performing posts by a specific metric"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/stats/aggregated/top-posts
+```
+
+## Overview
+
+Get the top N posts ranked by a specific metric (views, likes, comments, shares, or saves). Uses the latest statistics for each post. Perfect for displaying top content and identifying viral posts.
+
+## Request Body
+
+<ParamField body="metric" type="string" required>
+  The metric to sort by. One of: `views`, `likes`, `comments`, `shares`, `saves`
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Number of posts to return. Default: 5. Maximum: 100.
+</ParamField>
+
+<ParamField body="postIds" type="string[]">
+  Array of post IDs to filter. Omit to include all posts.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="TopPost[]">
+  Array of top posts sorted by the requested metric
+  
+  <Expandable title="TopPost properties">
+    <ResponseField name="post_id" type="string">
+      Post identifier
+    </ResponseField>
+    
+    <ResponseField name="account_id" type="string">
+      Associated account ID
+    </ResponseField>
+    
+    <ResponseField name="caption" type="string | null">
+      Post caption/description
+    </ResponseField>
+    
+    <ResponseField name="media_urls" type="string[] | null">
+      Array of media URLs
+    </ResponseField>
+    
+    <ResponseField name="type" type="string">
+      Post type (`video` or `slideshow`)
+    </ResponseField>
+    
+    <ResponseField name="social_id" type="string | null">
+      Platform-specific post ID
+    </ResponseField>
+    
+    <ResponseField name="views" type="number | null">
+      Total views
+    </ResponseField>
+    
+    <ResponseField name="likes" type="number | null">
+      Total likes
+    </ResponseField>
+    
+    <ResponseField name="comments" type="number | null">
+      Total comments
+    </ResponseField>
+    
+    <ResponseField name="shares" type="number | null">
+      Total shares
+    </ResponseField>
+    
+    <ResponseField name="saves" type="number | null">
+      Total saves/bookmarks
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of the stat record
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/stats/aggregated/top-posts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "metric": "views",
+    "limit": 10
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/stats/aggregated/top-posts',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'metric': 'views',
+        'limit': 10
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    for i, post in enumerate(data['data'], 1):
+        print(f"{i}. {post['caption'][:50]}...")
+        print(f"   Views: {post['views']:,} | Likes: {post['likes']:,}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/stats/aggregated/top-posts', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    metric: 'views',
+    limit: 10
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  data.data.forEach((post, index) => {
+    console.log(`${index + 1}. ${post.caption?.substring(0, 50)}...`);
+    console.log(`   Views: ${post.views.toLocaleString()} | Likes: ${post.likes.toLocaleString()}`);
+  });
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.stats.getTopPosts({
+  metric: 'views',
+  limit: 10
+});
+
+if (response.ok) {
+  response.data.forEach((post, index) => {
+    console.log(`${index + 1}. ${post.caption?.substring(0, 50)}...`);
+    console.log(`   Views: ${post.views}`);
+    console.log(`   Likes: ${post.likes}`);
+    console.log(`   Engagement: ${post.comments + post.shares + post.saves}`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "post_id": "post_abc123",
+      "account_id": "acc_123456",
+      "caption": "Amazing workout routine! 💪 #fitness #workout",
+      "media_urls": ["https://example.com/video1.mp4"],
+      "type": "video",
+      "social_id": "7234567890123456789",
+      "views": 2500000,
+      "likes": 180000,
+      "comments": 5600,
+      "shares": 12000,
+      "saves": 45000,
+      "created_at": "2024-01-15T10:00:00Z"
+    },
+    {
+      "post_id": "post_def456",
+      "account_id": "acc_789012",
+      "caption": "Quick morning stretch routine ☀️",
+      "media_urls": ["https://example.com/video2.mp4"],
+      "type": "video",
+      "social_id": "7234567890987654321",
+      "views": 1800000,
+      "likes": 120000,
+      "comments": 3200,
+      "shares": 8500,
+      "saves": 32000,
+      "created_at": "2024-01-15T10:00:00Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+

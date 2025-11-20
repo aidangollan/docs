@@ -11,7 +11,13 @@ POST https://api.ugc.inc/stats/accounts
 
 ## Overview
 
-Get historical statistics for accounts including follower counts, views, likes, and other metrics. Use this endpoint to track account growth and engagement over time.
+Get account statistics including follower counts, views, likes, and other metrics.
+
+**Behavior:**
+- **If `startDate` and `endDate` are NOT provided:** Returns the latest stat per account (one record per account) - optimal for dashboards showing current state
+- **If `startDate` or `endDate` is provided:** Returns all stats within the date range - use for historical analysis and trend tracking
+
+Use this endpoint to track account growth and engagement over time.
 
 ## Request Body
 
@@ -20,11 +26,11 @@ Get historical statistics for accounts including follower counts, views, likes, 
 </ParamField>
 
 <ParamField body="startDate" type="string">
-  Start date in ISO 8601 format (e.g., `2024-01-01T00:00:00Z`)
+  Start date in ISO 8601 format (e.g., `2024-01-01T00:00:00Z`). Optional. If omitted (along with `endDate`), returns latest stat per account.
 </ParamField>
 
 <ParamField body="endDate" type="string">
-  End date in ISO 8601 format (e.g., `2024-12-31T23:59:59Z`)
+  End date in ISO 8601 format (e.g., `2024-12-31T23:59:59Z`). Optional. If omitted (along with `startDate`), returns latest stat per account.
 </ParamField>
 
 <ParamField body="tag" type="string">

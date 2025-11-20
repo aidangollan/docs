@@ -1,0 +1,182 @@
+---
+title: "Get Daily Aggregated Statistics"
+description: "Get pre-aggregated daily statistics for dashboard charts"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/stats/aggregated/daily
+```
+
+## Overview
+
+Get daily aggregated statistics showing total changes across all filtered accounts per day. This endpoint is optimized for rendering time-series charts and dashboards.
+
+Returns one record per day containing the sum of daily changes for all metrics (followers, following, views, likes) across all accounts matching your filters.
+
+## Request Body
+
+<ParamField body="startDate" type="string" required>
+  Start date in ISO 8601 format (e.g., `2024-01-01T00:00:00Z`)
+</ParamField>
+
+<ParamField body="endDate" type="string" required>
+  End date in ISO 8601 format (e.g., `2024-12-31T23:59:59Z`)
+</ParamField>
+
+<ParamField body="accountIds" type="string[]">
+  Array of account IDs to include in aggregation. Omit to include all accounts.
+</ParamField>
+
+<ParamField body="tag" type="string">
+  Filter by account tag
+</ParamField>
+
+<ParamField body="org_group" type="string">
+  Filter by organization group
+</ParamField>
+
+<ParamField body="user_group" type="string">
+  Filter by user group
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="DailyAggregatedStat[]">
+  Array of daily aggregated statistics
+  
+  <Expandable title="DailyAggregatedStat properties">
+    <ResponseField name="date" type="string">
+      Date in ISO format (YYYY-MM-DD)
+    </ResponseField>
+    
+    <ResponseField name="followers" type="number">
+      Total follower change across all accounts on this day
+    </ResponseField>
+    
+    <ResponseField name="following" type="number">
+      Total following change across all accounts on this day
+    </ResponseField>
+    
+    <ResponseField name="views" type="number">
+      Total views gained across all accounts on this day
+    </ResponseField>
+    
+    <ResponseField name="likes" type="number">
+      Total likes gained across all accounts on this day
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/stats/aggregated/daily \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "startDate": "2024-01-01T00:00:00Z",
+    "endDate": "2024-01-31T23:59:59Z",
+    "tag": "fitness"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/stats/aggregated/daily',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'startDate': '2024-01-01T00:00:00Z',
+        'endDate': '2024-01-31T23:59:59Z',
+        'tag': 'fitness'
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    for day in data['data']:
+        print(f"{day['date']}: +{day['followers']} followers, +{day['views']} views")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/stats/aggregated/daily', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    startDate: '2024-01-01T00:00:00Z',
+    endDate: '2024-01-31T23:59:59Z',
+    tag: 'fitness'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  data.data.forEach(day => {
+    console.log(`${day.date}: +${day.followers} followers, +${day.views} views`);
+  });
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.stats.getDailyAggregated({
+  startDate: '2024-01-01T00:00:00Z',
+  endDate: '2024-01-31T23:59:59Z',
+  tag: 'fitness'
+});
+
+if (response.ok) {
+  response.data.forEach(day => {
+    console.log(`${day.date}:`);
+    console.log(`  Followers: +${day.followers}`);
+    console.log(`  Views: +${day.views}`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "date": "2024-01-01",
+      "followers": 234,
+      "following": 12,
+      "views": 45600,
+      "likes": 3420
+    },
+    {
+      "date": "2024-01-02",
+      "followers": 189,
+      "following": 8,
+      "views": 38900,
+      "likes": 2890
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
