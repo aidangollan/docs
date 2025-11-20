@@ -66,6 +66,10 @@ Returns one record per day containing the sum of daily changes for all metrics (
     <ResponseField name="likes" type="number">
       Total likes gained across all accounts on this day
     </ResponseField>
+    
+    <ResponseField name="posts" type="number">
+      Total number of posts created on this day
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -102,7 +106,7 @@ data = response.json()
 
 if data['ok']:
     for day in data['data']:
-        print(f"{day['date']}: +{day['followers']} followers, +{day['views']} views")
+        print(f"{day['date']}: +{day['followers']} followers, +{day['views']} views, {day['posts']} posts")
 ```
 
 ```javascript JavaScript
@@ -123,7 +127,7 @@ const data = await response.json();
 
 if (data.ok) {
   data.data.forEach(day => {
-    console.log(`${day.date}: +${day.followers} followers, +${day.views} views`);
+    console.log(`${day.date}: +${day.followers} followers, +${day.views} views, ${day.posts} posts`);
   });
 }
 ```
@@ -146,6 +150,7 @@ if (response.ok) {
     console.log(`${day.date}:`);
     console.log(`  Followers: +${day.followers}`);
     console.log(`  Views: +${day.views}`);
+    console.log(`  Posts: ${day.posts}`);
   });
 }
 ```
@@ -165,14 +170,16 @@ if (response.ok) {
       "followers": 234,
       "following": 12,
       "views": 45600,
-      "likes": 3420
+      "likes": 3420,
+      "posts": 15
     },
     {
       "date": "2024-01-02",
       "followers": 189,
       "following": 8,
       "views": 38900,
-      "likes": 2890
+      "likes": 2890,
+      "posts": 12
     }
   ]
 }
