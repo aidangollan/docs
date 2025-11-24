@@ -1,6 +1,6 @@
 ---
 title: "Update Account Info"
-description: "Update account metadata (tag, groups)"
+description: "Update account metadata (tag, groups, keywords, profiles)"
 ---
 
 ## Endpoint
@@ -11,7 +11,7 @@ POST https://api.ugc.inc/accounts/update-info
 
 ## Overview
 
-Update account metadata including tag, organization group, and user group. This endpoint updates the internal categorization and grouping of accounts without modifying the social media profile itself.
+Update account metadata including tag, organization group, user group, keywords, and profiles. This endpoint updates the internal categorization and grouping of accounts without modifying the social media profile itself.
 
 ## Request Body
 
@@ -31,8 +31,16 @@ Update account metadata including tag, organization group, and user group. This 
   New user group identifier
 </ParamField>
 
+<ParamField body="keywords" type="string">
+  Comma-separated list of keywords for warmup activities (e.g., "fitness,health,workout")
+</ParamField>
+
+<ParamField body="profiles" type="string">
+  Comma-separated list of profile usernames for warmup activities (e.g., "@fitinfluencer1,@healthguru2")
+</ParamField>
+
 <Note>
-  At least one of `tag`, `org_group`, or `user_group` must be provided.
+  At least one of `tag`, `org_group`, `user_group`, `keywords`, or `profiles` must be provided.
 </Note>
 
 ## Response
@@ -61,7 +69,9 @@ curl -X POST https://api.ugc.inc/accounts/update-info \
     "accountId": "acc_123456",
     "tag": "premium",
     "org_group": "marketing",
-    "user_group": "team_alpha"
+    "user_group": "team_alpha",
+    "keywords": "fitness,health,workout",
+    "profiles": "@fitinfluencer1,@healthguru2"
   }'
 ```
 
@@ -78,7 +88,9 @@ response = requests.post(
         'accountId': 'acc_123456',
         'tag': 'premium',
         'org_group': 'marketing',
-        'user_group': 'team_alpha'
+        'user_group': 'team_alpha',
+        'keywords': 'fitness,health,workout',
+        'profiles': '@fitinfluencer1,@healthguru2'
     }
 )
 
@@ -99,7 +111,9 @@ const response = await fetch('https://api.ugc.inc/accounts/update-info', {
     accountId: 'acc_123456',
     tag: 'premium',
     org_group: 'marketing',
-    user_group: 'team_alpha'
+    user_group: 'team_alpha',
+    keywords: 'fitness,health,workout',
+    profiles: '@fitinfluencer1,@healthguru2'
   })
 });
 
@@ -121,7 +135,9 @@ const response = await client.accounts.updateInfo({
   accountId: 'acc_123456',
   tag: 'premium',
   org_group: 'marketing',
-  user_group: 'team_alpha'
+  user_group: 'team_alpha',
+  keywords: 'fitness,health,workout',
+  profiles: '@fitinfluencer1,@healthguru2'
 });
 
 if (response.ok) {
@@ -147,6 +163,8 @@ if (response.ok) {
       "tag": "premium",
       "org_group": "marketing",
       "user_group": "team_alpha",
+      "keywords": "fitness,health,workout",
+      "profiles": "@fitinfluencer1,@healthguru2",
       "username": "coolcreator",
       "nick_name": "Cool Creator",
       "pfp_url": "https://storage.example.com/avatar.jpg"
