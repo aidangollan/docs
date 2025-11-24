@@ -69,6 +69,10 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
       Whether warmup tasks are enabled for this account
     </ResponseField>
     
+    <ResponseField name="warmup_version" type="'original' | 'v1_smart' | null">
+      Warmup scheduling algorithm version. `original` uses the standard scheduling logic, `v1_smart` uses an optimized algorithm (coming soon)
+    </ResponseField>
+    
     <ResponseField name="keywords" type="string | null">
       Search keywords used for warmup tasks (comma-separated)
     </ResponseField>
@@ -176,6 +180,7 @@ if (response.ok) {
       "nick_name": "Cool Creator",
       "pfp_url": "https://storage.example.com/avatar.jpg",
       "warmup_enabled": true,
+      "warmup_version": "original",
       "keywords": "fitness,workout,health",
       "profiles": "fitnessguru,healthcoach"
     },
@@ -189,6 +194,7 @@ if (response.ok) {
       "nick_name": "Awesome Account",
       "pfp_url": "https://storage.example.com/avatar2.jpg",
       "warmup_enabled": false,
+      "warmup_version": null,
       "keywords": null,
       "profiles": null
     }

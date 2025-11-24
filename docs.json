@@ -44,6 +44,7 @@
           "api-reference/endpoint/accounts-status",
           "api-reference/endpoint/accounts-update-info",
           "api-reference/endpoint/accounts-update-social",
+          "api-reference/endpoint/accounts-reset-warmup",
           "api-reference/endpoint/accounts-delete-posts"
         ]
       },

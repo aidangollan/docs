@@ -1,0 +1,212 @@
+---
+title: "Reset Account Warmup"
+description: "Reset or delete warmup activity for an account"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/accounts/reset-warmup
+```
+
+## Overview
+
+Reset warmup activity for an account. This endpoint has two modes:
+
+- **Reset mode** (default): Resets the run count for all warmup tasks, causing them to re-execute
+- **Delete mode**: Completely removes all warmup tasks from the account
+
+This is useful when you want to restart the warmup process or clear all warmup activity.
+
+## Request Body
+
+<ParamField body="accountId" type="string" required>
+  The ID of the account to reset warmup for
+</ParamField>
+
+<ParamField body="delete_activity" type="boolean" default={false}>
+  If `true`, deletes all warmup tasks completely. If `false` (default), resets task run counts so they will re-execute
+</ParamField>
+
+## Response
+
+<ResponseField name="message" type="string">
+  Success message describing the action taken
+</ResponseField>
+
+<ResponseField name="tasks_affected" type="number">
+  Number of warmup tasks that were reset or deleted
+</ResponseField>
+
+<ResponseField name="action" type="'reset' | 'deleted'">
+  The action that was performed: `'reset'` if tasks were reset to re-run, `'deleted'` if tasks were removed
+</ResponseField>
+
+## Reset vs Delete
+
+### Reset Mode (`delete_activity: false`)
+
+- Tasks remain in the database but are marked to re-run
+- Task history is preserved
+- Warmup will resume from the beginning
+- Use when you want to restart warmup while keeping task records
+
+### Delete Mode (`delete_activity: true`)
+
+- All warmup tasks are permanently removed
+- Task history is lost
+- Account can have fresh warmup tasks scheduled
+- Use when you want to completely clear warmup activity
+
+<RequestExample>
+
+```bash cURL - Reset
+curl -X POST https://api.ugc.inc/accounts/reset-warmup \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "acc_123456",
+    "delete_activity": false
+  }'
+```
+
+```bash cURL - Delete
+curl -X POST https://api.ugc.inc/accounts/reset-warmup \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "acc_123456",
+    "delete_activity": true
+  }'
+```
+
+```python Python
+import requests
+
+# Reset warmup (tasks will re-run)
+response = requests.post(
+    'https://api.ugc.inc/accounts/reset-warmup',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'accountId': 'acc_123456',
+        'delete_activity': False
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print(f"Action: {data['data']['action']}")
+    print(f"Tasks affected: {data['data']['tasks_affected']}")
+```
+
+```javascript JavaScript
+// Reset warmup
+const response = await fetch('https://api.ugc.inc/accounts/reset-warmup', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accountId: 'acc_123456',
+    delete_activity: false
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Action:', data.data.action);
+  console.log('Tasks affected:', data.data.tasks_affected);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Reset warmup (tasks will re-run)
+const response = await client.accounts.resetWarmup({
+  accountId: 'acc_123456',
+  delete_activity: false
+});
+
+if (response.ok) {
+  console.log('Message:', response.data.message);
+  console.log('Tasks affected:', response.data.tasks_affected);
+  console.log('Action:', response.data.action); // 'reset'
+}
+
+// Delete all warmup activity
+const deleteResponse = await client.accounts.resetWarmup({
+  accountId: 'acc_123456',
+  delete_activity: true
+});
+
+if (deleteResponse.ok) {
+  console.log('Message:', deleteResponse.data.message);
+  console.log('Tasks affected:', deleteResponse.data.tasks_affected);
+  console.log('Action:', deleteResponse.data.action); // 'deleted'
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Reset Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "Successfully reset warmup for account (tasks will re-run)",
+    "tasks_affected": 12,
+    "action": "reset"
+  }
+}
+```
+
+```json Delete Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "Successfully deleted all warmup activity for account",
+    "tasks_affected": 12,
+    "action": "deleted"
+  }
+}
+```
+
+```json No Tasks
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "No warmup tasks found for this account",
+    "tasks_affected": 0,
+    "action": "reset"
+  }
+}
+```
+
+```json Error Response
+{
+  "ok": false,
+  "code": 404,
+  "message": "Account not found"
+}
+```
+
+</ResponseExample>
+
