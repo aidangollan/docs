@@ -70,7 +70,11 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
     </ResponseField>
     
     <ResponseField name="warmup_version" type="'original' | 'v1_smart' | null">
-      Warmup scheduling algorithm version. `original` uses the standard scheduling logic, `v1_smart` uses an optimized algorithm (coming soon)
+      Warmup scheduling algorithm version. `original` uses the standard scheduling logic, `v1_smart` uses an optimized algorithm with custom flows
+    </ResponseField>
+    
+    <ResponseField name="description" type="string | null">
+      Description/interest area for the account. Used by v1_smart warmup for browse tasks
     </ResponseField>
     
     <ResponseField name="keywords" type="string | null">
@@ -181,6 +185,7 @@ if (response.ok) {
       "pfp_url": "https://storage.example.com/avatar.jpg",
       "warmup_enabled": true,
       "warmup_version": "original",
+      "description": "health and wellness content",
       "keywords": "fitness,workout,health",
       "profiles": "fitnessguru,healthcoach"
     },
@@ -195,6 +200,7 @@ if (response.ok) {
       "pfp_url": "https://storage.example.com/avatar2.jpg",
       "warmup_enabled": false,
       "warmup_version": null,
+      "description": null,
       "keywords": null,
       "profiles": null
     }

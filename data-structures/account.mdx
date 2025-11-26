@@ -20,7 +20,8 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `nick_name` | `string \| null` | Display name shown on profile |
 | `pfp_url` | `string \| null` | URL to account's profile picture |
 | `warmup_enabled` | `boolean \| null` | Whether warmup tasks are enabled for this account |
-| `warmup_version` | `'original' \| 'v1_smart' \| null` | Warmup scheduling algorithm version. `'original'` uses the standard scheduling logic, `'v1_smart'` uses an optimized algorithm (coming soon) |
+| `warmup_version` | `'original' \| 'v1_smart' \| null` | Warmup scheduling algorithm version. `'original'` uses the standard scheduling logic, `'v1_smart'` uses an optimized algorithm with custom flows |
+| `description` | `string \| null` | Description/interest area for the account. Used by v1_smart warmup for browse tasks |
 | `keywords` | `string \| null` | Search keywords used for warmup tasks (comma-separated) |
 | `profiles` | `string \| null` | Profile usernames to search for warmup tasks (comma-separated) |
 
@@ -76,6 +77,7 @@ const campaignAccounts = await client.accounts.getAccounts({
   "pfp_url": "https://storage.example.com/avatar.jpg",
   "warmup_enabled": true,
   "warmup_version": "original",
+  "description": "health and wellness content",
   "keywords": "fitness,workout,health",
   "profiles": "fitnessguru,healthcoach"
 }

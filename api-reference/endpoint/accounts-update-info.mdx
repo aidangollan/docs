@@ -1,6 +1,6 @@
 ---
 title: "Update Account Info"
-description: "Update account metadata (tag, groups, keywords, profiles)"
+description: "Update account metadata (tag, groups, keywords, profiles, description, warmup version)"
 ---
 
 ## Endpoint
@@ -11,7 +11,7 @@ POST https://api.ugc.inc/accounts/update-info
 
 ## Overview
 
-Update account metadata including tag, organization group, user group, keywords, and profiles. This endpoint updates the internal categorization and grouping of accounts without modifying the social media profile itself.
+Update account metadata including tag, organization group, user group, keywords, profiles, description, and warmup version. This endpoint updates the internal categorization and grouping of accounts without modifying the social media profile itself.
 
 ## Request Body
 
@@ -39,8 +39,16 @@ Update account metadata including tag, organization group, user group, keywords,
   Comma-separated list of profile usernames for warmup activities (e.g., "@fitinfluencer1,@healthguru2")
 </ParamField>
 
+<ParamField body="description" type="string">
+  Description/interest area for the account. Used by v1_smart warmup for browse tasks (e.g., "health and wellness content")
+</ParamField>
+
+<ParamField body="warmupVersion" type="'original' | 'v1_smart'">
+  Warmup scheduling algorithm version. `'original'` uses standard scheduling (20-30 min durations), `'v1_smart'` uses optimized algorithm with custom flows (5-10 min after day 4)
+</ParamField>
+
 <Note>
-  At least one of `tag`, `org_group`, `user_group`, `keywords`, or `profiles` must be provided.
+  At least one of `tag`, `org_group`, `user_group`, `keywords`, `profiles`, `description`, or `warmupVersion` must be provided.
 </Note>
 
 ## Response
@@ -71,7 +79,9 @@ curl -X POST https://api.ugc.inc/accounts/update-info \
     "org_group": "marketing",
     "user_group": "team_alpha",
     "keywords": "fitness,health,workout",
-    "profiles": "@fitinfluencer1,@healthguru2"
+    "profiles": "@fitinfluencer1,@healthguru2",
+    "description": "health and wellness content",
+    "warmupVersion": "v1_smart"
   }'
 ```
 
@@ -90,7 +100,9 @@ response = requests.post(
         'org_group': 'marketing',
         'user_group': 'team_alpha',
         'keywords': 'fitness,health,workout',
-        'profiles': '@fitinfluencer1,@healthguru2'
+        'profiles': '@fitinfluencer1,@healthguru2',
+        'description': 'health and wellness content',
+        'warmupVersion': 'v1_smart'
     }
 )
 
@@ -113,7 +125,9 @@ const response = await fetch('https://api.ugc.inc/accounts/update-info', {
     org_group: 'marketing',
     user_group: 'team_alpha',
     keywords: 'fitness,health,workout',
-    profiles: '@fitinfluencer1,@healthguru2'
+    profiles: '@fitinfluencer1,@healthguru2',
+    description: 'health and wellness content',
+    warmupVersion: 'v1_smart'
   })
 });
 
@@ -137,7 +151,9 @@ const response = await client.accounts.updateInfo({
   org_group: 'marketing',
   user_group: 'team_alpha',
   keywords: 'fitness,health,workout',
-  profiles: '@fitinfluencer1,@healthguru2'
+  profiles: '@fitinfluencer1,@healthguru2',
+  description: 'health and wellness content',
+  warmupVersion: 'v1_smart'
 });
 
 if (response.ok) {
@@ -165,6 +181,8 @@ if (response.ok) {
       "user_group": "team_alpha",
       "keywords": "fitness,health,workout",
       "profiles": "@fitinfluencer1,@healthguru2",
+      "description": "health and wellness content",
+      "warmup_version": "v1_smart",
       "username": "coolcreator",
       "nick_name": "Cool Creator",
       "pfp_url": "https://storage.example.com/avatar.jpg"
