@@ -66,7 +66,7 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
     </ResponseField>
     
     <ResponseField name="music_post_id" type="string | null">
-      ID of the music/audio track used in the post
+      Legacy field for music/audio ID (deprecated in favor of social_audio_id)
     </ResponseField>
     
     <ResponseField name="scheduled_at" type="string | null">
@@ -194,7 +194,7 @@ if (response.ok) {
       "media_urls": [
         "https://storage.example.com/video1.mp4"
       ],
-      "music_post_id": "music_xyz789",
+      "music_post_id": "audio_xyz789",
       "scheduled_at": "2024-01-15T14:30:00Z",
       "postUrl": "https://www.tiktok.com/@username/video/7234567890123456789"
     },
@@ -210,7 +210,7 @@ if (response.ok) {
         "https://storage.example.com/img2.jpg",
         "https://storage.example.com/img3.jpg"
       ],
-      "music_post_id": "music_abc123",
+      "music_post_id": "audio_abc123",
       "scheduled_at": "2024-01-20T10:00:00Z"
     }
   ]

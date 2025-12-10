@@ -47,8 +47,12 @@ Update account metadata including tag, organization group, user group, keywords,
   Warmup scheduling algorithm version. `'original'` uses standard scheduling (20-30 min durations), `'v1_smart'` uses optimized algorithm with custom flows (5-10 min after day 4)
 </ParamField>
 
+<ParamField body="postVersion" type="'original' | 'v1_custom'">
+  Post flow version. `'original'` uses standard posting flow, `'v1_custom'` uses customized posting flow
+</ParamField>
+
 <Note>
-  At least one of `tag`, `org_group`, `user_group`, `keywords`, `profiles`, `description`, or `warmupVersion` must be provided.
+  At least one of `tag`, `org_group`, `user_group`, `keywords`, `profiles`, `description`, `warmupVersion`, or `postVersion` must be provided.
 </Note>
 
 ## Response

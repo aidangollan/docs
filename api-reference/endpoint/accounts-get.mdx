@@ -27,6 +27,10 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
   Filter accounts by user group
 </ParamField>
 
+<ParamField body="status" type="'pending' | 'initialized' | 'setup' | 'error'">
+  Filter accounts by status
+</ParamField>
+
 ## Response
 
 <ResponseField name="data" type="Account[]">
@@ -83,6 +87,18 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
     
     <ResponseField name="profiles" type="string | null">
       Profile usernames to search for warmup tasks (comma-separated)
+    </ResponseField>
+    
+    <ResponseField name="bio" type="string | null">
+      Account bio text
+    </ResponseField>
+    
+    <ResponseField name="post_version" type="'original' | 'v1_custom' | null">
+      Post flow version. `original` uses standard posting flow, `v1_custom` uses customized posting flow
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Account status: `pending`, `initialized`, `setup`, or `error`
     </ResponseField>
   </Expandable>
 </ResponseField>

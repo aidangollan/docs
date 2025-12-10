@@ -40,13 +40,31 @@ const media = await client.media.create({
 });
 ```
 
-## Request
+## Request Body
 
-This endpoint is called automatically by the Vercel Blob client library. It expects the standard Vercel Blob upload protocol request body.
+<ParamField body="filename" type="string" required>
+  The filename for the upload. This will be used as part of the storage path.
+</ParamField>
+
+<ParamField body="contentType" type="string">
+  Optional MIME type of the file (e.g., `image/jpeg`, `video/mp4`). If not provided, defaults to allowing images, videos, and audio.
+</ParamField>
 
 ## Response
 
-Returns the standard Vercel Blob upload protocol response with upload credentials.
+<ResponseField name="data" type="object">
+  Upload credentials
+  
+  <Expandable title="Response properties">
+    <ResponseField name="clientToken" type="string">
+      The Vercel Blob client token for direct upload
+    </ResponseField>
+    
+    <ResponseField name="pathname" type="string">
+      The storage path where the file will be uploaded
+    </ResponseField>
+  </Expandable>
+</ResponseField>
 
 <RequestExample>
 

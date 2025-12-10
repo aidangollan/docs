@@ -56,8 +56,8 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
   **Limit:** Maximum 500 characters
 </ParamField>
 
-<ParamField body="musicPostId" type="string">
-  ID of a post that uses the song you want to attach
+<ParamField body="socialAudioId" type="string">
+  ID of a social audio record to attach to the post
   
   <Note>
     **Music Support:**
@@ -66,7 +66,24 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
   </Note>
   
   **How to use:**
-  To add music to your video, provide the ID of any post that already uses the song you want. For example, if you want to use the song from this TikTok: `https://www.tiktok.com/music/The-Fate-of-Ophelia-7556815852168759313`, find a video that uses that song (e.g., `https://www.tiktok.com/@taylorswift/video/7559313483398008095`) and provide its ID: `7559313483398008095` as the `musicPostId`.
+  1. First, import the audio using the [Upload Social Audio](/api-reference/endpoint/media-social-audio-upload) endpoint with a TikTok video or music URL
+  2. This returns a social audio record with an `id`
+  3. Use that `id` as the `socialAudioId` here
+  
+  **Example workflow:**
+  ```javascript
+  // Step 1: Import audio from a TikTok video
+  const audioResponse = await client.media.createSocialAudio({
+    url: 'https://www.tiktok.com/@username/video/1234567890'
+  });
+  
+  // Step 2: Use the returned ID in your post
+  const postResponse = await client.posts.createVideo({
+    accountId: 'acc_123456',
+    videoUrl: 'https://example.com/video.mp4',
+    socialAudioId: audioResponse.data.id
+  });
+  ```
 </ParamField>
 
 <ParamField body="postTime" type="string">
@@ -125,8 +142,8 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
       Array containing the video URL
     </ResponseField>
     
-    <ResponseField name="music_post_id" type="string | null">
-      Music/audio ID
+    <ResponseField name="social_audio_id" type="string | null">
+      ID of the attached social audio record
     </ResponseField>
     
     <ResponseField name="scheduled_at" type="string | null">
@@ -145,7 +162,7 @@ curl -X POST https://api.ugc.inc/post/video \
     "accountId": "acc_123456",
     "videoUrl": "https://storage.example.com/video.mp4",
     "caption": "My awesome video! 🎥 #viral #content",
-    "musicPostId": "music_xyz789",
+    "socialAudioId": "audio_xyz789",
     "postTime": "2024-12-31T12:00:00Z"
   }'
 ```
@@ -163,7 +180,7 @@ response = requests.post(
         'accountId': 'acc_123456',
         'videoUrl': 'https://storage.example.com/video.mp4',
         'caption': 'My awesome video! 🎥 #viral #content',
-        'musicPostId': 'music_xyz789',
+        'socialAudioId': 'audio_xyz789',
         'postTime': '2024-12-31T12:00:00Z'
     }
 )
@@ -186,7 +203,7 @@ const response = await fetch('https://api.ugc.inc/post/video', {
     accountId: 'acc_123456',
     videoUrl: 'https://storage.example.com/video.mp4',
     caption: 'My awesome video! 🎥 #viral #content',
-    musicPostId: 'music_xyz789',
+    socialAudioId: 'audio_xyz789',
     postTime: '2024-12-31T12:00:00Z'
   })
 });
@@ -211,7 +228,7 @@ const response = await client.posts.createVideo({
   accountId: 'acc_123456',
   videoUrl: 'https://storage.example.com/video.mp4',
   caption: 'My awesome video! 🎥 #viral #content',
-  musicPostId: 'music_xyz789',
+  socialAudioId: 'audio_xyz789',
   postTime: '2024-12-31T12:00:00Z'
 });
 
@@ -261,7 +278,7 @@ if (response.ok) {
     "media_urls": [
       "https://storage.example.com/video.mp4"
     ],
-    "music_post_id": "music_xyz789",
+    "social_audio_id": "audio_xyz789",
     "scheduled_at": "2024-12-31T12:00:00Z"
   }
 }

@@ -11,18 +11,28 @@ POST https://api.ugc.inc/media/create
 
 ## Overview
 
-Create media records from file URLs. Use this after uploading files directly to blob storage via the presigned URL endpoint, or to import media from external URLs.
+Create media records from file URLs. Use this after uploading files directly to blob storage via the presigned URL endpoint, or to reference media from external URLs.
 
 The API will:
-1. Download the file from the provided URL
-2. Determine the media type (video, image, or audio)
-3. Upload to Vercel Blob storage
-4. Create a database record
+1. Determine the media type from the URL extension (video, image, or audio)
+2. Create a database record pointing to the provided URL
+
+<Note>
+  This endpoint does NOT re-upload files. It creates database records that reference the provided URLs directly. Make sure your URLs are publicly accessible and permanent.
+</Note>
 
 ## Request Body
 
 <ParamField body="urls" type="string[]" required>
   Array of file URLs to create media from. Always provide as an array, even for single files.
+</ParamField>
+
+<ParamField body="names" type="string[]">
+  Optional array of original filenames, parallel to the `urls` array. If not provided, filenames are extracted from the URLs.
+</ParamField>
+
+<ParamField body="previewUrls" type="(string | null)[]">
+  Optional array of preview/thumbnail URLs, parallel to the `urls` array. Useful for providing video thumbnails.
 </ParamField>
 
 <ParamField body="tag" type="string">
