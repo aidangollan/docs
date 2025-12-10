@@ -1,0 +1,100 @@
+---
+title: "Media"
+description: "Media file data structures for user uploads and social audio"
+---
+
+The media system supports two types of media: **User Media** (uploaded files) and **Social Audio** (imported from TikTok).
+
+## Media (Union Type)
+
+The `Media` type is a union of `UserMedia` and `SocialAudio`. When fetching media, you can differentiate between them using the `media_type` field.
+
+```typescript
+type Media = UserMedia | SocialAudio;
+```
+
+## UserMedia
+
+Represents uploaded media files (images, videos, audio).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique identifier |
+| `org_id` | `string` | Organization ID |
+| `name` | `string \| null` | File name |
+| `tag` | `string \| null` | Custom tag for categorization |
+| `type` | `'video' \| 'image' \| 'audio' \| null` | Media type |
+| `url` | `string` | URL to fetch the file (via API proxy) |
+| `created_at` | `string` | ISO timestamp of creation |
+| `media_type` | `'user_media'` | Discriminator field |
+
+### Example UserMedia Object
+
+```json
+{
+  "id": "media_abc123",
+  "org_id": "org_xyz789",
+  "name": "product-video.mp4",
+  "tag": "products",
+  "type": "video",
+  "url": "https://api.ugc.inc/media/file/media_abc123",
+  "created_at": "2024-01-15T10:30:00.000Z",
+  "media_type": "user_media"
+}
+```
+
+## SocialAudio
+
+Represents audio imported from TikTok videos or music links.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique identifier |
+| `org_id` | `string` | Organization ID |
+| `name` | `string \| null` | Audio/song title |
+| `tag` | `string \| null` | Custom tag for categorization |
+| `social_post_link` | `string \| null` | Link to a TikTok post using this audio |
+| `social_audio_link` | `string \| null` | Direct link to the TikTok audio/music page |
+| `platform_type` | `'tiktok' \| null` | Source platform |
+| `preview_url` | `string \| null` | URL to fetch cover image (via API proxy) |
+| `audio_url` | `string \| null` | URL to fetch audio file (via API proxy) |
+| `created_at` | `string` | ISO timestamp of creation |
+| `media_type` | `'social_audio'` | Discriminator field |
+| `type` | `'social_audio'` | Type field for compatibility |
+
+### Example SocialAudio Object
+
+```json
+{
+  "id": "audio_def456",
+  "org_id": "org_xyz789",
+  "name": "Trending Sound - Artist Name",
+  "tag": "trending",
+  "social_post_link": "https://www.tiktok.com/@username/video/1234567890",
+  "social_audio_link": "https://www.tiktok.com/music/Trending-Sound-1234567890",
+  "platform_type": "tiktok",
+  "preview_url": "https://api.ugc.inc/media/file/audio_def456/preview",
+  "audio_url": "https://api.ugc.inc/media/file/audio_def456/audio",
+  "created_at": "2024-01-15T10:30:00.000Z",
+  "media_type": "social_audio",
+  "type": "social_audio"
+}
+```
+
+## Type Checking
+
+When working with the `Media` union type, use the `media_type` field to determine the specific type:
+
+```typescript
+function processMedia(media: Media) {
+  if (media.media_type === 'user_media') {
+    // TypeScript knows this is UserMedia
+    console.log('File URL:', media.url);
+  } else {
+    // TypeScript knows this is SocialAudio
+    console.log('Audio URL:', media.audio_url);
+    console.log('Cover URL:', media.preview_url);
+  }
+}
+```
+

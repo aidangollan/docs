@@ -1,0 +1,122 @@
+---
+title: "Get Media File"
+description: "Fetch a media file by its ID"
+---
+
+## Endpoint
+
+```
+GET https://api.ugc.inc/media/file/{id}
+GET https://api.ugc.inc/media/file/{id}/preview
+GET https://api.ugc.inc/media/file/{id}/audio
+```
+
+## Overview
+
+Retrieve the actual media file content. This endpoint acts as a proxy to the underlying blob storage, hiding the storage URLs from clients.
+
+**URL Patterns:**
+- `/media/file/{id}` - Returns the main file (user_media video/image/audio, or social_audio's audio file)
+- `/media/file/{id}/preview` - Returns the social_audio cover image
+- `/media/file/{id}/audio` - Returns the social_audio audio file (same as no suffix)
+
+## Path Parameters
+
+<ParamField path="id" type="string" required>
+  The media ID
+</ParamField>
+
+<ParamField path="subpath" type="string">
+  Optional subpath: `preview` for cover image, `audio` for audio file (social_audio only)
+</ParamField>
+
+## Response
+
+Returns the raw file content with appropriate `Content-Type` header.
+
+**Content Types:**
+- Videos: `video/mp4`
+- Images: `image/jpeg`, `image/png`, etc.
+- Audio: `audio/mpeg`
+
+The response includes cache headers for optimal performance:
+- `Cache-Control: public, max-age=31536000, immutable`
+
+<RequestExample>
+
+```bash cURL - User Media
+curl -X GET "https://api.ugc.inc/media/file/media_abc123" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -o video.mp4
+```
+
+```bash cURL - Social Audio Preview
+curl -X GET "https://api.ugc.inc/media/file/audio_def456/preview" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -o cover.jpg
+```
+
+```bash cURL - Social Audio File
+curl -X GET "https://api.ugc.inc/media/file/audio_def456/audio" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -o audio.mp3
+```
+
+```javascript JavaScript
+// Fetch and display an image
+const response = await fetch('https://api.ugc.inc/media/file/media_abc123', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+
+const blob = await response.blob();
+const imageUrl = URL.createObjectURL(blob);
+document.getElementById('image').src = imageUrl;
+```
+
+```typescript React
+// Using the URL directly in img/video/audio tags
+// The URLs returned from getMedia() can be used directly
+
+const { data } = await client.media.getMedia();
+
+// For user_media
+<img src={media.url} alt={media.name} />
+<video src={media.url} controls />
+
+// For social_audio
+<img src={socialAudio.preview_url} alt="Cover" />
+<audio src={socialAudio.audio_url} controls />
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```
+HTTP/1.1 200 OK
+Content-Type: video/mp4
+Cache-Control: public, max-age=31536000, immutable
+
+[binary file content]
+```
+
+```json Error Response - Not Found
+{
+  "ok": false,
+  "code": 404,
+  "message": "Media not found"
+}
+```
+
+```json Error Response - Unauthorized
+{
+  "ok": false,
+  "code": 401,
+  "message": "Missing or invalid Authorization header. Expected format: 'Bearer <token>'"
+}
+```
+
+</ResponseExample>
+

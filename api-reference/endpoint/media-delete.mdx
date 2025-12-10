@@ -1,0 +1,160 @@
+---
+title: "Delete Media"
+description: "Delete one or more media items"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/media/delete
+```
+
+## Overview
+
+Delete media items by their IDs. This will also delete the associated files from blob storage. Works for both user-uploaded media and social audio.
+
+## Request Body
+
+<ParamField body="ids" type="string[]" required>
+  Array of media IDs to delete. Always provide as an array, even for single deletions.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Deletion result
+  
+  <Expandable title="Response properties">
+    <ResponseField name="deleted" type="string[]">
+      Array of IDs that were successfully deleted
+    </ResponseField>
+    
+    <ResponseField name="failed" type="array">
+      Array of failed deletions with error details
+      
+      <Expandable title="Failed item properties">
+        <ResponseField name="id" type="string">
+          Media ID that failed to delete
+        </ResponseField>
+        <ResponseField name="message" type="string">
+          Error message
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="message" type="string">
+      Summary message
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/media/delete \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ids": ["media_abc123", "audio_def456"]
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/media/delete',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'ids': ['media_abc123', 'audio_def456']
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print(f"Deleted: {len(data['data']['deleted'])} items")
+    
+    if data['data'].get('failed'):
+        for fail in data['data']['failed']:
+            print(f"Failed to delete {fail['id']}: {fail['message']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/media/delete', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    ids: ['media_abc123', 'audio_def456']
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Deleted:', data.data.deleted.length, 'items');
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Delete single item (still pass as array)
+const single = await client.media.delete({
+  ids: ['media_abc123']
+});
+
+// Delete multiple items
+const multiple = await client.media.delete({
+  ids: ['media_abc123', 'media_def456', 'audio_ghi789']
+});
+
+if (multiple.ok) {
+  console.log(`Deleted ${multiple.data.deleted.length} items`);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "data": {
+    "deleted": ["media_abc123", "audio_def456"],
+    "message": "Deleted 2 items"
+  }
+}
+```
+
+```json Partial Success Response
+{
+  "ok": true,
+  "code": 200,
+  "data": {
+    "deleted": ["media_abc123"],
+    "failed": [
+      {
+        "id": "media_notfound",
+        "message": "Media not found"
+      }
+    ],
+    "message": "Deleted 1 items, 1 failed"
+  }
+}
+```
+
+</ResponseExample>
+

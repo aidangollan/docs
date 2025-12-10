@@ -1,0 +1,129 @@
+---
+title: "Get Upload URL"
+description: "Get a presigned URL for direct client-side uploads"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/media/create/url
+```
+
+## Overview
+
+This endpoint is designed to be used as the `handleUploadUrl` for the `@vercel/blob/client` upload function. It handles token generation for direct client-to-storage uploads.
+
+**Upload Flow:**
+1. Client calls `upload()` from `@vercel/blob/client` with this endpoint as `handleUploadUrl`
+2. This endpoint validates auth and returns upload credentials
+3. Client uploads directly to Vercel Blob storage
+4. After upload, call `/media/create` with the resulting blob URL to create the media record
+
+## Usage with @vercel/blob/client
+
+```typescript
+import { upload } from '@vercel/blob/client';
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+
+// Upload file directly to blob storage
+const blob = await upload(file.name, file, {
+  access: 'public',
+  handleUploadUrl: client.media.getUploadHandlerUrl()
+});
+
+// Create media record from the uploaded blob
+const media = await client.media.create({
+  urls: [blob.url],
+  tag: 'uploads'
+});
+```
+
+## Request
+
+This endpoint is called automatically by the Vercel Blob client library. It expects the standard Vercel Blob upload protocol request body.
+
+## Response
+
+Returns the standard Vercel Blob upload protocol response with upload credentials.
+
+<RequestExample>
+
+```typescript React
+import { upload } from '@vercel/blob/client';
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+async function uploadFile(file: File, tag?: string) {
+  // Step 1: Upload to blob storage
+  const blob = await upload(file.name, file, {
+    access: 'public',
+    handleUploadUrl: client.media.getUploadHandlerUrl()
+  });
+  
+  // Step 2: Create media record
+  const response = await client.media.create({
+    urls: [blob.url],
+    tag
+  });
+  
+  if (response.ok) {
+    return response.data.data[0]; // Return the created media
+  }
+  
+  throw new Error('Failed to create media record');
+}
+
+// Usage
+const file = document.querySelector('input[type="file"]').files[0];
+const media = await uploadFile(file, 'user-uploads');
+console.log('Uploaded:', media.url);
+```
+
+```typescript Multiple Files
+import { upload } from '@vercel/blob/client';
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+async function uploadMultipleFiles(files: File[], tag?: string) {
+  // Upload all files to blob storage
+  const blobs = await Promise.all(
+    files.map(file => 
+      upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: client.media.getUploadHandlerUrl()
+      })
+    )
+  );
+  
+  // Create media records for all uploaded files
+  const response = await client.media.create({
+    urls: blobs.map(b => b.url),
+    tag
+  });
+  
+  return response;
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Vercel Blob Protocol Response
+{
+  "type": "blob.generate-client-token",
+  "clientToken": "vercel_blob_client_...",
+  "url": "https://blob.vercel-storage.com/..."
+}
+```
+
+</ResponseExample>
+

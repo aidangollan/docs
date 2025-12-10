@@ -23,7 +23,8 @@
           "data-structures/account-stat",
           "data-structures/post-stat",
           "data-structures/api-key",
-          "data-structures/editor"
+          "data-structures/editor",
+          "data-structures/media"
         ]
       },
       {
@@ -70,6 +71,19 @@
           "api-reference/endpoint/org-api-keys-list",
           "api-reference/endpoint/org-api-keys-edit",
           "api-reference/endpoint/org-api-keys-delete"
+        ]
+      },
+      {
+        "group": "Media",
+        "pages": [
+          "api-reference/endpoint/media-get",
+          "api-reference/endpoint/media-file",
+          "api-reference/endpoint/media-social-audio-get",
+          "api-reference/endpoint/media-social-audio-upload",
+          "api-reference/endpoint/media-create",
+          "api-reference/endpoint/media-create-url",
+          "api-reference/endpoint/media-update-tag",
+          "api-reference/endpoint/media-delete"
         ]
       },
       {
