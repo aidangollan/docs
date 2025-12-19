@@ -42,6 +42,7 @@
         "group": "Comments",
         "pages": [
           "api-reference/endpoint/comments-create",
+          "api-reference/endpoint/comments-list",
           "api-reference/endpoint/comments-status"
         ]
       },
