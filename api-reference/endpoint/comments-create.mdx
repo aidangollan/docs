@@ -11,7 +11,7 @@ POST https://api.ugc.inc/comment/create
 
 ## Overview
 
-Create a task to post a comment on a TikTok video using one of your accounts. The comment will be posted through the phone farm automation system. Use the returned `taskId` to check the status of the comment.
+Create a task to post a comment on a TikTok video using one of your accounts. Use the returned `taskId` to check the status of the comment.
 
 ## Request Body
 
@@ -20,7 +20,6 @@ Create a task to post a comment on a TikTok video using one of your accounts. Th
   
   The account must:
   - Be in `setup` status
-  - Have a GeeLark phone ID configured
   - Belong to your organization
 </ParamField>
 
@@ -173,7 +172,7 @@ if (response.ok) {
 {
   "ok": false,
   "code": 400,
-  "message": "Account does not have a GeeLark phone ID configured"
+  "message": "Account is not fully configured"
 }
 ```
 
