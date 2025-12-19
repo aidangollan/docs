@@ -1,5 +1,5 @@
 ---
-title: "Create Comment Task"
+title: "Create Comment"
 description: "Create a comment on a TikTok post"
 ---
 
@@ -11,7 +11,7 @@ POST https://api.ugc.inc/comment/create
 
 ## Overview
 
-Create a task to post a comment on a TikTok video using one of your accounts. Use the returned `taskId` to check the status of the comment.
+Create a comment on a TikTok video using one of your accounts. Use the returned `commentId` to check the status of the comment.
 
 ## Request Body
 
@@ -42,11 +42,11 @@ Create a task to post a comment on a TikTok video using one of your accounts. Us
 ## Response
 
 <ResponseField name="data" type="object">
-  Task creation response
+  Comment creation response
   
   <Expandable title="Response properties">
-    <ResponseField name="taskId" type="string">
-      Unique task identifier - use this to check the comment status
+    <ResponseField name="commentId" type="string">
+      Unique comment identifier - use this to check the comment status
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -83,8 +83,8 @@ response = requests.post(
 data = response.json()
 
 if data['ok']:
-    print('Comment task created:', data['data']['taskId'])
-    # Use this taskId to check status later
+    print('Comment created:', data['data']['commentId'])
+    # Use this commentId to check status later
 ```
 
 ```javascript JavaScript
@@ -104,8 +104,8 @@ const response = await fetch('https://api.ugc.inc/comment/create', {
 const data = await response.json();
 
 if (data.ok) {
-  console.log('Comment task created:', data.data.taskId);
-  // Use this taskId to check status later
+  console.log('Comment created:', data.data.commentId);
+  // Use this commentId to check status later
 }
 ```
 
@@ -123,11 +123,11 @@ const response = await client.comments.createComment({
 });
 
 if (response.ok) {
-  console.log(`Comment task created: ${response.data.taskId}`);
+  console.log(`Comment created: ${response.data.commentId}`);
   
   // Poll for status
-  const checkStatus = async (taskId: string) => {
-    const statusResponse = await client.comments.getStatus({ taskId });
+  const checkStatus = async (commentId: string) => {
+    const statusResponse = await client.comments.getStatus({ commentId });
     
     if (statusResponse.ok) {
       if (statusResponse.data.status === 'completed') {
@@ -136,12 +136,12 @@ if (response.ok) {
         console.log('Comment failed:', statusResponse.data.error);
       } else {
         // Still processing - check again later
-        setTimeout(() => checkStatus(taskId), 5000);
+        setTimeout(() => checkStatus(commentId), 5000);
       }
     }
   };
   
-  checkStatus(response.data.taskId);
+  checkStatus(response.data.commentId);
 }
 ```
 
@@ -155,7 +155,7 @@ if (response.ok) {
   "code": 200,
   "message": "Success",
   "data": {
-    "taskId": "task_abc123xyz"
+    "commentId": "550e8400-e29b-41d4-a716-446655440000"
   }
 }
 ```
@@ -185,4 +185,3 @@ if (response.ok) {
 ```
 
 </ResponseExample>
-

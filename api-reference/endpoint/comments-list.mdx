@@ -1,0 +1,267 @@
+---
+title: "Get Comments"
+description: "Get comments for your organization"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/comment
+```
+
+## Overview
+
+Retrieve comments for your organization. You can filter by specific comment IDs, account IDs, or account tag.
+
+## Request Body
+
+<ParamField body="commentIds" type="string[]">
+  Get specific comments by their IDs.
+</ParamField>
+
+<ParamField body="accountIds" type="string[]">
+  Filter comments by account IDs. Only returns comments made by these accounts.
+</ParamField>
+
+<ParamField body="tag" type="string">
+  Filter comments by account tag. Returns comments from all accounts that have this tag.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="Comment[]">
+  Array of comment objects
+  
+  Each comment includes:
+  - `id`: Unique comment identifier
+  - `accountId`: Account ID used for the comment
+  - `postUrl`: URL of the TikTok post
+  - `commentText`: The comment text
+  - `status`: Current status (`pending`, `running`, `completed`, `failed`)
+  - `commentUrl`: URL to the posted comment (if completed)
+  - `error`: Error message (if failed)
+  - `createdAt`: When the comment was created
+  - `completedAt`: When the comment completed (if applicable)
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL (Get All Comments)
+curl -X POST https://api.ugc.inc/comment \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```bash cURL (Get Specific Comments)
+curl -X POST https://api.ugc.inc/comment \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "commentIds": ["550e8400-e29b-41d4-a716-446655440000"]
+  }'
+```
+
+```bash cURL (Get Comments by Accounts)
+curl -X POST https://api.ugc.inc/comment \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountIds": ["acc_123456", "acc_789012"]
+  }'
+```
+
+```bash cURL (Get Comments by Tag)
+curl -X POST https://api.ugc.inc/comment \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tag": "campaign-1"
+  }'
+```
+
+```python Python
+import requests
+
+# Get all comments
+response = requests.post(
+    'https://api.ugc.inc/comment',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={}
+)
+
+data = response.json()
+if data['code'] == 200:
+    comments = data['data']
+    print(f"Found {len(comments)} comments")
+    
+    for comment in comments:
+        print(f"- {comment['commentText'][:30]}... ({comment['status']})")
+
+# Get specific comments
+response = requests.post(
+    'https://api.ugc.inc/comment',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={'commentIds': ['550e8400-e29b-41d4-a716-446655440000']}
+)
+
+# Get comments by accounts
+response = requests.post(
+    'https://api.ugc.inc/comment',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={'accountIds': ['acc_123456']}
+)
+
+# Get comments by tag
+response = requests.post(
+    'https://api.ugc.inc/comment',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={'tag': 'campaign-1'}
+)
+```
+
+```javascript JavaScript
+// Get all comments
+const response = await fetch('https://api.ugc.inc/comment', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
+if (data.code === 200) {
+  console.log(`Found ${data.data.length} comments`);
+  
+  data.data.forEach(comment => {
+    console.log(`- ${comment.commentText.slice(0, 30)}... (${comment.status})`);
+  });
+}
+
+// Get specific comments
+const specificResponse = await fetch('https://api.ugc.inc/comment', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ commentIds: ['550e8400-e29b-41d4-a716-446655440000'] })
+});
+
+// Get comments by accounts
+const accountResponse = await fetch('https://api.ugc.inc/comment', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ accountIds: ['acc_123456'] })
+});
+
+// Get comments by tag
+const tagResponse = await fetch('https://api.ugc.inc/comment', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ tag: 'campaign-1' })
+});
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Get all comments
+const response = await client.comments.getComments();
+if (response.ok) {
+  console.log(`Found ${response.data.length} comments`);
+  
+  response.data.forEach(comment => {
+    console.log(`- ${comment.commentText.slice(0, 30)}... (${comment.status})`);
+  });
+}
+
+// Get specific comments by IDs
+const specificComments = await client.comments.getComments({ 
+  commentIds: ['550e8400-e29b-41d4-a716-446655440000'] 
+});
+
+// Get comments for specific accounts
+const accountComments = await client.comments.getComments({ 
+  accountIds: ['acc_123456'] 
+});
+
+// Get comments by tag
+const taggedComments = await client.comments.getComments({ tag: 'campaign-1' });
+
+// Get only completed comments
+const allComments = await client.comments.getComments();
+if (allComments.ok) {
+  const completedComments = allComments.data.filter(
+    c => c.status === 'completed'
+  );
+  console.log(`${completedComments.length} comments have been posted`);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "code": 200,
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "accountId": "acc_123456",
+      "postUrl": "https://www.tiktok.com/@creator/video/7234567890123456789",
+      "commentText": "Great video! 🔥",
+      "status": "completed",
+      "commentUrl": "https://www.tiktok.com/@creator/video/7234567890123456789?comment_id=7000000000000000001",
+      "error": null,
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "completedAt": "2024-01-15T10:31:00.000Z"
+    },
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440001",
+      "accountId": "acc_789012",
+      "postUrl": "https://www.tiktok.com/@another/video/7234567890123456790",
+      "commentText": "Love this!",
+      "status": "pending",
+      "commentUrl": null,
+      "error": null,
+      "createdAt": "2024-01-15T11:00:00.000Z",
+      "completedAt": null
+    }
+  ]
+}
+```
+
+```json Success Response (Empty)
+{
+  "code": 200,
+  "data": []
+}
+```
+
+</ResponseExample>
