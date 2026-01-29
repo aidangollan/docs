@@ -24,6 +24,7 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `description` | `string \| null` | Description/interest area for the account. Used by v1_smart warmup for browse tasks |
 | `keywords` | `string \| null` | Search keywords used for warmup tasks (comma-separated) |
 | `profiles` | `string \| null` | Profile usernames to search for warmup tasks (comma-separated) |
+| `status` | `string` | Account status: `'pending'`, `'initialized'`, `'setup'`, `'warming'`, `'warmed'`, `'needs_replacement'`, or `'error'` |
 
 ## Account Organization
 
@@ -63,6 +64,20 @@ const campaignAccounts = await client.accounts.getAccounts({
 });
 ```
 
+## Account Status
+
+The `status` field indicates the current lifecycle stage of an account:
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Account is awaiting initialization |
+| `initialized` | Account has been created but not fully set up |
+| `setup` | Account is fully configured and ready for warmup |
+| `warming` | Account is currently in the warmup phase |
+| `warmed` | Account has completed warmup and is ready for posting |
+| `needs_replacement` | Account needs to be replaced with a new one |
+| `error` | Account encountered an error |
+
 ## Example Response
 
 ```json
@@ -79,7 +94,8 @@ const campaignAccounts = await client.accounts.getAccounts({
   "warmup_version": "original",
   "description": "health and wellness content",
   "keywords": "fitness,workout,health",
-  "profiles": "fitnessguru,healthcoach"
+  "profiles": "fitnessguru,healthcoach",
+  "status": "warmed"
 }
 ```
 

@@ -128,5 +128,9 @@
      "cursor",
      "vscode"
    ]
+  },
+  "embedding": {
+    "enabled": true,
+    "origins": ["https://app.ugc.inc", "http://localhost:3000"]
   }
 }

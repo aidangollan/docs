@@ -1,6 +1,6 @@
 ---
 title: "Update Media Tag"
-description: "Update the tag on a media item"
+description: "Update tags on one or more media items"
 ---
 
 ## Endpoint
@@ -11,37 +11,72 @@ POST https://api.ugc.inc/media/update-tag
 
 ## Overview
 
-Update the tag on a media item. Works for both user-uploaded media and social audio.
+Update tags on one or more media items. Works for both user-uploaded media and social audio. Supports bulk updates with different tags for each item in a single request.
 
 ## Request Body
 
-<ParamField body="id" type="string" required>
-  The ID of the media item to update
+### Bulk Update (Recommended)
+
+<ParamField body="updates" type="array" required>
+  Array of update objects, each containing:
+  
+  <Expandable title="Update Object">
+    <ParamField body="id" type="string" required>
+      The ID of the media item to update
+    </ParamField>
+    <ParamField body="tag" type="string" required>
+      The new tag value for this item
+    </ParamField>
+  </Expandable>
 </ParamField>
 
-<ParamField body="tag" type="string" required>
-  The new tag value
+### Single Update (Deprecated)
+
+<ParamField body="id" type="string">
+  The ID of the media item to update (deprecated - use `updates` array instead)
+</ParamField>
+
+<ParamField body="tag" type="string">
+  The new tag value (deprecated - use `updates` array instead)
 </ParamField>
 
 ## Response
 
-<ResponseField name="data" type="UserMedia | SocialAudio">
-  The updated media object
+<ResponseField name="data.results" type="array">
+  Array of update results, one for each item in the request:
+  
+  <Expandable title="Result Object">
+    <ResponseField name="id" type="string">
+      The ID of the media item
+    </ResponseField>
+    <ResponseField name="success" type="boolean">
+      Whether the update succeeded
+    </ResponseField>
+    <ResponseField name="media" type="UserMedia | SocialAudio">
+      The updated media object (only present if successful)
+    </ResponseField>
+    <ResponseField name="error" type="string">
+      Error message (only present if failed)
+    </ResponseField>
+  </Expandable>
 </ResponseField>
 
 <RequestExample>
 
-```bash cURL
+```bash cURL (Bulk)
 curl -X POST https://api.ugc.inc/media/update-tag \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "id": "media_abc123",
-    "tag": "featured"
+    "updates": [
+      { "id": "media_abc123", "tag": "featured" },
+      { "id": "media_def456", "tag": "archive" },
+      { "id": "media_ghi789", "tag": "featured/videos" }
+    ]
   }'
 ```
 
-```python Python
+```python Python (Bulk)
 import requests
 
 response = requests.post(
@@ -51,18 +86,24 @@ response = requests.post(
         'Content-Type': 'application/json'
     },
     json={
-        'id': 'media_abc123',
-        'tag': 'featured'
+        'updates': [
+            {'id': 'media_abc123', 'tag': 'featured'},
+            {'id': 'media_def456', 'tag': 'archive'},
+            {'id': 'media_ghi789', 'tag': 'featured/videos'}
+        ]
     }
 )
 
 data = response.json()
 
-if data['ok']:
-    print(f"Updated tag to: {data['data']['tag']}")
+for result in data['data']['results']:
+    if result['success']:
+        print(f"Updated {result['id']} to: {result['media']['tag']}")
+    else:
+        print(f"Failed to update {result['id']}: {result['error']}")
 ```
 
-```javascript JavaScript
+```javascript JavaScript (Bulk)
 const response = await fetch('https://api.ugc.inc/media/update-tag', {
   method: 'POST',
   headers: {
@@ -70,32 +111,46 @@ const response = await fetch('https://api.ugc.inc/media/update-tag', {
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    id: 'media_abc123',
-    tag: 'featured'
+    updates: [
+      { id: 'media_abc123', tag: 'featured' },
+      { id: 'media_def456', tag: 'archive' },
+      { id: 'media_ghi789', tag: 'featured/videos' }
+    ]
   })
 });
 
 const data = await response.json();
 
-if (data.ok) {
-  console.log('Updated tag to:', data.data.tag);
+for (const result of data.data.results) {
+  if (result.success) {
+    console.log(`Updated ${result.id} to: ${result.media.tag}`);
+  } else {
+    console.log(`Failed to update ${result.id}: ${result.error}`);
+  }
 }
 ```
 
-```typescript React
+```typescript React (Bulk)
 import { UGCClient } from 'ugcinc';
 
 const client = new UGCClient({
   apiKey: 'YOUR_API_KEY'
 });
 
-const response = await client.media.updateTag({
-  id: 'media_abc123',
-  tag: 'featured'
+const response = await client.media.updateTags({
+  updates: [
+    { id: 'media_abc123', tag: 'featured' },
+    { id: 'media_def456', tag: 'archive' },
+    { id: 'media_ghi789', tag: 'featured/videos' }
+  ]
 });
 
 if (response.ok) {
-  console.log('Updated tag to:', response.data.tag);
+  for (const result of response.data.results) {
+    if (result.success) {
+      console.log(`Updated ${result.id} to: ${result.media?.tag}`);
+    }
+  }
 }
 ```
 
@@ -103,50 +158,92 @@ if (response.ok) {
 
 <ResponseExample>
 
-```json Success Response (UserMedia)
+```json Success Response (All Succeeded)
 {
   "ok": true,
   "code": 200,
   "data": {
-    "id": "media_abc123",
-    "org_id": "org_xyz789",
-    "name": "video.mp4",
-    "tag": "featured",
-    "type": "video",
-    "url": "https://api.ugc.inc/media/file/media_abc123",
-    "created_at": "2024-01-15T10:30:00.000Z",
-    "media_type": "user_media"
-  }
+    "results": [
+      {
+        "id": "media_abc123",
+        "success": true,
+        "media": {
+          "id": "media_abc123",
+          "org_id": "org_xyz789",
+          "name": "video.mp4",
+          "tag": "featured",
+          "type": "video",
+          "url": "https://api.ugc.inc/media/file/media_abc123",
+          "created_at": "2024-01-15T10:30:00.000Z",
+          "media_type": "user_media"
+        }
+      },
+      {
+        "id": "media_def456",
+        "success": true,
+        "media": {
+          "id": "media_def456",
+          "org_id": "org_xyz789",
+          "name": "image.jpg",
+          "tag": "archive",
+          "type": "image",
+          "url": "https://api.ugc.inc/media/file/media_def456",
+          "created_at": "2024-01-14T09:00:00.000Z",
+          "media_type": "user_media"
+        }
+      }
+    ]
+  },
+  "message": "Successfully updated 2 media item(s)"
 }
 ```
 
-```json Success Response (SocialAudio)
+```json Partial Success Response
 {
   "ok": true,
-  "code": 200,
+  "code": 207,
   "data": {
-    "id": "audio_def456",
-    "org_id": "org_xyz789",
-    "name": "Trending Sound",
-    "tag": "featured",
-    "social_post_link": "https://www.tiktok.com/@user/video/123",
-    "social_audio_link": "https://www.tiktok.com/music/Trending-Sound-123",
-    "platform_type": "tiktok",
-    "preview_url": "https://api.ugc.inc/media/file/audio_def456/preview",
-    "audio_url": "https://api.ugc.inc/media/file/audio_def456/audio",
-    "created_at": "2024-01-14T09:00:00.000Z",
-    "media_type": "social_audio"
-  }
+    "results": [
+      {
+        "id": "media_abc123",
+        "success": true,
+        "media": {
+          "id": "media_abc123",
+          "tag": "featured",
+          "..."
+        }
+      },
+      {
+        "id": "media_invalid",
+        "success": false,
+        "error": "Media not found"
+      }
+    ]
+  },
+  "message": "Partially updated: 1/2 succeeded"
 }
 ```
 
-```json Error Response
+```json Error Response (All Failed)
 {
   "ok": false,
-  "code": 404,
-  "message": "Media not found"
+  "code": 400,
+  "data": {
+    "results": [
+      {
+        "id": "media_invalid1",
+        "success": false,
+        "error": "Media not found"
+      },
+      {
+        "id": "media_invalid2",
+        "success": false,
+        "error": "Media not found"
+      }
+    ]
+  },
+  "message": "All updates failed"
 }
 ```
 
 </ResponseExample>
-
