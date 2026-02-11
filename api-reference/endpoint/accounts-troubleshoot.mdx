@@ -1,0 +1,179 @@
+---
+title: "Troubleshoot Accounts"
+description: "Check the health of active accounts and identify issues"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/accounts/troubleshoot
+```
+
+## Overview
+
+Run diagnostics on your active accounts to identify health issues. Returns a `healthy` boolean and a `fail_reason` enum for each account that has a problem.
+
+Only accounts with status `setup`, `warming`, or `warmed` are included. This endpoint checks proxy connectivity and task success rates to determine account health.
+
+## Fail Reasons
+
+| Value | Description |
+|-------|-------------|
+| `proxy_issue` | The account's proxy is either missing or failing connectivity checks. This means the account's device cannot route traffic properly, which will cause warmup tasks and posts to fail. |
+
+## Request Body
+
+<ParamField body="accountIds" type="string[]">
+  Optional array of account IDs to check. If omitted, all active accounts are checked.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="TroubleshootAccount[]">
+  Array of account health results
+
+  <Expandable title="TroubleshootAccount properties">
+    <ResponseField name="id" type="string">
+      Account ID
+    </ResponseField>
+
+    <ResponseField name="username" type="string | null">
+      Account username
+    </ResponseField>
+
+    <ResponseField name="type" type="string">
+      Platform type (`tiktok` or `instagram`)
+    </ResponseField>
+
+    <ResponseField name="status" type="string">
+      Account status (`setup`, `warming`, or `warmed`)
+    </ResponseField>
+
+    <ResponseField name="tag" type="string | null">
+      Account tag
+    </ResponseField>
+
+    <ResponseField name="healthy" type="boolean">
+      Whether the account is healthy. `false` if any issues were detected.
+    </ResponseField>
+
+    <ResponseField name="fail_reason" type="string | null">
+      The reason the account is unhealthy. `null` if the account is healthy. See the Fail Reasons table above for possible values.
+    </ResponseField>
+
+    <ResponseField name="failed_tasks" type="number">
+      Total number of failed tasks for this account
+    </ResponseField>
+
+    <ResponseField name="total_tasks" type="number">
+      Total number of tasks for this account
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/accounts/troubleshoot \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/accounts/troubleshoot',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={}
+)
+
+data = response.json()
+
+if data['ok']:
+    unhealthy = [a for a in data['data'] if not a['healthy']]
+    print(f'{len(unhealthy)} accounts have issues')
+    for account in unhealthy:
+        print(f"  {account['username']}: {account['fail_reason']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/accounts/troubleshoot', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  const unhealthy = data.data.filter(a => !a.healthy);
+  console.log(`${unhealthy.length} accounts have issues`);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Check all active accounts
+const response = await client.accounts.troubleshoot();
+
+// Check specific accounts
+const response2 = await client.accounts.troubleshoot({
+  accountIds: ['acc_123', 'acc_456']
+});
+
+if (response.ok) {
+  const unhealthy = response.data.filter(a => !a.healthy);
+  console.log(`${unhealthy.length} accounts have issues`);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "id": "acc_123456",
+      "username": "fitness_guru",
+      "type": "tiktok",
+      "status": "warmed",
+      "tag": "premium",
+      "healthy": true,
+      "fail_reason": null,
+      "failed_tasks": 2,
+      "total_tasks": 50
+    },
+    {
+      "id": "acc_789012",
+      "username": "cooking_tips",
+      "type": "tiktok",
+      "status": "warming",
+      "tag": null,
+      "healthy": false,
+      "fail_reason": "proxy_issue",
+      "failed_tasks": 15,
+      "total_tasks": 20
+    }
+  ]
+}
+```
+
+</ResponseExample>

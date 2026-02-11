@@ -62,7 +62,8 @@
           "api-reference/endpoint/accounts-update-social",
           "api-reference/endpoint/accounts-niche-switch",
           "api-reference/endpoint/accounts-reset-warmup",
-          "api-reference/endpoint/accounts-delete-posts"
+          "api-reference/endpoint/accounts-delete-posts",
+          "api-reference/endpoint/accounts-troubleshoot"
         ]
       },
       {
