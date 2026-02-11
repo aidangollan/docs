@@ -35,6 +35,10 @@ This is useful when you need up-to-date statistics for multiple accounts without
   Optional. If provided, only refreshes accounts in this specific org_group
 </ParamField>
 
+<ParamField body="force" type="boolean">
+  Optional. If `true`, bypasses the once-per-hour rate limit
+</ParamField>
+
 ## Response
 
 <ResponseField name="data" type="RefreshStatsResponse">
