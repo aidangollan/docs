@@ -1,0 +1,28 @@
+---
+title: "Delete Automation Run"
+description: "Delete a run and its execution state"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/delete-run
+```
+
+## Request Body
+
+<ParamField body="runId" type="string" required>
+  Run ID to delete.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="null">
+  Returns `null` on success.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.deleteRun({ runId: 'run_123' });
+```

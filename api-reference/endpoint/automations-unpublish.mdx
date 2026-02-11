@@ -1,0 +1,28 @@
+---
+title: "Unpublish Automation"
+description: "Disable recurrence scheduling for an automation template"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/unpublish
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Template ID to unpublish.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="null">
+  Returns `null` on success.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.unpublish({ templateId: 'tpl_123' });
+```

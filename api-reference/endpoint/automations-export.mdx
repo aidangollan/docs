@@ -1,0 +1,28 @@
+---
+title: "Export Automation Template"
+description: "Export full template data for debugging and tooling"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/export
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Template ID to export.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="AutomationExport">
+  Full exported template payload.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.exportTemplate({ templateId: 'tpl_123' });
+```

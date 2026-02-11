@@ -1,0 +1,28 @@
+---
+title: "Get Automation Run Status"
+description: "Get run state, executors, and execution edges"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/status
+```
+
+## Request Body
+
+<ParamField body="runId" type="string" required>
+  Run ID to inspect.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ run: AutomationRun; executors: ExecutorNode[]; edges: ExecutionEdge[] }">
+  Run object plus expanded execution graph state.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.getStatus({ runId: 'run_123' });
+```

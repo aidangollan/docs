@@ -1,0 +1,74 @@
+---
+title: "Delete Integration Key"
+description: "Delete an integration key for a provider"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/org/integration-key/delete
+```
+
+## Overview
+
+Delete an integration key for a specific AI provider. After deletion, automation nodes will fall back to platform-provided keys for that provider.
+
+## Request Body
+
+<ParamField body="provider" type="string" required>
+  The provider to delete the key for. One of: `fal`, `openai`, `claude`, `gemini`, `groq`
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="provider" type="string">
+      The provider whose key was deleted
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/org/integration-key/delete \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider": "openai"
+  }'
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.org.deleteIntegrationKey({
+  provider: 'openai'
+});
+
+if (response.ok) {
+  console.log('Key deleted for:', response.data.provider);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "provider": "openai"
+  }
+}
+```
+
+</ResponseExample>

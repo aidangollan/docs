@@ -1,0 +1,25 @@
+---
+title: "Comment"
+description: "Comment task data returned by the comments API"
+---
+
+## TypeScript Type
+
+```typescript
+interface Comment {
+  id: string;
+  accountId: string;
+  postUrl: string;
+  commentText: string;
+  status: 'scheduled' | 'pending' | 'verifying' | 'completed' | 'failed';
+  commentUrl?: string | null;
+  error?: string | null;
+  createdAt?: string;
+  completedAt?: string | null;
+}
+```
+
+## Related Endpoints
+
+- `POST /comment/create`
+- `POST /comment`

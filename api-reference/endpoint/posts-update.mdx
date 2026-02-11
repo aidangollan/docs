@@ -1,0 +1,267 @@
+---
+title: "Update Post"
+description: "Update an existing scheduled or failed post in place"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/post/update
+```
+
+## Overview
+
+Update an existing post without deleting and recreating it. The post retains its original ID. Only posts with `scheduled` or `failed` status can be updated.
+
+<Info>
+  **Failed Post Behavior:**
+
+  When updating a post with `failed` status, the post will automatically be reset to `scheduled` status with its failure reason cleared. This allows you to fix issues and reschedule the post.
+</Info>
+
+<Warning>
+  **Post type cannot be changed.** A video post remains a video post and a slideshow post remains a slideshow post. To change the post type, delete the post and create a new one.
+</Warning>
+
+## Request Body
+
+<ParamField body="postId" type="string" required>
+  The ID of the post to update
+</ParamField>
+
+<ParamField body="caption" type="string" optional>
+  New caption for the post (max 500 characters)
+</ParamField>
+
+<ParamField body="title" type="string" optional>
+  New title for the post (max 90 characters, slideshow posts only)
+</ParamField>
+
+<ParamField body="socialAudioId" type="string" optional>
+  New social audio ID for the post
+</ParamField>
+
+<ParamField body="postTime" type="string" optional>
+  New scheduled time in ISO 8601 format. The time may be adjusted if the requested slot is unavailable.
+</ParamField>
+
+<ParamField body="accountId" type="string" optional>
+  Move the post to a different account. The new account must belong to the same organization.
+</ParamField>
+
+<ParamField body="mediaUrls" type="string[]" optional>
+  Replace the post's media URLs. For video posts, provide a single URL. For slideshow posts, provide one or more image URLs.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="Post">
+  The updated post object
+
+  <Expandable title="Post properties">
+    <ResponseField name="id" type="string">
+      Post ID (unchanged from the original post)
+    </ResponseField>
+
+    <ResponseField name="account_id" type="string">
+      Account ID the post belongs to
+    </ResponseField>
+
+    <ResponseField name="type" type="string">
+      Post type: `video` or `slideshow`
+    </ResponseField>
+
+    <ResponseField name="status" type="string">
+      Post status (will be `scheduled` after update)
+    </ResponseField>
+
+    <ResponseField name="caption" type="string | null">
+      Post caption
+    </ResponseField>
+
+    <ResponseField name="title" type="string | null">
+      Post title
+    </ResponseField>
+
+    <ResponseField name="media_urls" type="string[] | null">
+      Media URLs for the post
+    </ResponseField>
+
+    <ResponseField name="social_audio_id" type="string | null">
+      Social audio ID
+    </ResponseField>
+
+    <ResponseField name="music_post_id" type="string | null">
+      Music post ID (deprecated)
+    </ResponseField>
+
+    <ResponseField name="scheduled_at" type="string | null">
+      Scheduled time in ISO 8601 format
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error Cases
+
+- **404 Not Found**: Post doesn't exist or doesn't belong to your organization
+- **400 Bad Request**: Post ID not provided, caption exceeds 500 characters, title exceeds 90 characters, or post is not in an editable status
+- **400 Bad Request**: Cannot update post — only `scheduled` or `failed` posts can be updated
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/post/update \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "postId": "post_abc123",
+    "caption": "Updated caption!",
+    "postTime": "2025-01-15T14:00:00Z"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/post/update',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'postId': 'post_abc123',
+        'caption': 'Updated caption!',
+        'postTime': '2025-01-15T14:00:00Z'
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    post = data['data']
+    print(f"Updated post {post['id']} - status: {post['status']}")
+else:
+    print(f"Error: {data['message']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/post/update', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    postId: 'post_abc123',
+    caption: 'Updated caption!',
+    postTime: '2025-01-15T14:00:00Z'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log(`Updated post ${data.data.id}`);
+  console.log(`Status: ${data.data.status}`);
+} else {
+  console.error(`Error: ${data.message}`);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Update caption and schedule time
+const response = await client.posts.updatePost({
+  postId: 'post_abc123',
+  caption: 'Updated caption!',
+  postTime: '2025-01-15T14:00:00Z'
+});
+
+if (response.ok) {
+  console.log(`Updated post ${response.data.id}`);
+  console.log(`Status: ${response.data.status}`);
+  console.log(`Scheduled at: ${response.data.scheduled_at}`);
+} else {
+  console.error(`Error: ${response.message}`);
+}
+
+// Replace media for a video post
+const mediaResponse = await client.posts.updatePost({
+  postId: 'post_def456',
+  mediaUrls: ['https://example.com/new-video.mp4']
+});
+
+// Move post to a different account
+const moveResponse = await client.posts.updatePost({
+  postId: 'post_ghi789',
+  accountId: 'acc_newaccount'
+});
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success - Updated Post
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "id": "post_abc123",
+    "account_id": "acc_xyz789",
+    "type": "video",
+    "status": "scheduled",
+    "caption": "Updated caption!",
+    "title": null,
+    "media_urls": ["https://blob.vercel-storage.com/video.mp4"],
+    "social_audio_id": null,
+    "music_post_id": null,
+    "scheduled_at": "2025-01-15T14:00:00.000Z"
+  }
+}
+```
+
+```json Success - Failed Post Reset to Scheduled
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "id": "post_abc123",
+    "account_id": "acc_xyz789",
+    "type": "slideshow",
+    "status": "scheduled",
+    "caption": "Fixed caption",
+    "title": "My slideshow",
+    "media_urls": ["https://blob.vercel-storage.com/img1.jpg", "https://blob.vercel-storage.com/img2.jpg"],
+    "social_audio_id": "audio_123",
+    "music_post_id": null,
+    "scheduled_at": "2025-01-15T14:00:00.000Z"
+  }
+}
+```
+
+```json Error - Post Not Editable
+{
+  "ok": false,
+  "code": 400,
+  "message": "Cannot update post with status \"complete\". Only scheduled or failed posts can be updated."
+}
+```
+
+```json Error - Not Found
+{
+  "ok": false,
+  "code": 404,
+  "message": "Post not found or doesn't belong to your organization"
+}
+```
+
+</ResponseExample>

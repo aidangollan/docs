@@ -1,0 +1,63 @@
+---
+title: "Cancel Subscription"
+description: "Cancel your subscription at the end of the current billing period"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/billing/cancel
+```
+
+## Overview
+
+Cancel your subscription. The subscription remains active until the end of the current billing period. All accounts remain functional until that date.
+
+## Request
+
+No request body required. Authentication via profile-scoped Bearer token.
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="Response properties">
+    <ResponseField name="message" type="string">
+      Confirmation message
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/billing/cancel \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const response = await client.billing.cancelSubscription();
+
+if (response.ok) {
+  console.log(response.data.message);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "Subscription will be cancelled at the end of the current billing period"
+  }
+}
+```
+
+</ResponseExample>

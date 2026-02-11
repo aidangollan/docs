@@ -17,7 +17,6 @@ Represents engagement statistics for an individual post at a specific point in t
 | `likes` | `number \| null` | Like count at the time of recording |
 | `comments` | `number \| null` | Comment count at the time of recording |
 | `shares` | `number \| null` | Share count at the time of recording |
-| `saves` | `number \| null` | Save/bookmark count at the time of recording |
 | `created_at` | `string` | ISO 8601 timestamp when stat was recorded |
 
 ## How Post Stats Work
@@ -51,7 +50,6 @@ The time-series nature of post stats allows you to:
 | `likes` | Number of likes/hearts the post received |
 | `comments` | Number of comments on the post |
 | `shares` | Number of times the post was shared |
-| `saves` | Number of times the post was saved/bookmarked |
 
 ## Example Response
 
@@ -63,7 +61,6 @@ The time-series nature of post stats allows you to:
   "likes": 8950,
   "comments": 342,
   "shares": 567,
-  "saves": 1234,
   "created_at": "2024-12-25T10:00:00Z"
 }
 ```

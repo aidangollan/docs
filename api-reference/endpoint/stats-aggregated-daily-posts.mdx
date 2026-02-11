@@ -1,0 +1,60 @@
+---
+title: "Get Daily Post Stats"
+description: "Get per-post daily metric values and changes"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/stats/aggregated/daily-posts
+```
+
+## Request Body
+
+<ParamField body="startDate" type="string" required>
+  Start date/time (ISO-8601).
+</ParamField>
+
+<ParamField body="endDate" type="string" required>
+  End date/time (ISO-8601).
+</ParamField>
+
+<ParamField body="accountIds" type="string[]">
+  Optional account ID filter.
+</ParamField>
+
+<ParamField body="tag" type="string">
+  Optional account tag filter.
+</ParamField>
+
+<ParamField body="org_group" type="string">
+  Optional organization group filter.
+</ParamField>
+
+<ParamField body="user_group" type="string">
+  Optional user group filter.
+</ParamField>
+
+<ParamField body="hosts" type="string[]">
+  Optional phone type filter.
+</ParamField>
+
+<ParamField body="postType" type="'video' | 'slideshow'">
+  Optional post type filter.
+</ParamField>
+
+<ParamField body="audioIds" type="string[]">
+  Optional audio filter (`'none'` includes posts without audio).
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="DailyPostStat[]">
+  Daily per-post stats and delta fields.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.stats.getDailyPostStats({ startDate: '2026-01-01', endDate: '2026-01-31' });
+```

@@ -1,0 +1,28 @@
+---
+title: "Stop Automation Run"
+description: "Stop an in-progress run"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/stop
+```
+
+## Request Body
+
+<ParamField body="runId" type="string" required>
+  Run ID to stop.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="null">
+  Returns `null` on success.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.stop({ runId: 'run_123' });
+```

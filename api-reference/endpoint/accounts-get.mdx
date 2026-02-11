@@ -40,7 +40,11 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
     <ResponseField name="id" type="string">
       Unique account identifier
     </ResponseField>
-    
+
+    <ResponseField name="org_name" type="string | null">
+      Name of the organization this account belongs to
+    </ResponseField>
+
     <ResponseField name="type" type="string">
       Account platform type (`tiktok` or `instagram`)
     </ResponseField>
@@ -192,6 +196,7 @@ if (response.ok) {
   "data": [
     {
       "id": "acc_123456",
+      "org_name": "My Organization",
       "type": "tiktok",
       "tag": "influencer",
       "org_group": "group1",
@@ -207,6 +212,7 @@ if (response.ok) {
     },
     {
       "id": "acc_789012",
+      "org_name": "My Organization",
       "type": "instagram",
       "tag": "influencer",
       "org_group": "group1",

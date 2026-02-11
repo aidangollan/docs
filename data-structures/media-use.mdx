@@ -1,0 +1,32 @@
+---
+title: "Media Use"
+description: "Usage records for source media IDs in named workflows"
+---
+
+## TypeScript Types
+
+```typescript
+interface MediaUse {
+  id: string;
+  user_media_id: string;
+  name: string;
+  source_id: string | null;
+  created_at: string;
+}
+
+interface GetMediaUseResponse {
+  sourceIds: string[];
+  entries: MediaUse[];
+}
+
+interface FilterMediaResponse {
+  available: string[];
+  used_count: number;
+  available_count: number;
+}
+```
+
+## Related Endpoints
+
+- `POST /media/use`
+- `POST /media/filter`

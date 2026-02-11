@@ -1,0 +1,28 @@
+---
+title: "Get Automation Template"
+description: "Retrieve a single automation template"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/get
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Automation template ID.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="AutomationTemplate">
+  The requested automation template.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.getTemplate({ templateId: 'tpl_123' });
+```

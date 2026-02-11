@@ -1,0 +1,136 @@
+---
+title: "Update Organization Name"
+description: "Update your organization's name"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/org/name
+```
+
+## Overview
+
+Updates the name of your organization. Requires an org-scoped API key.
+
+## Request Body
+
+<ParamField body="name" type="string" required>
+  The new name for the organization
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Updated organization object
+
+  <Expandable title="Response properties">
+    <ResponseField name="id" type="string">
+      Organization identifier
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Updated organization name
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/org/name \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My New Org Name"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/org/name',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'name': 'My New Org Name'
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    print('Organization updated:', data['data'])
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/org/name', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: 'My New Org Name'
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  console.log('Organization updated:', data.data);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.org.updateName({
+  name: 'My New Org Name'
+});
+
+if (response.ok) {
+  console.log('Updated org name:', response.data.name);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "id": "org_123456",
+    "name": "My New Org Name"
+  }
+}
+```
+
+```json Error Response - Not Found
+{
+  "ok": false,
+  "code": 404,
+  "message": "Organization not found"
+}
+```
+
+```json Error Response - Missing Parameter
+{
+  "ok": false,
+  "code": 400,
+  "message": "name is required"
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,28 @@
+---
+title: "Get Automation Run Logs"
+description: "Retrieve run logs ordered by creation time"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/logs
+```
+
+## Request Body
+
+<ParamField body="runId" type="string" required>
+  Run ID.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="AutomationRunLog[]">
+  Log entries for the run.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.getLogs({ runId: 'run_123' });
+```

@@ -1,0 +1,140 @@
+---
+title: "Niche Switch"
+description: "Switch account niche by updating keywords and description, and resetting warmup"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/accounts/niche-switch
+```
+
+## Overview
+
+Switch the niche for one or more accounts by updating their keywords and description. This automatically resets warmup so the accounts will re-warm with the new keywords.
+
+<Warning>
+  Niche switching resets all warmup progress for the affected accounts. They will need to re-warm from scratch with the new keywords.
+</Warning>
+
+## Request Body
+
+<ParamField body="updates" type="array" required>
+  Array of niche switch updates to apply. Each update object contains:
+
+  <Expandable title="Update object properties">
+    <ParamField body="accountId" type="string" required>
+      Account ID to update
+    </ParamField>
+
+    <ParamField body="keywords" type="string[]" required>
+      New keywords for the account warmup
+    </ParamField>
+
+    <ParamField body="description" type="string" required>
+      New description of the content the account should engage with
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  Response object containing success summary and results
+
+  <Expandable title="Response properties">
+    <ResponseField name="message" type="string">
+      Summary message
+    </ResponseField>
+
+    <ResponseField name="successful" type="number">
+      Number of accounts successfully updated
+    </ResponseField>
+
+    <ResponseField name="failed" type="number">
+      Number of accounts that failed
+    </ResponseField>
+
+    <ResponseField name="results" type="array">
+      Array of individual results
+
+      <Expandable title="Result object properties">
+        <ResponseField name="accountId" type="string">
+          Account ID
+        </ResponseField>
+
+        <ResponseField name="success" type="boolean">
+          Whether the niche switch was successful
+        </ResponseField>
+
+        <ResponseField name="error" type="string">
+          Error message (only present on failure)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.accounts.nicheSwitch({
+  updates: [
+    {
+      accountId: 'acc_123456',
+      keywords: ['fitness', 'gym', 'workout', 'health'],
+      description: 'Fitness and workout content, gym motivation videos'
+    }
+  ]
+});
+
+if (response.ok) {
+  console.log(`Niche switch applied to ${response.data.successful} account(s)`);
+}
+```
+
+```bash cURL
+curl -X POST https://api.ugc.inc/accounts/niche-switch \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "updates": [
+      {
+        "accountId": "acc_123456",
+        "keywords": ["fitness", "gym", "workout", "health"],
+        "description": "Fitness and workout content, gym motivation videos"
+      }
+    ]
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Niche switch submitted for 1 account(s). Warmup has been reset and will re-run with new keywords.",
+  "data": {
+    "message": "Niche switch submitted for 1 account(s). Warmup has been reset and will re-run with new keywords.",
+    "successful": 1,
+    "failed": 0,
+    "results": [
+      {
+        "accountId": "acc_123456",
+        "success": true
+      }
+    ]
+  }
+}
+```
+
+</ResponseExample>

@@ -11,7 +11,7 @@ POST https://api.ugc.inc/stats/posts
 
 ## Overview
 
-Get post statistics including views, likes, comments, shares, and saves.
+Get post statistics including views, likes, comments, and shares.
 
 **Behavior:**
 - **If `startDate` and `endDate` are NOT provided:** Returns the latest stat per post (one record per post) - optimal for dashboards showing current state
@@ -61,10 +61,6 @@ Use this endpoint to track post performance over time.
     
     <ResponseField name="shares" type="number | null">
       Share count at the time of recording
-    </ResponseField>
-    
-    <ResponseField name="saves" type="number | null">
-      Save/bookmark count at the time of recording
     </ResponseField>
     
     <ResponseField name="created_at" type="string">
@@ -172,7 +168,6 @@ if (response.ok) {
       "likes": 8950,
       "comments": 342,
       "shares": 567,
-      "saves": 1234,
       "created_at": "2024-12-25T10:00:00Z"
     },
     {
@@ -182,7 +177,6 @@ if (response.ok) {
       "likes": 9120,
       "comments": 356,
       "shares": 589,
-      "saves": 1289,
       "created_at": "2024-12-26T10:00:00Z"
     }
   ]

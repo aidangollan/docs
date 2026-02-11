@@ -1,0 +1,132 @@
+---
+title: "Request Replacement"
+description: "Request a replacement for an account"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/billing/request-replacement
+```
+
+## Overview
+
+Request a replacement for an account. The first replacement for any account is **auto-approved** — the old account is reclaimed and a new uninitialized account is created immediately. Subsequent replacement requests require manual admin review.
+
+## Request Body
+
+<ParamField body="account_id" type="string" required>
+  ID of the account to replace
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Reason for requesting a replacement
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="Response properties">
+    <ResponseField name="message" type="string">
+      Status message indicating if the replacement was auto-approved or submitted for review
+    </ResponseField>
+
+    <ResponseField name="request" type="object | null">
+      The billing request record
+
+      <Expandable title="Request properties">
+        <ResponseField name="id" type="string">
+          Request ID
+        </ResponseField>
+
+        <ResponseField name="type" type="'replacement'">
+          Request type
+        </ResponseField>
+
+        <ResponseField name="status" type="'pending' | 'approved'">
+          Request status
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="new_account_id" type="string | null">
+      ID of the new replacement account (only set when auto-approved)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/billing/request-replacement \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "acc_123", "reason": "Account was banned"}'
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const response = await client.billing.requestReplacement({
+  account_id: 'acc_123',
+  reason: 'Account was banned'
+});
+
+if (response.ok) {
+  console.log(response.data.message);
+  if (response.data.new_account_id) {
+    console.log(`New account: ${response.data.new_account_id}`);
+  }
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Auto-Approved (First Replacement)
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "Replacement auto-approved. New account created.",
+    "request": {
+      "id": "req_123",
+      "org_id": "org_123",
+      "account_id": "acc_123",
+      "type": "replacement",
+      "status": "approved",
+      "reason": "Account was banned",
+      "created_at": "2025-01-15T10:00:00.000Z",
+      "resolved_at": "2025-01-15T10:00:00.000Z"
+    },
+    "new_account_id": "acc_456"
+  }
+}
+```
+
+```json Pending Review (Subsequent Replacement)
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "Replacement request submitted for review",
+    "request": {
+      "id": "req_124",
+      "org_id": "org_123",
+      "account_id": "acc_456",
+      "type": "replacement",
+      "status": "pending",
+      "reason": "Account was banned again",
+      "created_at": "2025-01-20T10:00:00.000Z",
+      "resolved_at": null
+    },
+    "new_account_id": null
+  }
+}
+```
+
+</ResponseExample>

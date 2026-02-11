@@ -24,7 +24,8 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `description` | `string \| null` | Description/interest area for the account. Used by v1_smart warmup for browse tasks |
 | `keywords` | `string \| null` | Search keywords used for warmup tasks (comma-separated) |
 | `profiles` | `string \| null` | Profile usernames to search for warmup tasks (comma-separated) |
-| `status` | `string` | Account status: `'pending'`, `'initialized'`, `'setup'`, `'warming'`, `'warmed'`, `'needs_replacement'`, or `'error'` |
+| `phone_type` | `string \| null` | Account hosting type: `'physical_iphone'`, `'physical_android'`, `'emulated_android'`, `'social_api'`, or `'tracking'`. Tracking accounts are read-only and cannot be used for posting |
+| `status` | `string` | Account status: `'pending'`, `'initialized'`, `'setup'`, `'warming'`, `'warmed'`, `'needs_replacement'`, or `'replacing'` |
 
 ## Account Organization
 
@@ -76,7 +77,7 @@ The `status` field indicates the current lifecycle stage of an account:
 | `warming` | Account is currently in the warmup phase |
 | `warmed` | Account has completed warmup and is ready for posting |
 | `needs_replacement` | Account needs to be replaced with a new one |
-| `error` | Account encountered an error |
+| `replacing` | Account is being replaced |
 
 ## Example Response
 

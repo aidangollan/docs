@@ -1,0 +1,28 @@
+---
+title: "Get Recurrence Status"
+description: "Get scheduling status for a recurring automation template"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/recurrence-status
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Template ID.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ hasRecurrence: boolean; isPublished: boolean; nextRunAt: string | null; lastRunAt: string | null }">
+  Current recurrence and publish state.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.getRecurrenceStatus({ templateId: 'tpl_123' });
+```

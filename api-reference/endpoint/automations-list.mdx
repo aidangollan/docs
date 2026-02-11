@@ -1,0 +1,26 @@
+---
+title: "List Automation Templates"
+description: "Retrieve all automation templates for the authenticated organization"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/list
+```
+
+## Request Body
+
+No request body is required.
+
+## Response
+
+<ResponseField name="data" type="AutomationTemplate[]">
+  Array of automation templates for the organization.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.listTemplates({ orgId: 'org-id' });
+```

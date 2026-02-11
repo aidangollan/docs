@@ -1,0 +1,32 @@
+---
+title: "Update Run Review Status"
+description: "Approve or reject an automation run"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/update-review-status
+```
+
+## Request Body
+
+<ParamField body="runId" type="string" required>
+  Run ID to update.
+</ParamField>
+
+<ParamField body="reviewStatus" type="'approved' | 'rejected'" required>
+  New review status.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ success: boolean }">
+  Update result.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.updateReviewStatus({ runId: 'run_123', reviewStatus: 'approved' });
+```

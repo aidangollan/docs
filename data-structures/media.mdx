@@ -3,7 +3,7 @@ title: "Media"
 description: "Media file data structures for user uploads and social audio"
 ---
 
-The media system supports two types of media: **User Media** (uploaded files) and **Social Audio** (imported from TikTok).
+The media system supports two types of media: **User Media** (uploaded files) and **Social Audio** (imported from TikTok or Instagram).
 
 ## Media (Union Type)
 
@@ -45,7 +45,7 @@ Represents uploaded media files (images, videos, audio).
 
 ## SocialAudio
 
-Represents audio imported from TikTok videos or music links.
+Represents audio imported from TikTok or Instagram.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -53,9 +53,9 @@ Represents audio imported from TikTok videos or music links.
 | `org_id` | `string` | Organization ID |
 | `name` | `string \| null` | Audio/song title |
 | `tag` | `string \| null` | Custom tag for categorization |
-| `social_post_link` | `string \| null` | Link to a TikTok post using this audio |
-| `social_audio_link` | `string \| null` | Direct link to the TikTok audio/music page |
-| `platform_type` | `'tiktok' \| null` | Source platform |
+| `social_post_link` | `string \| null` | Link to a post using this audio (TikTok video or Instagram reel) |
+| `social_audio_link` | `string \| null` | Direct link to the audio/music page on the source platform |
+| `platform_type` | `'tiktok' \| 'instagram' \| null` | Source platform |
 | `preview_url` | `string \| null` | URL to fetch cover image (via API proxy) |
 | `audio_url` | `string \| null` | URL to fetch audio file (via API proxy) |
 | `created_at` | `string` | ISO timestamp of creation |

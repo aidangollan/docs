@@ -1,6 +1,6 @@
 ---
 title: "Update Account Social Profile"
-description: "Update account social profile for one or more accounts (avatar, nickname, bio)"
+description: "Update account social profile for one or more accounts (username, avatar, nickname, bio)"
 ---
 
 ## Endpoint
@@ -11,10 +11,11 @@ POST https://api.ugc.inc/accounts/update-social
 
 ## Overview
 
-Update the social media profile of one or more accounts including avatar, nickname (display name), and bio. This endpoint creates tasks that will update the actual TikTok/Instagram profiles.
+Update the social media profile of one or more accounts including username, avatar, nickname (display name), and bio. Changes are submitted as pending and applied manually within 24 hours.
 
 <Warning>
   **Important Rate Limits (per account):**
+  - **Username:** Can only be updated **once every 7 days**
   - **Nickname:** Can only be updated **once every 7 days**
   - **Avatar:** Can only be updated **once every 24 hours**
   - **Bio:** Can only be updated **once every 24 hours**
@@ -42,6 +43,10 @@ Update the social media profile of one or more accounts including avatar, nickna
       Account ID to update
     </ParamField>
 
+    <ParamField body="username" type="string">
+      New username for the account
+    </ParamField>
+
     <ParamField body="avatarUrl" type="string">
       New avatar/profile picture URL (must be publicly accessible, have a 1:1 aspect ratio, and be at least 250x250 pixels)
     </ParamField>
@@ -57,7 +62,7 @@ Update the social media profile of one or more accounts including avatar, nickna
 </ParamField>
 
 <Note>
-  Each update in the array should include at least one field to update (avatarUrl, nickName, or bio).
+  Each update in the array should include at least one field to update (username, avatarUrl, nickName, or bio).
 </Note>
 
 ## Response

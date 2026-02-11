@@ -1,0 +1,28 @@
+---
+title: "Delete Automation Template"
+description: "Delete an automation template"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/delete
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Template ID to delete.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="null">
+  Returns `null` on success.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.deleteTemplate({ templateId: 'tpl_123' });
+```

@@ -1,0 +1,40 @@
+---
+title: "Run Automation"
+description: "Start one or more runs for an automation template"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/run
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Template ID to execute.
+</ParamField>
+
+<ParamField body="variableInputs" type="Record<string, PortValue>">
+  Optional runtime variable values keyed by input node ID.
+</ParamField>
+
+<ParamField body="saveAsPreview" type="boolean">
+  Optional flag to save output as preview.
+</ParamField>
+
+<ParamField body="tag" type="string">
+  Optional run tag.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ runIds: string[] }">
+  Array of run IDs started by this call.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.run({ templateId: 'tpl_123', orgId: 'org-id' });
+```

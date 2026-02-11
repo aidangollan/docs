@@ -20,11 +20,17 @@
           "data-structures/account",
           "data-structures/post",
           "data-structures/task",
+          "data-structures/comment",
+          "data-structures/media",
+          "data-structures/media-use",
           "data-structures/account-stat",
           "data-structures/post-stat",
           "data-structures/api-key",
+          "data-structures/integration-key",
+          "data-structures/automation",
           "data-structures/editor",
-          "data-structures/media"
+          "data-structures/npm-package-types",
+          "data-structures/billing-request"
         ]
       },
       {
@@ -33,6 +39,7 @@
           "api-reference/endpoint/posts-get",
           "api-reference/endpoint/posts-create-video",
           "api-reference/endpoint/posts-create-slideshow",
+          "api-reference/endpoint/posts-update",
           "api-reference/endpoint/posts-status",
           "api-reference/endpoint/posts-delete",
           "api-reference/endpoint/posts-retry"
@@ -42,17 +49,18 @@
         "group": "Comments",
         "pages": [
           "api-reference/endpoint/comments-create",
-          "api-reference/endpoint/comments-list",
-          "api-reference/endpoint/comments-status"
+          "api-reference/endpoint/comments-list"
         ]
       },
       {
         "group": "Accounts",
         "pages": [
           "api-reference/endpoint/accounts-get",
+          "api-reference/endpoint/accounts-create",
           "api-reference/endpoint/accounts-status",
           "api-reference/endpoint/accounts-update-info",
           "api-reference/endpoint/accounts-update-social",
+          "api-reference/endpoint/accounts-niche-switch",
           "api-reference/endpoint/accounts-reset-warmup",
           "api-reference/endpoint/accounts-delete-posts"
         ]
@@ -62,6 +70,12 @@
         "pages": [
           "api-reference/endpoint/stats-accounts",
           "api-reference/endpoint/stats-posts",
+          "api-reference/endpoint/stats-aggregated-daily",
+          "api-reference/endpoint/stats-granular-daily-accounts",
+          "api-reference/endpoint/stats-aggregated-daily-posts",
+          "api-reference/endpoint/stats-dashboard-daily",
+          "api-reference/endpoint/stats-aggregated-top-accounts",
+          "api-reference/endpoint/stats-aggregated-top-posts",
           "api-reference/endpoint/stats-refresh"
         ]
       },
@@ -76,9 +90,14 @@
       {
         "group": "Organization",
         "pages": [
+          "api-reference/endpoint/org-get",
+          "api-reference/endpoint/org-update-name",
           "api-reference/endpoint/org-api-keys-list",
           "api-reference/endpoint/org-api-keys-edit",
-          "api-reference/endpoint/org-api-keys-delete"
+          "api-reference/endpoint/org-api-keys-delete",
+          "api-reference/endpoint/org-integration-keys-list",
+          "api-reference/endpoint/org-integration-keys-upsert",
+          "api-reference/endpoint/org-integration-keys-delete"
         ]
       },
       {
@@ -89,17 +108,49 @@
           "api-reference/endpoint/media-social-audio-get",
           "api-reference/endpoint/media-social-audio-upload",
           "api-reference/endpoint/media-create",
+          "api-reference/endpoint/media-create-text",
           "api-reference/endpoint/media-create-url",
+          "api-reference/endpoint/media-use",
+          "api-reference/endpoint/media-filter",
           "api-reference/endpoint/media-update-tag",
+          "api-reference/endpoint/media-update-name",
           "api-reference/endpoint/media-delete"
         ]
       },
       {
-        "group": "Render",
+        "group": "Billing",
         "pages": [
-          "api-reference/endpoint/render-submit",
-          "api-reference/endpoint/render-status",
-          "api-reference/endpoint/render-download"
+          "api-reference/endpoint/billing-get",
+          "api-reference/endpoint/billing-cancel",
+          "api-reference/endpoint/billing-portal",
+          "api-reference/endpoint/billing-deactivate",
+          "api-reference/endpoint/billing-request-replacement",
+          "api-reference/endpoint/billing-request-refund",
+          "api-reference/endpoint/billing-requests"
+        ]
+      },
+      {
+        "group": "Automations",
+        "pages": [
+          "api-reference/endpoint/automations-list",
+          "api-reference/endpoint/automations-get",
+          "api-reference/endpoint/automations-create",
+          "api-reference/endpoint/automations-delete",
+          "api-reference/endpoint/automations-run",
+          "api-reference/endpoint/automations-status",
+          "api-reference/endpoint/automations-list-runs",
+          "api-reference/endpoint/automations-list-all-runs",
+          "api-reference/endpoint/automations-update-review-status",
+          "api-reference/endpoint/automations-validate",
+          "api-reference/endpoint/automations-delete-run",
+          "api-reference/endpoint/automations-export",
+          "api-reference/endpoint/automations-export-run",
+          "api-reference/endpoint/automations-stop",
+          "api-reference/endpoint/automations-recurrence-status",
+          "api-reference/endpoint/automations-publish",
+          "api-reference/endpoint/automations-unpublish",
+          "api-reference/endpoint/automations-run-once",
+          "api-reference/endpoint/automations-logs"
         ]
       }
     ],
@@ -119,14 +170,14 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   }
 }

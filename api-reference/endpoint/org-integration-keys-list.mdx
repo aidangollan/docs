@@ -1,0 +1,95 @@
+---
+title: "List Integration Keys"
+description: "Retrieve all integration keys for your organization"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/org/integration-key
+```
+
+## Overview
+
+Retrieve a list of all integration keys associated with your organization. Integration keys are used to authenticate with third-party AI providers (fal.ai, OpenAI, Claude, Gemini, Groq). For security reasons, key values are returned masked.
+
+## Request Body
+
+No request body parameters required.
+
+## Response
+
+<ResponseField name="data" type="IntegrationKey[]">
+  Array of integration key objects
+
+  <Expandable title="IntegrationKey properties">
+    <ResponseField name="id" type="string">
+      Unique integration key identifier
+    </ResponseField>
+
+    <ResponseField name="provider" type="string">
+      Provider name. One of: `fal`, `openai`, `claude`, `gemini`, `groq`
+    </ResponseField>
+
+    <ResponseField name="maskedKey" type="string">
+      Masked key value showing only the first 4 and last 4 characters
+    </ResponseField>
+
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of when the key was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/org/integration-key \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.org.getIntegrationKeys();
+
+if (response.ok) {
+  console.log('Integration Keys:', response.data);
+  response.data.forEach(key => {
+    console.log(`${key.provider}: ${key.maskedKey}`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "provider": "openai",
+      "maskedKey": "sk-p...8xYz",
+      "created_at": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440001",
+      "provider": "fal",
+      "maskedKey": "fal_...Ab12",
+      "created_at": "2024-02-20T14:45:00.000Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>

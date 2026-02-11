@@ -1,0 +1,30 @@
+---
+title: "Create Text Media"
+description: "Create text media entries from raw text content"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/media/create/text
+```
+
+## Request Body
+
+<ParamField body="texts" type="Array<{ content: string; name?: string; tag?: string }>">
+  Non-empty array of text payloads.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ data: UserMedia[]; message: string }">
+  Created text media entries.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.media.importText({
+  texts: [{ content: 'Hook line', name: 'hook-1', tag: 'hooks' }],
+});
+```

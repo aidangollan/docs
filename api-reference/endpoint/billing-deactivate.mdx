@@ -1,0 +1,82 @@
+---
+title: "Deactivate Account"
+description: "Deactivate an account slot and remove it from your subscription"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/billing/deactivate
+```
+
+## Overview
+
+Deactivate an account slot. This removes the account from your subscription (no proration — you are not charged for the remaining period). The account is reclaimed and moved to the internal UGC Inc organization.
+
+## Request Body
+
+<ParamField body="account_id" type="string" required>
+  ID of the account to deactivate
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="Response properties">
+    <ResponseField name="message" type="string">
+      Confirmation message
+    </ResponseField>
+
+    <ResponseField name="account_id" type="string">
+      ID of the deactivated account
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/billing/deactivate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "acc_123"}'
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const response = await client.billing.deactivateAccount({
+  account_id: 'acc_123'
+});
+
+if (response.ok) {
+  console.log(response.data.message);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "Account deactivated and billing updated",
+    "account_id": "acc_123"
+  }
+}
+```
+
+```json Error - Not Your Account
+{
+  "ok": false,
+  "code": 400,
+  "message": "Account does not belong to your organization"
+}
+```
+
+</ResponseExample>

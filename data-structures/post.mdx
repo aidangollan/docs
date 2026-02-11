@@ -18,6 +18,7 @@ Represents a video or slideshow post on a social media account.
 | `social_id` | `string \| null` | Platform-specific post ID (TikTok video ID or Instagram reel code, available after posting) |
 | `caption` | `string \| null` | Post caption/description text (max 500 characters) |
 | `media_urls` | `string[] \| null` | Array of URLs to video/image files used in the post |
+| `thumbnail_url` | `string \| null` | URL of a JPEG thumbnail image generated from the first frame of a video post. Only present for video posts. |
 | `music_post_id` | `string \| null` | ID of the music/audio track used in the post |
 | `scheduled_at` | `string \| null` | When the post is scheduled to be published (ISO 8601 format) |
 | `postUrl` | `string \| undefined` | Direct URL to view the post on the social platform. Only available when `status` is `'complete'`. Format: TikTok: `https://www.tiktok.com/@username/video/{social_id}`, Instagram: `https://www.instagram.com/p/{social_id}/` |

@@ -1,0 +1,28 @@
+---
+title: "Run Automation Once"
+description: "Immediately trigger one manual run for a template"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/run-once
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Template ID to run once.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ runIds: string[] }">
+  Created run IDs.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.runOnce({ templateId: 'tpl_123' });
+```

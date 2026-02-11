@@ -1,0 +1,69 @@
+---
+title: "Billing Portal"
+description: "Get a Stripe billing portal URL for managing payment methods"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/billing/portal
+```
+
+## Overview
+
+Generate a Stripe billing portal session URL. The portal allows users to manage payment methods, view invoices, and update billing information.
+
+## Request Body
+
+<ParamField body="return_url" type="string">
+  URL to redirect to after the portal session. Defaults to `https://app.ugc.inc`.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="Response properties">
+    <ResponseField name="url" type="string">
+      Stripe billing portal URL. Redirect the user to this URL.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/billing/portal \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"return_url": "https://myapp.com/settings"}'
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const response = await client.billing.getPortalUrl({
+  return_url: 'https://myapp.com/settings'
+});
+
+if (response.ok) {
+  window.location.href = response.data.url;
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "url": "https://billing.stripe.com/p/session/..."
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,97 @@
+---
+title: "Upsert Integration Key"
+description: "Create or update an integration key for a provider"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/org/integration-key/upsert
+```
+
+## Overview
+
+Create or update an integration key for a specific AI provider. If a key already exists for the provider, it will be updated. Integration keys are used automatically by automation nodes (LLM, image generation, video generation, custom model).
+
+## Request Body
+
+<ParamField body="provider" type="string" required>
+  The provider to set the key for. One of: `fal`, `openai`, `claude`, `gemini`, `groq`
+</ParamField>
+
+<ParamField body="key" type="string" required>
+  The API key value for the provider
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="IntegrationKey">
+  The created or updated integration key (with masked value)
+
+  <Expandable title="IntegrationKey properties">
+    <ResponseField name="id" type="string">
+      Unique integration key identifier
+    </ResponseField>
+
+    <ResponseField name="provider" type="string">
+      Provider name
+    </ResponseField>
+
+    <ResponseField name="maskedKey" type="string">
+      Masked key value showing only the first 4 and last 4 characters
+    </ResponseField>
+
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of when the key was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/org/integration-key/upsert \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider": "openai",
+    "key": "sk-proj-abc123..."
+  }'
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.org.upsertIntegrationKey({
+  provider: 'openai',
+  key: 'sk-proj-abc123...'
+});
+
+if (response.ok) {
+  console.log('Key saved:', response.data.provider, response.data.maskedKey);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "provider": "openai",
+    "maskedKey": "sk-p...8xYz",
+    "created_at": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+</ResponseExample>

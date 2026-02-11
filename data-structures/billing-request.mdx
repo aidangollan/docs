@@ -1,0 +1,66 @@
+---
+title: "Billing Request"
+description: "Billing request data structure for replacements and refunds"
+---
+
+## Billing Request
+
+Billing requests represent user requests for account replacements or refunds. Replacement requests for first-time accounts are auto-approved; all other requests require admin review.
+
+```typescript
+interface BillingRequest {
+  id: string;
+  org_id: string;
+  account_id: string;
+  type: 'replacement' | 'refund';
+  status: 'pending' | 'approved' | 'denied';
+  reason: string | null;
+  created_at: string;    // ISO 8601
+  resolved_at: string | null;  // ISO 8601
+}
+```
+
+## Fields
+
+<ResponseField name="id" type="string">
+  Unique identifier for the billing request
+</ResponseField>
+
+<ResponseField name="org_id" type="string">
+  Organization ID the request belongs to
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Account ID the request is about
+</ResponseField>
+
+<ResponseField name="type" type="'replacement' | 'refund'">
+  Type of billing request:
+  - `replacement` — Request to replace an account with a new one
+  - `refund` — Request for a refund on an account
+</ResponseField>
+
+<ResponseField name="status" type="'pending' | 'approved' | 'denied'">
+  Current status of the request:
+  - `pending` — Awaiting admin review
+  - `approved` — Request was approved
+  - `denied` — Request was denied
+</ResponseField>
+
+<ResponseField name="reason" type="string | null">
+  User-provided reason for the request
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the request was created
+</ResponseField>
+
+<ResponseField name="resolved_at" type="string | null">
+  ISO 8601 timestamp of when the request was approved or denied. `null` if still pending.
+</ResponseField>
+
+## NPM Package Type
+
+```typescript
+import type { BillingRequestInfo } from 'ugcinc';
+```

@@ -1,0 +1,48 @@
+---
+title: "Create or Update Automation Template"
+description: "Create a new automation template or update an existing one"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/create
+```
+
+## Request Body
+
+<ParamField body="name" type="string" required>
+  Template display name.
+</ParamField>
+
+<ParamField body="workflowDefinition" type="WorkflowDefinition" required>
+  Workflow graph definition (`nodes` and optional `canvasState`).
+</ParamField>
+
+<ParamField body="description" type="string">
+  Optional template description.
+</ParamField>
+
+<ParamField body="templateId" type="string">
+  If set, updates the existing template instead of creating a new one.
+</ParamField>
+
+<ParamField body="skipValidation" type="boolean">
+  If `true`, skips workflow validation (for draft saves).
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="string">
+  Template ID.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.createTemplate({
+  orgId: 'org-id',
+  name: 'My Workflow',
+  workflowDefinition,
+});
+```

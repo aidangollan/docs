@@ -1,0 +1,52 @@
+---
+title: "Get Daily Account Stats (Granular)"
+description: "Get per-account daily metric deltas"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/stats/granular/daily-accounts
+```
+
+## Request Body
+
+<ParamField body="startDate" type="string" required>
+  Start date/time (ISO-8601).
+</ParamField>
+
+<ParamField body="endDate" type="string" required>
+  End date/time (ISO-8601).
+</ParamField>
+
+<ParamField body="accountIds" type="string[]">
+  Optional account ID filter.
+</ParamField>
+
+<ParamField body="tag" type="string">
+  Optional account tag filter.
+</ParamField>
+
+<ParamField body="org_group" type="string">
+  Optional organization group filter.
+</ParamField>
+
+<ParamField body="user_group" type="string">
+  Optional user group filter.
+</ParamField>
+
+<ParamField body="hosts" type="string[]">
+  Optional phone type filter.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="DailyAccountStat[]">
+  Daily per-account deltas.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.stats.getDailyAccountStats({ startDate: '2026-01-01', endDate: '2026-01-31' });
+```

@@ -1,0 +1,28 @@
+---
+title: "Publish Automation"
+description: "Enable recurrence scheduling for an automation template"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/publish
+```
+
+## Request Body
+
+<ParamField body="templateId" type="string" required>
+  Template ID to publish.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="null">
+  Returns `null` on success.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.publish({ templateId: 'tpl_123' });
+```

@@ -1,0 +1,28 @@
+---
+title: "Get Media Use Entries"
+description: "Get media usage records for a specific use-case name"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/media/use
+```
+
+## Request Body
+
+<ParamField body="name" type="string" required>
+  Use-case name.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ sourceIds: string[]; entries: MediaUse[] }">
+  Matching usage records and extracted source IDs.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.media.getMediaUse({ name: 'klipy' });
+```

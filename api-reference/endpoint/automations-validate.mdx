@@ -1,0 +1,28 @@
+---
+title: "Validate Workflow"
+description: "Validate an automation workflow definition without saving it"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/validate
+```
+
+## Request Body
+
+<ParamField body="workflowDefinition" type="WorkflowDefinition" required>
+  Workflow graph to validate.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ valid: boolean; errors: string[] }">
+  Validation result and error messages.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.validateWorkflow({ workflowDefinition });
+```

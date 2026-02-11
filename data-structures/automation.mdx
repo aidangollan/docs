@@ -1,0 +1,81 @@
+---
+title: "Automation"
+description: "Core automation template, run, executor, and workflow graph types"
+---
+
+## Core Types
+
+```typescript
+interface WorkflowDefinition {
+  nodes: WorkflowNodeDefinition[];
+  canvasState?: CanvasState;
+}
+
+interface AutomationTemplate {
+  id: string;
+  org_id: string;
+  name: string;
+  description: string | null;
+  nodes: TemplateNode[];
+  recurrence_enabled: boolean;
+  next_run_at: string | null;
+  last_run_at: string | null;
+  schedule_config: ScheduleConfig | null;
+  account_iteration_config: AccountIterationConfig | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface AutomationRun {
+  id: string;
+  template_id: string;
+  org_id: string;
+  tag: string | null;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped';
+  variable_inputs: Record<string, PortValue> | null;
+  review_status: 'pending_review' | 'approved' | 'rejected' | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+interface ExecutorNode {
+  id: string;
+  template_node_id: string;
+  executor_index: number;
+  type: NodeType;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'skipped' | 'stopped';
+  output_value: unknown | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+interface ExecutionEdge {
+  id: string;
+  source_executor_id: string;
+  source_port: string;
+  target_executor_id: string;
+  target_port: string;
+  value: unknown | null;
+}
+```
+
+## Related Endpoints
+
+- `POST /automations/list`
+- `POST /automations/get`
+- `POST /automations/create`
+- `POST /automations/run`
+- `POST /automations/status`
+- `POST /automations/list-runs`
+- `POST /automations/list-all-runs`
+- `POST /automations/update-review-status`
+- `POST /automations/validate`
+- `POST /automations/delete-run`
+- `POST /automations/export`
+- `POST /automations/export-run`
+- `POST /automations/stop`
+- `POST /automations/recurrence-status`
+- `POST /automations/publish`
+- `POST /automations/unpublish`
+- `POST /automations/run-once`
+- `POST /automations/logs`

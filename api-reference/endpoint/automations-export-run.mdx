@@ -1,0 +1,28 @@
+---
+title: "Export Automation Run"
+description: "Export full run data including executor and edge state"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/automations/export-run
+```
+
+## Request Body
+
+<ParamField body="runId" type="string" required>
+  Run ID to export.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="AutomationRunExport">
+  Full exported run payload.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.automations.exportRun({ runId: 'run_123' });
+```

@@ -1,0 +1,23 @@
+---
+title: "Integration Key"
+description: "Organization-level third-party provider key metadata"
+---
+
+## TypeScript Types
+
+```typescript
+type IntegrationProvider = 'fal' | 'openai' | 'claude' | 'gemini' | 'groq';
+
+interface IntegrationKey {
+  id: string;
+  provider: IntegrationProvider;
+  maskedKey: string;
+  created_at: string;
+}
+```
+
+## Related Endpoints
+
+- `POST /org/integration-key`
+- `POST /org/integration-key/upsert`
+- `POST /org/integration-key/delete`

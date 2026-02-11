@@ -1,0 +1,35 @@
+---
+title: "Filter Media by Usage"
+description: "Filter source IDs into available vs used for a named media use-case"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/media/filter
+```
+
+## Request Body
+
+<ParamField body="source_ids" type="string[]" required>
+  Source IDs to evaluate.
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Use-case name (for example `profile_picture`).
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ available: string[]; used_count: number; available_count: number }">
+  Usage filter result.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.media.filter({
+  source_ids: ['source_1', 'source_2'],
+  name: 'profile_picture',
+});
+```

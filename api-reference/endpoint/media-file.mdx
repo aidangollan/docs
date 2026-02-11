@@ -1,11 +1,12 @@
 ---
 title: "Get Media File"
-description: "Fetch a media file by its ID"
+description: "Fetch media content by ID (supports preview/audio paths and HTTP range requests)"
 ---
 
 ## Endpoint
 
-```
+```bash
+GET https://api.ugc.inc/media/file/[...path]
 GET https://api.ugc.inc/media/file/{id}
 GET https://api.ugc.inc/media/file/{id}/preview
 GET https://api.ugc.inc/media/file/{id}/audio
@@ -13,101 +14,34 @@ GET https://api.ugc.inc/media/file/{id}/audio
 
 ## Overview
 
-Retrieve the actual media file content. This endpoint acts as a proxy to the underlying blob storage, hiding the storage URLs from clients.
+Public file endpoint used by returned media URLs. No authentication is required.
 
-<Note>
-  **This is a public endpoint** - no authentication is required. This allows media URLs to be used directly in `<img>`, `<video>`, and `<audio>` tags without needing to pass credentials.
-</Note>
-
-**URL Patterns:**
-- `/media/file/{id}` - Returns the main file (user_media video/image/audio, or social_audio's audio file)
-- `/media/file/{id}/preview` - Returns the preview/thumbnail image (for videos or social_audio cover)
-- `/media/file/{id}/audio` - Returns the social_audio audio file (same as no suffix for social_audio)
+- `/media/file/{id}`: main file for `user_media`; audio file for `social_audio`
+- `/media/file/{id}/preview`: preview image when available
+- `/media/file/{id}/audio`: explicit audio path for `social_audio`
 
 ## Path Parameters
 
 <ParamField path="id" type="string" required>
-  The media ID
+  Media ID.
 </ParamField>
 
-<ParamField path="subpath" type="string">
-  Optional subpath: `preview` for cover image, `audio` for audio file (social_audio only)
+<ParamField path="subpath" type="'preview' | 'audio'">
+  Optional file variant.
 </ParamField>
 
 ## Response
 
-Returns the raw file content with appropriate `Content-Type` header.
+Binary stream with appropriate `Content-Type`.
 
-**Content Types:**
-- Videos: `video/mp4`
-- Images: `image/jpeg`, `image/png`, etc.
-- Audio: `audio/mpeg`
+The endpoint forwards HTTP range requests and returns `206 Partial Content` when a `Range` header is provided.
 
-The response includes cache headers for optimal performance:
+Common headers:
+- `Accept-Ranges: bytes`
 - `Cache-Control: public, max-age=31536000, immutable`
 
-<RequestExample>
+## Example
 
-```bash cURL - User Media
-curl -X GET "https://api.ugc.inc/media/file/media_abc123" \
-  -o video.mp4
+```bash
+curl -H "Range: bytes=0-1023" "https://api.ugc.inc/media/file/media_123" -o chunk.bin
 ```
-
-```bash cURL - Social Audio Preview
-curl -X GET "https://api.ugc.inc/media/file/audio_def456/preview" \
-  -o cover.jpg
-```
-
-```bash cURL - Social Audio File
-curl -X GET "https://api.ugc.inc/media/file/audio_def456/audio" \
-  -o audio.mp3
-```
-
-```javascript JavaScript
-// No authentication needed - use URLs directly in HTML
-const imageUrl = 'https://api.ugc.inc/media/file/media_abc123';
-document.getElementById('image').src = imageUrl;
-
-// Or fetch programmatically
-const response = await fetch('https://api.ugc.inc/media/file/media_abc123');
-const blob = await response.blob();
-```
-
-```typescript React
-// Using the URL directly in img/video/audio tags
-// The URLs returned from getMedia() can be used directly
-
-const { data } = await client.media.getMedia();
-
-// For user_media
-<img src={media.url} alt={media.name} />
-<video src={media.url} controls />
-
-// For social_audio
-<img src={socialAudio.preview_url} alt="Cover" />
-<audio src={socialAudio.audio_url} controls />
-```
-
-</RequestExample>
-
-<ResponseExample>
-
-```
-HTTP/1.1 200 OK
-Content-Type: video/mp4
-Cache-Control: public, max-age=31536000, immutable
-
-[binary file content]
-```
-
-```json Error Response - Not Found
-{
-  "ok": false,
-  "code": 404,
-  "message": "Media not found"
-}
-```
-
-
-</ResponseExample>
-

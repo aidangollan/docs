@@ -1,0 +1,74 @@
+---
+title: "NPM Package Types"
+description: "Complete exported type index for the ugcinc npm package"
+---
+
+All public TypeScript data structures exported by `ugcinc` are listed below, grouped by module.
+
+## `./accounts`
+
+`Account`, `AccountStat`, `AccountTask`, `EditProfileInfo`, `GetAccountsParams`, `GetAccountStatsParams`, `GetAccountStatusParams`, `AccountInfoUpdate`, `UpdateAccountInfoParams`, `AccountInfoUpdateResult`, `UpdateAccountInfoResponse`, `AccountSocialUpdate`, `UpdateAccountSocialParams`, `AccountSocialUpdateResult`, `UpdateAccountSocialResponse`, `DeleteAccountPostsParams`, `DeleteAccountPostsResponse`, `ResetWarmupParams`, `ResetWarmupResponse`, `NicheSwitchUpdate`, `NicheSwitchParams`, `NicheSwitchResult`, `NicheSwitchResponse`, `CreateAccountInput`, `CreateAccountsParams`, `CreateAccountResult`, `CreateAccountsResponse`
+
+## `./tasks`
+
+`TaskType`, `Task`, `GetTasksParams`
+
+## `./posts`
+
+`PostType`, `PostStatus`, `Post`, `PostStat`, `GetPostsParams`, `CreateSlideshowParams`, `GetPostStatsParams`, `GetPostStatusParams`, `CreateVideoParams`, `UpdatePostParams`, `DeletePostsParams`, `DeletePostsResponse`, `RetryPostsParams`, `SetPostStatusParams`, `SetPostStatusResponse`
+
+## `./comments`
+
+`CommentStatus`, `Comment`, `CreateCommentParams`, `CreateCommentResponse`, `GetCommentsParams`
+
+## `./media`
+
+`UserMedia`, `MediaUse`, `SocialAudio`, `Media`, `GetMediaParams`, `GetSocialAudioParams`, `UploadMediaParams`, `UploadMediaResponse`, `MediaTagUpdate`, `UpdateMediaTagsParams`, `MediaTagUpdateResult`, `UpdateMediaTagsResponse`, `UpdateMediaTagParams`, `UpdateMediaNameParams`, `DeleteMediaParams`, `DeleteMediaResponse`, `CreateSocialAudioParams`, `ImportTextParams`, `ImportTextResponse`, `CreateMediaFromUrlParams`, `GetMediaUseParams`, `GetMediaUseResponse`, `FilterMediaParams`, `FilterMediaResponse`, `GetUploadTokenParams`, `UploadTokenResponse`
+
+## `./stats`
+
+`RefreshStatsParams`, `RefreshStatsError`, `RefreshStatsResponse`, `DailyAggregatedStat`, `GetDailyAggregatedStatsParams`, `DailyAccountStat`, `GetDailyAccountStatsParams`, `DailyPostStat`, `GetDailyPostStatsParams`, `DashboardDailyStat`, `GetDashboardDailyStatsParams`, `TopAccount`, `GetTopAccountsParams`, `TopPost`, `GetTopPostsParams`
+
+## `./org`
+
+`ApiKey`, `DeleteApiKeyParams`, `EditApiKeyParams`, `IntegrationKey`, `IntegrationProvider`, `UpsertIntegrationKeyParams`, `DeleteIntegrationKeyParams`
+
+## `./types`
+
+`SuccessResponse`, `ErrorResponse`, `ApiResponse`
+
+## `./base`
+
+`ClientConfig`
+
+## `./render`
+
+`RenderJobResponse`, `RenderJobStatus`, `SubmitImageRenderJobParams`, `SubmitVideoRenderJobParams`, `SubmitScreenshotAnimationRenderJobParams`, `SubmitAutoCaptionRenderJobParams`, `SubmitInstagramDmRenderJobParams`, `SubmitIMessageDmRenderJobParams`, `IgDmMessage`, `ImDmMessage`, `RenderVideoEditorConfig`
+
+## `./render/types`
+
+`VideoEditorNodeConfig`, `VideoEditorChannel`, `VideoEditorSegment`, `VideoEditorVideoSegment`, `VideoEditorAudioSegment`, `VideoEditorImageSegment`, `VideoEditorTextSegment`, `VideoEditorImageSequenceSegment`, `VideoEditorVideoSequenceSegment`, `TimeValue`, `TimeMode`, `SegmentTimelinePosition`, `DeduplicationLevel`, `DeduplicationInput`, `ImageEditorElement`, `DimensionPresetKey`, `CropBoundary`, `CropAxisConfig`, `DynamicCropConfig`, `BorderRadiusConfig`, `VerticalAnchor`, `HorizontalAnchor`, `HorizontalSelfAnchor`, `VerticalSelfAnchor`, `RelativePositionConfigX`, `RelativePositionConfigY`
+
+## `./automations/types`
+
+`DayOfWeek`, `ScheduleConfig`, `AccountIterationConfig`, `MediaType`, `BasePortType`, `EnumOption`, `ImageValue`, `VideoValue`, `AudioValue`, `TextValue`, `NumberValue`, `BooleanValue`, `DateValue`, `EnumValue`, `SocialAudioValue`, `ObjectValue`, `PortValueFor`, `PortValue`, `NodeOutputValues`, `NodePort`, `NodePortWithPreview`, `ResolvedPorts`, `ComputedNode`, `OutputSchemaProperty`, `WorkflowNodeDefinition`, `WorkflowNodeInput`, `CanvasState`, `WorkflowDefinition`, `TemplateNode`, `AutomationTemplate`, `AutomationRun`, `ExecutorNode`, `ExecutionEdge`, `AccountData`, `FlowControlOutput`, `ExecutorContext`, `NodeExecutor`, `AsyncNodeExecutor`, `AnyNodeExecutor`, `AnyAsyncNodeExecutor`, `ExecutorAsyncJobStatus`, `ValidationErrorType`, `ValidationError`, `ExportedNode`, `ExportedConnection`, `ExportedTemplate`, `AutomationExport`, `ExportedExecutor`, `ExportedEdge`, `ExportedRun`, `AutomationRunExport`, `AutomationRunLog`, `InternalWorkflowConfig`, `AllWorkflowConfig`, `InternalNodeInputs`, `AllNodeInputs`, `InternalNodeOutputs`, `AllNodeOutputs`, `SchemaField`, `ObjectSchemaField`, `NestedSchemaField`
+
+## `./automations/nodes`
+
+`NodeDefinition`, `NodeType`, `UserCreatableNodeType`, `NodeConfig`, `WorkflowConfig`, `NodeInputs`, `NodeOutputs`, `InternalNodeType`
+
+## `./automations/nodes/types`
+
+`InputType`, `SelectionMode`, `ExhaustionBehavior`, `SelectionConfig`, `SelectionState`, `OutputMode`, `NodeCategory`, `TriggerIterationMode`, `IterationExhaustionBehavior`, `CollectionSelectionMode`, `TriggerCollectionConfig`, `MediaItemType`, `MediaNodeSelectionType`, `ResolvedPreview`, `PreviewSelectionState`, `PreviewContext`, `NullableOutputs`
+
+## `./automations/nodes/*` specific configs
+
+`AccountNodeConfig`, `AutoCaptionNodeConfig`, `AutoCaptionPreset`, `AutoCaptionFontWeight`, `AutoCaptionPosition`, `AutoPostNodeConfig`, `AutoPostMode`, `PostSchedulingMode`, `BranchNodeConfig`, `BranchDefinition`, `BranchPassthroughInput`, `BranchValueConfig`, `CollectNodeConfig`, `CollectedValues`, `CollectInputValue`, `ComposeWorkflowNodeConfig`, `ComposeWorkflowNodeInputs`, `ComposeWorkflowNodeOutputs`, `CreateDmNodeConfig`, `CreateDmMessage`, `DmPlatform`, `CustomModelNodeConfig`, `CustomModelOutputType`, `CustomModelInputParam`, `CustomModelParamType`, `OpenAPISchema`, `OpenAPIProperty`, `DeduplicateNodeConfig`, `DestructureNodeConfig`, `DestructureNodeInputs`, `DestructureNodeOutputs`, `DestructureSelection`, `IndexExpression`, `ForEachNodeConfig`, `ForEachNodeInputs`, `ForEachNodeOutputs`, `ForEachOutputProperty`, `GenerateImageNodeConfig`, `ImageGenerationTextModel`, `ImageGenerationEditModel`, `ImageGenerationModel`, `ImageModelProvider`, `ImageModelOption`, `AspectRatioOption`, `GenerateVideoNodeConfig`, `VideoGenerationTextToVideoModel`, `VideoGenerationImageToVideoModel`, `VideoGenerationModel`, `VideoModelProvider`, `VideoModelTier`, `VideoAspectRatioOption`, `VideoDurationOption`, `VideoModelOption`, `IfNodeConfig`, `IfLogicOperator`, `IfBooleanInput`, `ImageEditorNodeConfig`, `ImageComposerNodeConfig`, `ImageComposerRenderInput`, `LLMNodeConfig`, `LLMNodeOutputs`, `LLMProvider`, `ManualTriggerNodeConfig`, `ManualTriggerNodeOutputs`, `MediaNodeConfig`, `MediaNodeOutput`, `NotNodeConfig`, `OutputNodeConfig`, `OutputNodeOutputs`, `RandomNodeConfig`, `RandomInputPort`, `RandomNodeMode`, `RandomNodeOutputs`, `RandomRouteNodeConfig`, `RandomRouteBranch`, `RandomRoutePassthroughInput`, `RecurrenceNodeConfig`, `RecurrenceMediaOutput`, `RecurrenceMediaConfig`, `RecurrenceNodeOutputs`, `SaveToMediaNodeConfig`, `SaveToMediaInput`, `SaveToMediaType`, `ScreenshotAnimationNodeConfig`, `SocialAudioNodeConfig`, `TextNodeConfig`, `TranscriptNodeConfig`, `InputNodeConfig`, `InputNodeOutputs`, `VideoComposerNodeConfig`, `VideoComposerRenderInput`, `VideoImportNodeConfig`, `VideoImportNodeInputs`, `VideoImportNodeOutputs`, `VideoImportPlatform`, `VideoImportQuality`
+
+## `./port-id`
+
+`PortId`
+
+## `./tools`
+
+`ToolDefinition`
