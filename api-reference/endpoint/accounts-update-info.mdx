@@ -54,11 +54,15 @@ Update account metadata including tag, organization group, user group, keywords,
     <ParamField body="postVersion" type="'original' | 'v1_custom'">
       Post flow version. `'original'` uses standard posting flow, `'v1_custom'` uses customized posting flow
     </ParamField>
+
+    <ParamField body="approved" type="boolean">
+      Whether the account follows recommended best practices. Set to `false` to flag accounts with user-overridden guidelines.
+    </ParamField>
   </Expandable>
 </ParamField>
 
 <Note>
-  Each update in the array must include at least one field to update (tag, org_group, user_group, keywords, profiles, description, warmupVersion, or postVersion).
+  Each update in the array must include at least one field to update (tag, org_group, user_group, keywords, profiles, description, warmupVersion, postVersion, or approved).
 </Note>
 
 ## Response

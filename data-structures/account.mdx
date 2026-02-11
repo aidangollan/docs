@@ -25,6 +25,7 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `keywords` | `string \| null` | Search keywords used for warmup tasks (comma-separated) |
 | `profiles` | `string \| null` | Profile usernames to search for warmup tasks (comma-separated) |
 | `phone_type` | `string \| null` | Account hosting type: `'physical_iphone'`, `'physical_android'`, `'emulated_android'`, `'social_api'`, or `'tracking'`. Tracking accounts are read-only and cannot be used for posting |
+| `approved` | `boolean` | Whether the account configuration follows recommended best practices. Defaults to `true`. Set to `false` when a user overrides guidelines. |
 | `status` | `string` | Account status: `'pending'`, `'initialized'`, `'setup'`, `'warming'`, `'warmed'`, `'needs_replacement'`, or `'replacing'` |
 
 ## Account Organization
@@ -96,6 +97,7 @@ The `status` field indicates the current lifecycle stage of an account:
   "description": "health and wellness content",
   "keywords": "fitness,workout,health",
   "profiles": "fitnessguru,healthcoach",
+  "approved": true,
   "status": "warmed"
 }
 ```
