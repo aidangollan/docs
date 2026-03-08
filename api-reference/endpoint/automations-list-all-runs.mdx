@@ -23,14 +23,29 @@ POST https://api.ugc.inc/automations/list-all-runs
   Optional template filter.
 </ParamField>
 
+<ParamField body="cursor" type="string">
+  ISO timestamp cursor for pagination. Use the `created_at` value of the last run from the previous page.
+</ParamField>
+
 ## Response
 
-<ResponseField name="data" type="Array<{ run: AutomationRun; templateName: string; nodeCount: number; completedNodeCount: number }>">
+<ResponseField name="data.runs" type="Array<{ run: AutomationRun; templateName: string; nodeCount: number; completedNodeCount: number }>">
   Runs with template metadata.
+</ResponseField>
+
+<ResponseField name="data.hasMore" type="boolean">
+  Whether more runs are available after this page.
 </ResponseField>
 
 ## TypeScript
 
 ```typescript
-const res = await client.automations.listAllRuns({ reviewStatus: 'pending_review', limit: 50 });
+// First page
+const res = await client.automations.listAllRuns({ limit: 20 });
+
+// Next page
+const nextRes = await client.automations.listAllRuns({
+  limit: 20,
+  cursor: res.data.runs[res.data.runs.length - 1].run.created_at,
+});
 ```

@@ -16,7 +16,7 @@ Delete an integration key for a specific AI provider. After deletion, automation
 ## Request Body
 
 <ParamField body="provider" type="string" required>
-  The provider to delete the key for. One of: `fal`, `openai`, `claude`, `gemini`, `groq`
+  The provider to delete the key for. One of: `fal`, `openrouter`
 </ParamField>
 
 ## Response
@@ -36,7 +36,7 @@ curl -X POST https://api.ugc.inc/org/integration-key/delete \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "provider": "openai"
+    "provider": "openrouter"
   }'
 ```
 
@@ -48,7 +48,7 @@ const client = new UGCClient({
 });
 
 const response = await client.org.deleteIntegrationKey({
-  provider: 'openai'
+  provider: 'openrouter'
 });
 
 if (response.ok) {
@@ -66,7 +66,7 @@ if (response.ok) {
   "code": 200,
   "message": "Success",
   "data": {
-    "provider": "openai"
+    "provider": "openrouter"
   }
 }
 ```

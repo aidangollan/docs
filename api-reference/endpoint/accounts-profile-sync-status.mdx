@@ -1,0 +1,88 @@
+---
+title: "Get Profile Sync Status"
+description: "Check if custom provider account profiles are in sync with live social profiles"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/accounts/profile-sync-status
+```
+
+## Overview
+
+For custom provider (Autoviral) accounts, checks whether the live Instagram or TikTok profile matches the expected values after a profile update. When in sync, clears the pending state. Use this endpoint to poll after profile edits until the live profile reflects your changes.
+
+## Request Body
+
+<ParamField body="accountIds" type="string[]">
+  Array of account IDs to check. Only custom_provider accounts with pending_info_change are verified; others return inSync: true.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <ResponseField name="results" type="ProfileSyncStatusResult[]">
+    Array of results per account
+    
+    <Expandable title="ProfileSyncStatusResult properties">
+      <ResponseField name="accountId" type="string">
+        Account ID
+      </ResponseField>
+      
+      <ResponseField name="inSync" type="boolean">
+        Whether the live profile matches expected values. When true, pending_info_change is cleared.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST "https://api.ugc.inc/accounts/profile-sync-status?orgId=YOUR_ORG_ID" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"accountIds": ["acc_123456"]}'
+```
+
+```typescript TypeScript
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY',
+  orgId: 'YOUR_ORG_ID'
+});
+
+const response = await client.accounts.getProfileSyncStatus({
+  accountIds: ['acc_123456']
+});
+
+if (response.ok) {
+  response.data.results.forEach(({ accountId, inSync }) => {
+    console.log(`Account ${accountId}: ${inSync ? 'in sync' : 'still updating'}`);
+  });
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "results": [
+      {
+        "accountId": "acc_123456",
+        "inSync": true
+      }
+    ]
+  }
+}
+```
+
+</ResponseExample>

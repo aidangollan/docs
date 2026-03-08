@@ -1,0 +1,160 @@
+---
+title: "Create Draft Post"
+description: "Create a draft post without assigning it to an account"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/post/draft
+```
+
+## Overview
+
+Create a draft post that is saved but not assigned to an account or scheduled for publishing. Drafts allow you to prepare post content (media, caption, title) and assign an account and schedule later using the [Update Post](/api-reference/endpoint/posts-update) endpoint.
+
+<Info>
+  **Draft to Scheduled:**
+
+  To schedule a draft, use the [Update Post](/api-reference/endpoint/posts-update) endpoint to set both `accountId` and `postTime`. The post will automatically transition from `draft` to `scheduled` status.
+</Info>
+
+## Request Body
+
+<ParamField body="type" type="'video' | 'slideshow'" required>
+  Type of post content
+</ParamField>
+
+<ParamField body="mediaUrls" type="string[]" required>
+  Array of media URLs. For video posts, provide a single video URL. For slideshow posts, provide one or more image URLs.
+</ParamField>
+
+<ParamField body="caption" type="string">
+  Post caption/description (max 500 characters)
+</ParamField>
+
+<ParamField body="title" type="string">
+  Slideshow title (max 90 characters, slideshow posts only)
+</ParamField>
+
+<ParamField body="socialAudioId" type="string">
+  ID of a social audio record to attach to the post
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="Post">
+  The created draft post object
+
+  <Expandable title="Post properties">
+    <ResponseField name="id" type="string">
+      Unique post identifier
+    </ResponseField>
+
+    <ResponseField name="account_id" type="null">
+      Always `null` for draft posts
+    </ResponseField>
+
+    <ResponseField name="type" type="string">
+      Post type: `video` or `slideshow`
+    </ResponseField>
+
+    <ResponseField name="status" type="'draft'">
+      Always `draft` for newly created draft posts
+    </ResponseField>
+
+    <ResponseField name="caption" type="string | null">
+      Post caption
+    </ResponseField>
+
+    <ResponseField name="title" type="string | null">
+      Post title (slideshow only)
+    </ResponseField>
+
+    <ResponseField name="media_urls" type="string[]">
+      Media URLs for the post
+    </ResponseField>
+
+    <ResponseField name="scheduled_at" type="null">
+      Always `null` for draft posts
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/post/draft \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "video",
+    "mediaUrls": ["https://storage.example.com/video.mp4"],
+    "caption": "Draft caption - will assign account later"
+  }'
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+// Create a draft video post
+const draft = await client.posts.createDraft({
+  type: 'video',
+  mediaUrls: ['https://storage.example.com/video.mp4'],
+  caption: 'Draft caption',
+});
+
+if (draft.ok) {
+  console.log(`Draft created: ${draft.data.id}`);
+
+  // Later, assign account and schedule to publish
+  const scheduled = await client.posts.updatePost({
+    postId: draft.data.id,
+    accountId: 'acc_123456',
+    postTime: '2025-01-15T14:00:00Z',
+  });
+
+  console.log(`Status: ${scheduled.data.status}`); // "scheduled"
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "data": {
+    "id": "post_abc123",
+    "account_id": null,
+    "type": "video",
+    "status": "draft",
+    "social_id": null,
+    "caption": "Draft caption - will assign account later",
+    "title": null,
+    "media_urls": [
+      "https://storage.example.com/video.mp4"
+    ],
+    "thumbnail_url": null,
+    "social_audio_id": null,
+    "music_post_id": null,
+    "scheduled_at": null
+  }
+}
+```
+
+```json Error Response
+{
+  "ok": false,
+  "code": 400,
+  "message": "At least one media URL is required"
+}
+```
+
+</ResponseExample>

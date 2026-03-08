@@ -1,0 +1,219 @@
+---
+title: "Preview Schedule"
+description: "Preview finalized post times before creating or updating posts"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/post/preview-schedule
+```
+
+## Overview
+
+Preview how posts will be scheduled before actually creating or updating them. The endpoint processes entries sequentially, accounting for conflicts between entries in the batch and existing posts on each account. Returns the finalized time for each entry, indicating whether it was adjusted from the requested time.
+
+This is useful for showing users the exact times their posts will be scheduled at, since the scheduling system may adjust times to avoid conflicts (minimum 2-hour gap between posts on the same account).
+
+<Info>
+  **Batch Awareness:**
+
+  Entries are processed in order. Each entry's finalized time is considered when scheduling subsequent entries in the same batch. This means if two entries target the same account at the same time, the second one will be bumped.
+</Info>
+
+## Request Body
+
+<ParamField body="entries" type="array" required>
+  Array of schedule entries to preview
+
+  <Expandable title="Entry properties">
+    <ParamField body="accountId" type="string" required>
+      The account ID to schedule on
+    </ParamField>
+
+    <ParamField body="postTime" type="string" required>
+      Requested schedule time in ISO 8601 format
+    </ParamField>
+
+    <ParamField body="postId" type="string" optional>
+      Existing post ID (for updates). The post's current time slot will be excluded from conflict checks so it doesn't conflict with itself.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="excludePostIds" type="string[]" optional>
+  Array of post IDs to exclude from conflict checks. Useful when editing or approving multiple posts — pass all their IDs so they don't conflict with each other's stale database state.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="array">
+  Array of preview results, one per entry in the same order
+
+  <Expandable title="Result properties">
+    <ResponseField name="accountId" type="string">
+      Account ID
+    </ResponseField>
+
+    <ResponseField name="requestedTime" type="string">
+      The originally requested time in ISO 8601 format
+    </ResponseField>
+
+    <ResponseField name="scheduledTime" type="string">
+      The finalized time in ISO 8601 format (may differ from requestedTime)
+    </ResponseField>
+
+    <ResponseField name="bumped" type="boolean">
+      Whether the time was adjusted from the requested time
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error Cases
+
+- **400 Bad Request**: Missing entries array, empty entries, or entries missing required fields
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/post/preview-schedule \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "entries": [
+      { "accountId": "acc_123", "postTime": "2026-02-19T20:45:00Z" },
+      { "accountId": "acc_123", "postTime": "2026-02-19T21:00:00Z" }
+    ]
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.ugc.inc/post/preview-schedule',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'entries': [
+            {'accountId': 'acc_123', 'postTime': '2026-02-19T20:45:00Z'},
+            {'accountId': 'acc_123', 'postTime': '2026-02-19T21:00:00Z'}
+        ]
+    }
+)
+
+data = response.json()
+
+if data['ok']:
+    for result in data['data']:
+        bumped = " (bumped)" if result['bumped'] else ""
+        print(f"{result['accountId']}: {result['scheduledTime']}{bumped}")
+else:
+    print(f"Error: {data['message']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.ugc.inc/post/preview-schedule', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    entries: [
+      { accountId: 'acc_123', postTime: '2026-02-19T20:45:00Z' },
+      { accountId: 'acc_123', postTime: '2026-02-19T21:00:00Z' }
+    ]
+  })
+});
+
+const data = await response.json();
+
+if (data.ok) {
+  for (const result of data.data) {
+    console.log(`${result.accountId}: ${result.scheduledTime}${result.bumped ? ' (bumped)' : ''}`);
+  }
+} else {
+  console.error(`Error: ${data.message}`);
+}
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: 'YOUR_API_KEY'
+});
+
+const response = await client.posts.previewSchedule({
+  entries: [
+    { accountId: 'acc_123', postTime: '2026-02-19T20:45:00Z' },
+    { accountId: 'acc_123', postTime: '2026-02-19T21:00:00Z' }
+  ]
+});
+
+if (response.ok) {
+  const bumped = response.data.filter(r => r.bumped);
+  if (bumped.length > 0) {
+    console.log(`${bumped.length} post(s) were adjusted to avoid conflicts`);
+  }
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success - No Conflicts
+{
+  "ok": true,
+  "code": 200,
+  "data": [
+    {
+      "accountId": "acc_123",
+      "requestedTime": "2026-02-19T20:45:00.000Z",
+      "scheduledTime": "2026-02-19T20:45:00.000Z",
+      "bumped": false
+    },
+    {
+      "accountId": "acc_456",
+      "requestedTime": "2026-02-19T21:00:00.000Z",
+      "scheduledTime": "2026-02-19T21:00:00.000Z",
+      "bumped": false
+    }
+  ]
+}
+```
+
+```json Success - Time Adjusted
+{
+  "ok": true,
+  "code": 200,
+  "data": [
+    {
+      "accountId": "acc_123",
+      "requestedTime": "2026-02-19T20:45:00.000Z",
+      "scheduledTime": "2026-02-19T20:45:00.000Z",
+      "bumped": false
+    },
+    {
+      "accountId": "acc_123",
+      "requestedTime": "2026-02-19T21:00:00.000Z",
+      "scheduledTime": "2026-02-19T22:45:00.000Z",
+      "bumped": true
+    }
+  ]
+}
+```
+
+```json Error - Missing Fields
+{
+  "ok": false,
+  "code": 400,
+  "message": "Each entry must have accountId and postTime"
+}
+```
+
+</ResponseExample>

@@ -12,9 +12,9 @@ Represents a video or slideshow post on a social media account.
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | `string` | Unique post identifier |
-| `account_id` | `string` | ID of the account that created this post |
+| `account_id` | `string \| null` | ID of the account that created this post. `null` for draft posts not yet assigned to an account. |
 | `type` | `'video' \| 'slideshow'` | Type of post content |
-| `status` | `string` | Current status: `'scheduled'`, `'pending'`, `'complete'`, or `'failed'` |
+| `status` | `string` | Current status: `'draft'`, `'scheduled'`, `'pending'`, `'complete'`, or `'failed'` |
 | `social_id` | `string \| null` | Platform-specific post ID (TikTok video ID or Instagram reel code, available after posting) |
 | `caption` | `string \| null` | Post caption/description text (max 500 characters) |
 | `media_urls` | `string[] \| null` | Array of URLs to video/image files used in the post |
@@ -27,6 +27,7 @@ Represents a video or slideshow post on a social media account.
 
 | Status | Description | Can Delete? |
 |--------|-------------|-------------|
+| `draft` | Post is saved but not assigned to an account or scheduled | ✅ Yes |
 | `scheduled` | Post is scheduled to be published at a future time | ✅ Yes |
 | `pending` | Post is currently being processed/published | ✅ Yes |
 | `complete` | Post was successfully published to the platform | ❌ No |

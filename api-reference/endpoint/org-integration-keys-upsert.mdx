@@ -16,7 +16,7 @@ Create or update an integration key for a specific AI provider. If a key already
 ## Request Body
 
 <ParamField body="provider" type="string" required>
-  The provider to set the key for. One of: `fal`, `openai`, `claude`, `gemini`, `groq`
+  The provider to set the key for. One of: `fal`, `openrouter`
 </ParamField>
 
 <ParamField body="key" type="string" required>
@@ -54,8 +54,8 @@ curl -X POST https://api.ugc.inc/org/integration-key/upsert \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "provider": "openai",
-    "key": "sk-proj-abc123..."
+    "provider": "openrouter",
+    "key": "sk-or-abc123..."
   }'
 ```
 
@@ -67,8 +67,8 @@ const client = new UGCClient({
 });
 
 const response = await client.org.upsertIntegrationKey({
-  provider: 'openai',
-  key: 'sk-proj-abc123...'
+  provider: 'openrouter',
+  key: 'sk-or-abc123...'
 });
 
 if (response.ok) {
@@ -87,8 +87,8 @@ if (response.ok) {
   "message": "Success",
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440000",
-    "provider": "openai",
-    "maskedKey": "sk-p...8xYz",
+    "provider": "openrouter",
+    "maskedKey": "sk-o...8xYz",
     "created_at": "2024-01-15T10:30:00.000Z"
   }
 }

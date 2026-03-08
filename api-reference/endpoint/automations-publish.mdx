@@ -9,10 +9,28 @@ description: "Enable recurrence scheduling for an automation template"
 POST https://api.ugc.inc/automations/publish
 ```
 
+## Overview
+
+Publishing enables the recurrence scheduler for a template. The request must include both the recurrence schedule configuration and the account iteration mode that should be used by the scheduler.
+
 ## Request Body
 
 <ParamField body="templateId" type="string" required>
   Template ID to publish.
+</ParamField>
+
+<ParamField body="scheduleConfig" type="ScheduleConfig" required>
+  Recurrence schedule definition. Use the `ScheduleConfig` type exported by the
+  npm package for the exact shape.
+</ParamField>
+
+<ParamField
+  body="accountIterationConfig"
+  type="AccountIterationConfig | null"
+  required
+>
+  Scheduler account iteration settings. Pass `null` when the workflow does not
+  use account iteration.
 </ParamField>
 
 ## Response
@@ -24,5 +42,22 @@ POST https://api.ugc.inc/automations/publish
 ## TypeScript
 
 ```typescript
-const res = await client.automations.publish({ templateId: 'tpl_123' });
+import type { ScheduleConfig, AccountIterationConfig } from "ugcinc";
+
+const scheduleConfig: ScheduleConfig = {
+  frequencyType: "per-day",
+  runsPerDay: 3,
+  daysOfWeek: ["monday", "wednesday", "friday"],
+  timingType: "specific",
+  specificTimes: ["09:00", "13:00", "17:00"],
+  timezone: "America/Los_Angeles",
+};
+
+const accountIterationConfig: AccountIterationConfig | null = null;
+
+const res = await client.automations.publish({
+  templateId: "tpl_123",
+  scheduleConfig,
+  accountIterationConfig,
+});
 ```

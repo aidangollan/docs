@@ -19,6 +19,10 @@ POST https://api.ugc.inc/media/filter
   Use-case name (for example `profile_picture`).
 </ParamField>
 
+<ParamField body="urls" type="string[]">
+  Optional parallel array of URLs corresponding to each source ID. When provided, also filters out source IDs whose URLs are already used (catches duplicates where the same image has different source IDs).
+</ParamField>
+
 ## Response
 
 <ResponseField name="data" type="{ available: string[]; used_count: number; available_count: number }">

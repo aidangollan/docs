@@ -11,7 +11,7 @@ POST https://api.ugc.inc/org/integration-key
 
 ## Overview
 
-Retrieve a list of all integration keys associated with your organization. Integration keys are used to authenticate with third-party AI providers (fal.ai, OpenAI, Claude, Gemini, Groq). For security reasons, key values are returned masked.
+Retrieve a list of all integration keys associated with your organization. Integration keys are used to authenticate with third-party AI providers (fal.ai, OpenRouter). For security reasons, key values are returned masked.
 
 ## Request Body
 
@@ -28,7 +28,7 @@ No request body parameters required.
     </ResponseField>
 
     <ResponseField name="provider" type="string">
-      Provider name. One of: `fal`, `openai`, `claude`, `gemini`, `groq`
+      Provider name. One of: `fal`, `openrouter`
     </ResponseField>
 
     <ResponseField name="maskedKey" type="string">
@@ -78,8 +78,8 @@ if (response.ok) {
   "data": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",
-      "provider": "openai",
-      "maskedKey": "sk-p...8xYz",
+      "provider": "openrouter",
+      "maskedKey": "sk-o...8xYz",
       "created_at": "2024-01-15T10:30:00.000Z"
     },
     {

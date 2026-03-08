@@ -1,16 +1,13 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "UGC Inc API",
+    "description": "Public API surface for accounts, posts, comments, tasks, media, organization management, billing, statistics, and automations.",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.ugc.inc"
     }
   ],
   "security": [
@@ -19,76 +16,859 @@
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
+    "/accounts": {
+      "post": {
+        "operationId": "accounts_get_post",
+        "summary": "Get Accounts",
+        "description": "Retrieve accounts with optional filters",
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "type": "object"
                 }
               }
             }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
               }
             }
           }
         }
-      },
+      }
+    },
+    "/accounts/create": {
       "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
+        "operationId": "accounts_create_post",
+        "summary": "Create Accounts",
+        "description": "Create new account seats and update your subscription billing",
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "type": "object"
                 }
               }
             }
-          },
-          "400": {
-            "description": "unexpected error",
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/delete-posts": {
+      "post": {
+        "operationId": "accounts_delete_posts_post",
+        "summary": "Delete All Posts",
+        "description": "Delete all posts from one or more accounts",
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/niche-switch": {
+      "post": {
+        "operationId": "accounts_niche_switch_post",
+        "summary": "Niche Switch",
+        "description": "Switch account niche by updating keywords and description, and resetting warmup",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/profile-sync-status": {
+      "post": {
+        "operationId": "accounts_profile_sync_status_post",
+        "summary": "Get Profile Sync Status",
+        "description": "Check if custom provider account profiles are in sync with live social profiles",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/reset-warmup": {
+      "post": {
+        "operationId": "accounts_reset_warmup_post",
+        "summary": "Reset Account Warmup",
+        "description": "Reset or delete warmup activity for an account",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/status": {
+      "post": {
+        "operationId": "accounts_status_post",
+        "summary": "Get Account Status",
+        "description": "Get account status and pending tasks",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/troubleshoot": {
+      "post": {
+        "operationId": "accounts_troubleshoot_post",
+        "summary": "Troubleshoot Accounts",
+        "description": "Check the health of active accounts and identify issues",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/update-info": {
+      "post": {
+        "operationId": "accounts_update_info_post",
+        "summary": "Update Account Info",
+        "description": "Update account metadata for one or more accounts (tag, groups, keywords, profiles, description, warmup version)",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/update-social": {
+      "post": {
+        "operationId": "accounts_update_social_post",
+        "summary": "Update Account Social Profile",
+        "description": "Update account social profile for one or more accounts (username, avatar, nickname, bio)",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/create": {
+      "post": {
+        "operationId": "automations_create_post",
+        "summary": "Create or Update Automation Template",
+        "description": "Create a new automation template or update an existing one",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/delete": {
+      "post": {
+        "operationId": "automations_delete_post",
+        "summary": "Delete Automation Template",
+        "description": "Delete an automation template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/delete-run": {
+      "post": {
+        "operationId": "automations_delete_run_post",
+        "summary": "Delete Automation Run",
+        "description": "Delete a run and its execution state",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/export": {
+      "post": {
+        "operationId": "automations_export_post",
+        "summary": "Export Automation Template",
+        "description": "Export full template data for debugging and tooling",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/export-run": {
+      "post": {
+        "operationId": "automations_export_run_post",
+        "summary": "Export Automation Run",
+        "description": "Export full run data including executor and edge state",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/get": {
+      "post": {
+        "operationId": "automations_get_post",
+        "summary": "Get Automation Template",
+        "description": "Retrieve a single automation template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/list": {
+      "post": {
+        "operationId": "automations_list_post",
+        "summary": "List Automation Templates",
+        "description": "Retrieve all automation templates for the authenticated organization",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/list-all-runs": {
+      "post": {
+        "operationId": "automations_list_all_runs_post",
+        "summary": "List All Automation Runs",
+        "description": "List automation runs across templates",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/list-runs": {
+      "post": {
+        "operationId": "automations_list_runs_post",
+        "summary": "List Template Runs",
+        "description": "List runs for a specific automation template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/logs": {
+      "post": {
+        "operationId": "automations_logs_post",
+        "summary": "Get Automation Run Logs",
+        "description": "Retrieve run logs ordered by creation time",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/publish": {
+      "post": {
+        "operationId": "automations_publish_post",
+        "summary": "Publish Automation",
+        "description": "Enable recurrence scheduling for an automation template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/recurrence-status": {
+      "post": {
+        "operationId": "automations_recurrence_status_post",
+        "summary": "Get Recurrence Status",
+        "description": "Get scheduling status for a recurring automation template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/run": {
+      "post": {
+        "operationId": "automations_run_post",
+        "summary": "Run Automation",
+        "description": "Start one or more runs for an automation template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/run-once": {
+      "post": {
+        "operationId": "automations_run_once_post",
+        "summary": "Run Automation Once",
+        "description": "Immediately trigger one manual run for a template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/status": {
+      "post": {
+        "operationId": "automations_status_post",
+        "summary": "Get Automation Run Status",
+        "description": "Get run state, executors, and execution edges",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/stop": {
+      "post": {
+        "operationId": "automations_stop_post",
+        "summary": "Stop Automation Run",
+        "description": "Stop an in-progress run",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/unpublish": {
+      "post": {
+        "operationId": "automations_unpublish_post",
+        "summary": "Unpublish Automation",
+        "description": "Disable recurrence scheduling for an automation template",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/update-review-status": {
+      "post": {
+        "operationId": "automations_update_review_status_post",
+        "summary": "Update Run Review Status",
+        "description": "Approve or reject an automation run",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/automations/validate": {
+      "post": {
+        "operationId": "automations_validate_post",
+        "summary": "Validate Workflow",
+        "description": "Validate an automation workflow definition without saving it",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing": {
+      "get": {
+        "operationId": "billing_get_get",
+        "summary": "Get Billing",
+        "description": "Get billing information including subscription details and linked organizations",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
@@ -96,117 +876,1395 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
+    "/billing/cancel": {
+      "post": {
+        "operationId": "billing_cancel_post",
+        "summary": "Cancel Subscription",
+        "description": "Cancel your subscription at the end of the current billing period",
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/deactivate": {
+      "post": {
+        "operationId": "billing_deactivate_post",
+        "summary": "Deactivate Account",
+        "description": "Deactivate an account slot and remove it from your subscription",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/portal": {
+      "post": {
+        "operationId": "billing_portal_post",
+        "summary": "Billing Portal",
+        "description": "Get a Stripe billing portal URL for managing payment methods",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/request-refund": {
+      "post": {
+        "operationId": "billing_request_refund_post",
+        "summary": "Request Refund",
+        "description": "Request a refund for an account",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/request-replacement": {
+      "post": {
+        "operationId": "billing_request_replacement_post",
+        "summary": "Request Replacement",
+        "description": "Request a replacement for an account",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/requests": {
+      "get": {
+        "operationId": "billing_requests_get",
+        "summary": "Get Billing Requests",
+        "description": "Get all billing requests (replacements and refunds)",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/comment": {
       "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+        "operationId": "comments_list_post",
+        "summary": "Get Comments",
+        "description": "Get comments for your organization",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           }
         },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comment/create": {
+      "post": {
+        "operationId": "comments_create_post",
+        "summary": "Create Comment",
+        "description": "Create a comment on a TikTok post",
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media": {
+      "post": {
+        "operationId": "media_get_post",
+        "summary": "Get Media",
+        "description": "Retrieve media files with optional filters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/create": {
+      "post": {
+        "operationId": "media_create_post",
+        "summary": "Create Media from URLs",
+        "description": "Create media records from files already uploaded to blob storage",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/create/text": {
+      "post": {
+        "operationId": "media_create_text_post",
+        "summary": "Create Text Media",
+        "description": "Create text media entries from raw text content",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/create/url": {
+      "post": {
+        "operationId": "media_create_url_post",
+        "summary": "Get Upload Token",
+        "description": "Generate a Vercel Blob client token for direct media uploads",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/delete": {
+      "post": {
+        "operationId": "media_delete_post",
+        "summary": "Delete Media",
+        "description": "Delete one or more media items",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/file/{path}": {
+      "get": {
+        "operationId": "media_file_get",
+        "summary": "Get Media File",
+        "description": "Fetch media content by ID (supports preview/audio paths and HTTP range requests)",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "description": "Media path. Examples: `media_123`, `media_123/preview`, `media_123/audio`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/media/filter": {
+      "post": {
+        "operationId": "media_filter_post",
+        "summary": "Filter Media by Usage",
+        "description": "Filter source IDs into available vs used for a named media use-case",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/social-audio": {
+      "post": {
+        "operationId": "media_social_audio_get_post",
+        "summary": "Get Social Audio",
+        "description": "Retrieve social audio files with optional filters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/social-audio/upload": {
+      "post": {
+        "operationId": "media_social_audio_upload_post",
+        "summary": "Upload Social Audio",
+        "description": "Import audio from a TikTok or Instagram URL",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/update-name": {
+      "post": {
+        "operationId": "media_update_name_post",
+        "summary": "Update Media Name",
+        "description": "Update the name of a media item",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/update-tag": {
+      "post": {
+        "operationId": "media_update_tag_post",
+        "summary": "Update Media Tag",
+        "description": "Update tags on one or more media items",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/use": {
+      "post": {
+        "operationId": "media_use_post",
+        "summary": "Get Media Use Entries",
+        "description": "Get media usage records for a specific use-case name",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org": {
+      "get": {
+        "operationId": "org_get_get",
+        "summary": "Get Organizations",
+        "description": "List organizations linked to your API key",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org/api-key": {
+      "post": {
+        "operationId": "org_api_keys_list_post",
+        "summary": "List API Keys",
+        "description": "Retrieve all API keys for your organization",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org/api-key/delete": {
+      "post": {
+        "operationId": "org_api_keys_delete_post",
+        "summary": "Delete API Key",
+        "description": "Delete an API key from your organization",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org/api-key/edit": {
+      "post": {
+        "operationId": "org_api_keys_edit_post",
+        "summary": "Edit API Key",
+        "description": "Update an API key's name",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org/integration-key": {
+      "post": {
+        "operationId": "org_integration_keys_list_post",
+        "summary": "List Integration Keys",
+        "description": "Retrieve all integration keys for your organization",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org/integration-key/delete": {
+      "post": {
+        "operationId": "org_integration_keys_delete_post",
+        "summary": "Delete Integration Key",
+        "description": "Delete an integration key for a provider",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org/integration-key/upsert": {
+      "post": {
+        "operationId": "org_integration_keys_upsert_post",
+        "summary": "Upsert Integration Key",
+        "description": "Create or update an integration key for a provider",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org/name": {
+      "post": {
+        "operationId": "org_update_name_post",
+        "summary": "Update Organization Name",
+        "description": "Update your organization's name",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post": {
+      "post": {
+        "operationId": "posts_get_post",
+        "summary": "Get Posts",
+        "description": "Retrieve posts with optional filters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/delete": {
+      "post": {
+        "operationId": "posts_delete_post",
+        "summary": "Delete Posts",
+        "description": "Delete one or more posts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/preview-schedule": {
+      "post": {
+        "operationId": "posts_preview_schedule_post",
+        "summary": "Preview Schedule",
+        "description": "Preview finalized post times before creating or updating posts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/retry": {
+      "post": {
+        "operationId": "posts_retry_post",
+        "summary": "Retry Posts",
+        "description": "Retry one or more failed posts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/slideshow": {
+      "post": {
+        "operationId": "posts_create_slideshow_post",
+        "summary": "Create Slideshow Post",
+        "description": "Create a slideshow post from multiple images",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/status": {
+      "post": {
+        "operationId": "posts_status_post",
+        "summary": "Get Post Status",
+        "description": "Get the status of a specific post",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/update": {
+      "post": {
+        "operationId": "posts_update_post",
+        "summary": "Update Post",
+        "description": "Update an existing scheduled or failed post in place",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/post/video": {
+      "post": {
+        "operationId": "posts_create_video_post",
+        "summary": "Create Video Post",
+        "description": "Create a video post",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/accounts": {
+      "post": {
+        "operationId": "stats_accounts_post",
+        "summary": "Get Account Statistics",
+        "description": "Retrieve account statistics with filters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/aggregated/daily": {
+      "post": {
+        "operationId": "stats_aggregated_daily_post",
+        "summary": "Get Daily Aggregated Statistics",
+        "description": "Get pre-aggregated daily statistics for dashboard charts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/aggregated/daily-posts": {
+      "post": {
+        "operationId": "stats_aggregated_daily_posts_post",
+        "summary": "Get Daily Post Stats",
+        "description": "Get per-post daily metric values and changes",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/aggregated/top-accounts": {
+      "post": {
+        "operationId": "stats_aggregated_top_accounts_post",
+        "summary": "Get Top Accounts",
+        "description": "Get the highest-performing accounts by a specific metric",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/aggregated/top-posts": {
+      "post": {
+        "operationId": "stats_aggregated_top_posts_post",
+        "summary": "Get Top Posts",
+        "description": "Get the highest-performing posts by a specific metric",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/dashboard/daily": {
+      "post": {
+        "operationId": "stats_dashboard_daily_post",
+        "summary": "Get Dashboard Daily Statistics",
+        "description": "Retrieve pre-aggregated daily statistics for dashboard charts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/granular/daily-accounts": {
+      "post": {
+        "operationId": "stats_granular_daily_accounts_post",
+        "summary": "Get Daily Account Stats (Granular)",
+        "description": "Get per-account daily metric deltas",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/posts": {
+      "post": {
+        "operationId": "stats_posts_post",
+        "summary": "Get Post Statistics",
+        "description": "Retrieve post statistics with filters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/refresh": {
+      "post": {
+        "operationId": "stats_refresh_post",
+        "summary": "Refresh Statistics",
+        "description": "Fetch live statistics from TikTok/Instagram API for all accounts in your organization",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-Stream-Progress",
+            "in": "header",
+            "required": false,
+            "description": "Set to `true` to receive newline-delimited JSON progress events instead of the standard JSON summary response.",
+            "schema": {
+              "type": "string",
+              "enum": ["true"]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks": {
+      "post": {
+        "operationId": "tasks_get_post",
+        "summary": "Get Tasks",
+        "description": "Retrieve tasks with optional filters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/delete": {
+      "post": {
+        "operationId": "tasks_delete_post",
+        "summary": "Delete Tasks",
+        "description": "Delete one or more scheduled or failed tasks",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/retry": {
+      "post": {
+        "operationId": "tasks_retry_post",
+        "summary": "Retry Tasks",
+        "description": "Retry one or more failed tasks",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",

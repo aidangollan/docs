@@ -3,11 +3,11 @@ title: "NPM Package Types"
 description: "Complete exported type index for the ugcinc npm package"
 ---
 
-All public TypeScript data structures exported by `ugcinc` are listed below, grouped by module.
+All public TypeScript data structures exported by `ugcinc` are listed below, grouped by module or domain.
 
 ## `./accounts`
 
-`Account`, `AccountStat`, `AccountTask`, `EditProfileInfo`, `GetAccountsParams`, `GetAccountStatsParams`, `GetAccountStatusParams`, `AccountInfoUpdate`, `UpdateAccountInfoParams`, `AccountInfoUpdateResult`, `UpdateAccountInfoResponse`, `AccountSocialUpdate`, `UpdateAccountSocialParams`, `AccountSocialUpdateResult`, `UpdateAccountSocialResponse`, `DeleteAccountPostsParams`, `DeleteAccountPostsResponse`, `ResetWarmupParams`, `ResetWarmupResponse`, `NicheSwitchUpdate`, `NicheSwitchParams`, `NicheSwitchResult`, `NicheSwitchResponse`, `CreateAccountInput`, `CreateAccountsParams`, `CreateAccountResult`, `CreateAccountsResponse`
+`Account`, `AccountStat`, `AccountTask`, `EditProfileInfo`, `GetAccountsParams`, `GetAccountStatsParams`, `GetAccountStatusParams`, `AccountInfoUpdate`, `UpdateAccountInfoParams`, `AccountInfoUpdateResult`, `UpdateAccountInfoResponse`, `AccountSocialUpdate`, `UpdateAccountSocialParams`, `AccountSocialUpdateResult`, `UpdateAccountSocialResponse`, `DeleteAccountPostsParams`, `DeleteAccountPostsResponse`, `ResetWarmupParams`, `ResetWarmupResponse`, `NicheSwitchUpdate`, `NicheSwitchParams`, `NicheSwitchResult`, `NicheSwitchResponse`, `CreateAccountInput`, `CreateAccountsParams`, `CreateAccountResult`, `CreateAccountsResponse`, `TroubleshootFailReason`, `TroubleshootAccount`, `TroubleshootParams`
 
 ## `./tasks`
 
@@ -15,7 +15,7 @@ All public TypeScript data structures exported by `ugcinc` are listed below, gro
 
 ## `./posts`
 
-`PostType`, `PostStatus`, `Post`, `PostStat`, `GetPostsParams`, `CreateSlideshowParams`, `GetPostStatsParams`, `GetPostStatusParams`, `CreateVideoParams`, `UpdatePostParams`, `DeletePostsParams`, `DeletePostsResponse`, `RetryPostsParams`, `SetPostStatusParams`, `SetPostStatusResponse`
+`PostType`, `PostStatus`, `Post`, `PostStat`, `GetPostsParams`, `CreateSlideshowParams`, `GetPostStatsParams`, `GetPostStatusParams`, `CreateVideoParams`, `UpdatePostParams`, `DeletePostsParams`, `DeletePostsResponse`, `RetryPostsParams`, `SetPostStatusParams`, `SetPostStatusResponse`, `PreviewScheduleEntry`, `PreviewScheduleParams`, `PreviewScheduleResult`
 
 ## `./comments`
 
@@ -27,11 +27,15 @@ All public TypeScript data structures exported by `ugcinc` are listed below, gro
 
 ## `./stats`
 
-`RefreshStatsParams`, `RefreshStatsError`, `RefreshStatsResponse`, `DailyAggregatedStat`, `GetDailyAggregatedStatsParams`, `DailyAccountStat`, `GetDailyAccountStatsParams`, `DailyPostStat`, `GetDailyPostStatsParams`, `DashboardDailyStat`, `GetDashboardDailyStatsParams`, `TopAccount`, `GetTopAccountsParams`, `TopPost`, `GetTopPostsParams`
+`RefreshStatsParams`, `RefreshStatsError`, `RefreshStatsResponse`, `RefreshStartEvent`, `RefreshProgressEvent`, `RefreshDoneEvent`, `RefreshStreamEvent`, `DailyAggregatedStat`, `GetDailyAggregatedStatsParams`, `DailyAccountStat`, `GetDailyAccountStatsParams`, `DailyPostStat`, `GetDailyPostStatsParams`, `DashboardDailyStat`, `GetDashboardDailyStatsParams`, `TopAccount`, `GetTopAccountsParams`, `TopPost`, `GetTopPostsParams`
 
 ## `./org`
 
-`ApiKey`, `DeleteApiKeyParams`, `EditApiKeyParams`, `IntegrationKey`, `IntegrationProvider`, `UpsertIntegrationKeyParams`, `DeleteIntegrationKeyParams`
+`Org`, `ApiKey`, `DeleteApiKeyParams`, `EditApiKeyParams`, `IntegrationKey`, `IntegrationProvider`, `UpsertIntegrationKeyParams`, `DeleteIntegrationKeyParams`
+
+## `./billing`
+
+`BillingInfo`, `CancelSubscriptionResponse`, `PortalUrlResponse`, `DeactivateAccountParams`, `DeactivateAccountResponse`, `RequestReplacementParams`, `RequestReplacementResponse`, `RequestRefundParams`, `RequestRefundResponse`, `BillingRequestInfo`, `PortalParams`
 
 ## `./types`
 
@@ -47,7 +51,7 @@ All public TypeScript data structures exported by `ugcinc` are listed below, gro
 
 ## `./render/types`
 
-`VideoEditorNodeConfig`, `VideoEditorChannel`, `VideoEditorSegment`, `VideoEditorVideoSegment`, `VideoEditorAudioSegment`, `VideoEditorImageSegment`, `VideoEditorTextSegment`, `VideoEditorImageSequenceSegment`, `VideoEditorVideoSequenceSegment`, `TimeValue`, `TimeMode`, `SegmentTimelinePosition`, `DeduplicationLevel`, `DeduplicationInput`, `ImageEditorElement`, `DimensionPresetKey`, `CropBoundary`, `CropAxisConfig`, `DynamicCropConfig`, `BorderRadiusConfig`, `VerticalAnchor`, `HorizontalAnchor`, `HorizontalSelfAnchor`, `VerticalSelfAnchor`, `RelativePositionConfigX`, `RelativePositionConfigY`
+`VideoEditorNodeConfig`, `VideoEditorChannel`, `VideoEditorSegment`, `VideoEditorVideoSegment`, `VideoEditorAudioSegment`, `VideoEditorImageSegment`, `VideoEditorTextSegment`, `VideoEditorImageSequenceSegment`, `VideoEditorVideoSequenceSegment`, `TimeValue`, `TimeMode`, `SegmentTimelinePosition`, `DeduplicationLevel`, `DeduplicationInput`, `ImageEditorElement`, `DimensionPresetKey`
 
 ## `./automations/types`
 
@@ -63,7 +67,7 @@ All public TypeScript data structures exported by `ugcinc` are listed below, gro
 
 ## `./automations/nodes/*` specific configs
 
-`AccountNodeConfig`, `AutoCaptionNodeConfig`, `AutoCaptionPreset`, `AutoCaptionFontWeight`, `AutoCaptionPosition`, `AutoPostNodeConfig`, `AutoPostMode`, `PostSchedulingMode`, `BranchNodeConfig`, `BranchDefinition`, `BranchPassthroughInput`, `BranchValueConfig`, `CollectNodeConfig`, `CollectedValues`, `CollectInputValue`, `ComposeWorkflowNodeConfig`, `ComposeWorkflowNodeInputs`, `ComposeWorkflowNodeOutputs`, `CreateDmNodeConfig`, `CreateDmMessage`, `DmPlatform`, `CustomModelNodeConfig`, `CustomModelOutputType`, `CustomModelInputParam`, `CustomModelParamType`, `OpenAPISchema`, `OpenAPIProperty`, `DeduplicateNodeConfig`, `DestructureNodeConfig`, `DestructureNodeInputs`, `DestructureNodeOutputs`, `DestructureSelection`, `IndexExpression`, `ForEachNodeConfig`, `ForEachNodeInputs`, `ForEachNodeOutputs`, `ForEachOutputProperty`, `GenerateImageNodeConfig`, `ImageGenerationTextModel`, `ImageGenerationEditModel`, `ImageGenerationModel`, `ImageModelProvider`, `ImageModelOption`, `AspectRatioOption`, `GenerateVideoNodeConfig`, `VideoGenerationTextToVideoModel`, `VideoGenerationImageToVideoModel`, `VideoGenerationModel`, `VideoModelProvider`, `VideoModelTier`, `VideoAspectRatioOption`, `VideoDurationOption`, `VideoModelOption`, `IfNodeConfig`, `IfLogicOperator`, `IfBooleanInput`, `ImageEditorNodeConfig`, `ImageComposerNodeConfig`, `ImageComposerRenderInput`, `LLMNodeConfig`, `LLMNodeOutputs`, `LLMProvider`, `ManualTriggerNodeConfig`, `ManualTriggerNodeOutputs`, `MediaNodeConfig`, `MediaNodeOutput`, `NotNodeConfig`, `OutputNodeConfig`, `OutputNodeOutputs`, `RandomNodeConfig`, `RandomInputPort`, `RandomNodeMode`, `RandomNodeOutputs`, `RandomRouteNodeConfig`, `RandomRouteBranch`, `RandomRoutePassthroughInput`, `RecurrenceNodeConfig`, `RecurrenceMediaOutput`, `RecurrenceMediaConfig`, `RecurrenceNodeOutputs`, `SaveToMediaNodeConfig`, `SaveToMediaInput`, `SaveToMediaType`, `ScreenshotAnimationNodeConfig`, `SocialAudioNodeConfig`, `TextNodeConfig`, `TranscriptNodeConfig`, `InputNodeConfig`, `InputNodeOutputs`, `VideoComposerNodeConfig`, `VideoComposerRenderInput`, `VideoImportNodeConfig`, `VideoImportNodeInputs`, `VideoImportNodeOutputs`, `VideoImportPlatform`, `VideoImportQuality`
+`AccountNodeConfig`, `AutoCaptionNodeConfig`, `AutoCaptionPreset`, `AutoCaptionFontWeight`, `AutoCaptionPosition`, `AutoPostNodeConfig`, `AutoPostMode`, `PostSchedulingMode`, `BranchNodeConfig`, `BranchDefinition`, `BranchPassthroughInput`, `BranchValueConfig`, `CollectNodeConfig`, `CollectedValues`, `CollectInputValue`, `ComposeWorkflowNodeConfig`, `ComposeWorkflowNodeInputs`, `ComposeWorkflowNodeOutputs`, `CreateDmNodeConfig`, `CreateDmMessage`, `DmPlatform`, `CustomModelNodeConfig`, `CustomModelOutputType`, `CustomModelInputParam`, `CustomModelParamType`, `OpenAPISchema`, `OpenAPIProperty`, `DeduplicateNodeConfig`, `DestructureNodeConfig`, `DestructureNodeInputs`, `DestructureNodeOutputs`, `DestructureSelection`, `IndexExpression`, `ForEachNodeConfig`, `ForEachNodeInputs`, `ForEachNodeOutputs`, `ForEachOutputProperty`, `GenerateImageNodeConfig`, `ImageGenerationEditModel`, `ImageGenerationModel`, `ImageModelProvider`, `ImageModelOption`, `AspectRatioOption`, `ImageInput`, `ImageMediaItem`, `GenerateVideoNodeConfig`, `VideoGenerationTextToVideoModel`, `VideoGenerationImageToVideoModel`, `VideoGenerationFirstLastFrameModel`, `VideoGenerationReferenceModel`, `VideoGenerationModel`, `VideoInputMode`, `VideoModelProvider`, `VideoModelTier`, `VideoAspectRatioOption`, `VideoDurationOption`, `VideoModelOption`, `VideoMediaItem`, `ReferenceImageInput`, `IfNodeConfig`, `IfLogicOperator`, `IfBooleanInput`, `ImageEditorNodeConfig`, `ImageComposerNodeConfig`, `ImageComposerRenderInput`, `LLMNodeConfig`, `LLMNodeOutputs`, `LLMProvider`, `MediaNodeConfig`, `MediaNodeOutput`, `NotNodeConfig`, `OutputNodeConfig`, `OutputNodeOutputs`, `RandomNodeConfig`, `RandomInputPort`, `RandomNodeMode`, `RandomNodeOutputs`, `RandomRouteNodeConfig`, `RandomRouteBranch`, `RandomRoutePassthroughInput`, `RecurrenceNodeConfig`, `RecurrenceMediaOutput`, `RecurrenceMediaConfig`, `RecurrenceNodeOutputs`, `SaveToMediaNodeConfig`, `SaveToMediaInput`, `SaveToMediaType`, `ScreenshotAnimationNodeConfig`, `SocialAudioNodeConfig`, `TextNodeConfig`, `TranscriptNodeConfig`, `InputNodeConfig`, `InputNodeOutputs`, `VideoComposerNodeConfig`, `VideoComposerRenderInput`, `VideoImportNodeConfig`, `VideoImportNodeInputs`, `VideoImportNodeOutputs`, `VideoImportPlatform`, `VideoImportQuality`
 
 ## `./port-id`
 

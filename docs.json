@@ -39,7 +39,9 @@
           "api-reference/endpoint/posts-get",
           "api-reference/endpoint/posts-create-video",
           "api-reference/endpoint/posts-create-slideshow",
+          "api-reference/endpoint/posts-create-draft",
           "api-reference/endpoint/posts-update",
+          "api-reference/endpoint/posts-preview-schedule",
           "api-reference/endpoint/posts-status",
           "api-reference/endpoint/posts-delete",
           "api-reference/endpoint/posts-retry"
@@ -58,6 +60,7 @@
           "api-reference/endpoint/accounts-get",
           "api-reference/endpoint/accounts-create",
           "api-reference/endpoint/accounts-status",
+          "api-reference/endpoint/accounts-profile-sync-status",
           "api-reference/endpoint/accounts-update-info",
           "api-reference/endpoint/accounts-update-social",
           "api-reference/endpoint/accounts-niche-switch",

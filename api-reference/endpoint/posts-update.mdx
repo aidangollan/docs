@@ -11,7 +11,13 @@ POST https://api.ugc.inc/post/update
 
 ## Overview
 
-Update an existing post without deleting and recreating it. The post retains its original ID. Only posts with `scheduled` or `failed` status can be updated.
+Update an existing post without deleting and recreating it. The post retains its original ID. Only posts with `draft`, `scheduled`, or `failed` status can be updated.
+
+<Info>
+  **Draft Post Behavior:**
+
+  When updating a `draft` post with both `accountId` and `postTime`, the post will automatically transition to `scheduled` status. If only one is provided, the draft is updated but remains in `draft` status.
+</Info>
 
 <Info>
   **Failed Post Behavior:**
@@ -51,6 +57,10 @@ Update an existing post without deleting and recreating it. The post retains its
 
 <ParamField body="mediaUrls" type="string[]" optional>
   Replace the post's media URLs. For video posts, provide a single URL. For slideshow posts, provide one or more image URLs.
+</ParamField>
+
+<ParamField body="excludePostIds" type="string[]" optional>
+  Array of post IDs to exclude from schedule conflict checks when updating `postTime`. Useful when batch-updating multiple posts to prevent them from conflicting with each other.
 </ParamField>
 
 ## Response
@@ -105,7 +115,7 @@ Update an existing post without deleting and recreating it. The post retains its
 
 - **404 Not Found**: Post doesn't exist or doesn't belong to your organization
 - **400 Bad Request**: Post ID not provided, caption exceeds 500 characters, title exceeds 90 characters, or post is not in an editable status
-- **400 Bad Request**: Cannot update post — only `scheduled` or `failed` posts can be updated
+- **400 Bad Request**: Cannot update post — only `draft`, `scheduled`, or `failed` posts can be updated
 
 <RequestExample>
 
