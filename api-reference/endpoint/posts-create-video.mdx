@@ -96,16 +96,26 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
 
 <ParamField body="strict" type="boolean" default={false}>
   Scheduling mode - controls timing behavior
-  
+
   **When `strict: true`:**
   - Post must be scheduled at the exact requested time
   - If using auto-selection (`accountId: null`), picks the least recently posted account
   - Will return an error if the account cannot post at the exact time
-  
+
   **When `strict: false`:**
   - Post will be scheduled at the nearest available time
   - If using auto-selection (`accountId: null`), picks the account that can post closest to the requested time
   - Automatically adjusts to the next available slot if requested time is unavailable
+</ParamField>
+
+<ParamField body="mustPostBy" type="string">
+  Latest allowed scheduled time (ISO 8601 format)
+
+  If the post cannot be scheduled before this deadline, the request will return an error.
+
+  When using auto-selection (`accountId: null`), accounts that cannot post before this time are excluded from selection.
+
+  Example: `2024-12-31T23:59:59Z`
 </ParamField>
 
 ## Response
