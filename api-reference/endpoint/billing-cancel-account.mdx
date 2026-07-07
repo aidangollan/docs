@@ -1,0 +1,79 @@
+---
+title: "Cancel Account"
+description: "Cancel the subscription for a single account at the end of the current billing period"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/billing/cancel-account
+```
+
+## Overview
+
+Cancel the subscription for a single account. The account keeps access until the end of the current billing period, then is reclaimed automatically. You can undo this at any point before the period ends with [`/billing/reactivate-account`](/api-reference/endpoint/billing-reactivate-account).
+
+## Request Body
+
+<ParamField body="account_id" type="string" required>
+  ID of the account to cancel
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="Response properties">
+    <ResponseField name="message" type="string">
+      Confirmation message
+    </ResponseField>
+
+    <ResponseField name="account_id" type="string">
+      ID of the cancelled account
+    </ResponseField>
+
+    <ResponseField name="cancel_at" type="string">
+      ISO timestamp when the account will lose access
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/billing/cancel-account \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "acc_123"}'
+```
+
+```typescript React
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const response = await client.billing.cancelAccount({
+  account_id: 'acc_123'
+});
+
+if (response.ok) {
+  console.log(`Cancels on ${response.data.cancel_at}`);
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "message": "Account will be cancelled at the end of the current billing period",
+    "account_id": "acc_123",
+    "cancel_at": "2026-05-01T00:00:00.000Z"
+  }
+}
+```
+
+</ResponseExample>

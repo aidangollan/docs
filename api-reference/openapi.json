@@ -876,11 +876,11 @@
         }
       }
     },
-    "/billing/cancel": {
+    "/billing/cancel-account": {
       "post": {
-        "operationId": "billing_cancel_post",
-        "summary": "Cancel Subscription",
-        "description": "Cancel your subscription at the end of the current billing period",
+        "operationId": "billing_cancel_account_post",
+        "summary": "Cancel Account",
+        "description": "Cancel the subscription for a single account at the end of the current billing period",
         "responses": {
           "200": {
             "description": "Success",
@@ -894,22 +894,59 @@
           }
         },
         "requestBody": {
-          "required": false,
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "properties": {
+                  "account_id": { "type": "string" }
+                },
+                "required": ["account_id"]
               }
             }
           }
         }
       }
     },
-    "/billing/deactivate": {
+    "/billing/reactivate-account": {
       "post": {
-        "operationId": "billing_deactivate_post",
-        "summary": "Deactivate Account",
-        "description": "Deactivate an account slot and remove it from your subscription",
+        "operationId": "billing_reactivate_account_post",
+        "summary": "Reactivate Account",
+        "description": "Undo a pending cancellation on an account",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account_id": { "type": "string" }
+                },
+                "required": ["account_id"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/cancel-subscription": {
+      "post": {
+        "operationId": "billing_cancel_subscription_post",
+        "summary": "Cancel Subscription",
+        "description": "Cancel every account under this billing at the end of the current billing period",
         "responses": {
           "200": {
             "description": "Success",
@@ -1878,7 +1915,7 @@
       "post": {
         "operationId": "posts_create_video_post",
         "summary": "Create Video Post",
-        "description": "Create a video post",
+        "description": "Create a video post. Optionally accepts captionOverlays — text overlays to display on the video, each { text, x, y, fontSize } with x/y as the overlay center as a fraction (0-1) of the video width/height and fontSize as a fraction (0-1) of the video height. Returned on the post as caption_overlays.",
         "responses": {
           "200": {
             "description": "Success",

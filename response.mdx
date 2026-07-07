@@ -34,6 +34,13 @@ Every API response includes an `ok` field that indicates success or failure:
 }
 ```
 
+<Note>
+  **Pagination:** endpoints that support keyset pagination (e.g. `accounts.getAccounts()`,
+  `posts.getPosts()`) include an additional `nextCursor` field alongside `data` when a `limit` was
+  passed — pass it back as `cursor` to fetch the next page. See each endpoint's reference page for
+  details.
+</Note>
+
 ## Using the Response Pattern
 
 The `ok` field allows you to easily check if the request succeeded:

@@ -125,9 +125,10 @@
         "group": "Billing",
         "pages": [
           "api-reference/endpoint/billing-get",
-          "api-reference/endpoint/billing-cancel",
           "api-reference/endpoint/billing-portal",
-          "api-reference/endpoint/billing-deactivate",
+          "api-reference/endpoint/billing-cancel-account",
+          "api-reference/endpoint/billing-reactivate-account",
+          "api-reference/endpoint/billing-cancel-subscription",
           "api-reference/endpoint/billing-request-replacement",
           "api-reference/endpoint/billing-request-refund",
           "api-reference/endpoint/billing-requests"

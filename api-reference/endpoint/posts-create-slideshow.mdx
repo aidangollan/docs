@@ -37,6 +37,10 @@ Create and schedule a slideshow post from multiple images to be published on Tik
   Filter accounts by organization group (only used when `accountId` is `null`)
 </ParamField>
 
+<ParamField body="post_tag" type="string">
+  Custom tag stored on the created post itself (returned as `tag` on the Post object). Distinct from `tag`, which filters account auto-selection.
+</ParamField>
+
 <ParamField body="imageUrls" type="string[]" required>
   Array of image URLs (must be publicly accessible)
   
@@ -54,7 +58,7 @@ Create and schedule a slideshow post from multiple images to be published on Tik
   
   Can include hashtags and emojis
   
-  **Limit:** Maximum 500 characters
+  **Limit:** Maximum 4000 characters
 </ParamField>
 
 <ParamField body="socialAudioId" type="string">
@@ -147,6 +151,10 @@ Create and schedule a slideshow post from multiple images to be published on Tik
     
     <ResponseField name="caption" type="string | null">
       Post caption
+    </ResponseField>
+    
+    <ResponseField name="tag" type="string | null">
+      Custom tag stored on the post (from `post_tag`)
     </ResponseField>
     
     <ResponseField name="media_urls" type="string[]">

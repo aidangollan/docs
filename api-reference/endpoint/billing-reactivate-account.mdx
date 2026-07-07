@@ -1,22 +1,22 @@
 ---
-title: "Deactivate Account"
-description: "Deactivate an account slot and remove it from your subscription"
+title: "Reactivate Account"
+description: "Undo a pending cancellation on an account"
 ---
 
 ## Endpoint
 
 ```
-POST https://api.ugc.inc/billing/deactivate
+POST https://api.ugc.inc/billing/reactivate-account
 ```
 
 ## Overview
 
-Deactivate an account slot. This removes the account from your subscription (no proration — you are not charged for the remaining period). The account is reclaimed and moved to the internal UGC Inc organization.
+Undo a pending cancellation on an account, restoring it to its prior status. Must be called before the billing period ends. No billing change occurs — quantity was never decremented.
 
 ## Request Body
 
 <ParamField body="account_id" type="string" required>
-  ID of the account to deactivate
+  ID of the account to reactivate
 </ParamField>
 
 ## Response
@@ -28,7 +28,7 @@ Deactivate an account slot. This removes the account from your subscription (no 
     </ResponseField>
 
     <ResponseField name="account_id" type="string">
-      ID of the deactivated account
+      ID of the reactivated account
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -36,7 +36,7 @@ Deactivate an account slot. This removes the account from your subscription (no 
 <RequestExample>
 
 ```bash cURL
-curl -X POST https://api.ugc.inc/billing/deactivate \
+curl -X POST https://api.ugc.inc/billing/reactivate-account \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"account_id": "acc_123"}'
@@ -46,13 +46,9 @@ curl -X POST https://api.ugc.inc/billing/deactivate \
 import { UGCClient } from 'ugcinc';
 
 const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
-const response = await client.billing.deactivateAccount({
+const response = await client.billing.reactivateAccount({
   account_id: 'acc_123'
 });
-
-if (response.ok) {
-  console.log(response.data.message);
-}
 ```
 
 </RequestExample>
@@ -65,17 +61,9 @@ if (response.ok) {
   "code": 200,
   "message": "Success",
   "data": {
-    "message": "Account deactivated and billing updated",
+    "message": "Cancellation undone",
     "account_id": "acc_123"
   }
-}
-```
-
-```json Error - Not Your Account
-{
-  "ok": false,
-  "code": 400,
-  "message": "Account does not belong to your organization"
 }
 ```
 

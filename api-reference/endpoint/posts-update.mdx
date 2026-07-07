@@ -36,7 +36,7 @@ Update an existing post without deleting and recreating it. The post retains its
 </ParamField>
 
 <ParamField body="caption" type="string" optional>
-  New caption for the post (max 500 characters)
+  New caption for the post (max 4000 characters)
 </ParamField>
 
 <ParamField body="title" type="string" optional>
@@ -57,6 +57,10 @@ Update an existing post without deleting and recreating it. The post retains its
 
 <ParamField body="mediaUrls" type="string[]" optional>
   Replace the post's media URLs. For video posts, provide a single URL. For slideshow posts, provide one or more image URLs.
+</ParamField>
+
+<ParamField body="post_tag" type="string" optional>
+  Custom tag stored on the post (returned as `tag` on the Post object). Unlike other fields, an update containing only `post_tag` is allowed on posts of any status, including `complete`.
 </ParamField>
 
 <ParamField body="excludePostIds" type="string[]" optional>
@@ -89,6 +93,10 @@ Update an existing post without deleting and recreating it. The post retains its
       Post caption
     </ResponseField>
 
+    <ResponseField name="tag" type="string | null">
+      Custom tag stored on the post (from `post_tag`)
+    </ResponseField>
+
     <ResponseField name="title" type="string | null">
       Post title
     </ResponseField>
@@ -114,7 +122,7 @@ Update an existing post without deleting and recreating it. The post retains its
 ## Error Cases
 
 - **404 Not Found**: Post doesn't exist or doesn't belong to your organization
-- **400 Bad Request**: Post ID not provided, caption exceeds 500 characters, title exceeds 90 characters, or post is not in an editable status
+- **400 Bad Request**: Post ID not provided, caption exceeds 4000 characters, title exceeds 90 characters, or post is not in an editable status
 - **400 Bad Request**: Cannot update post — only `draft`, `scheduled`, or `failed` posts can be updated
 
 <RequestExample>

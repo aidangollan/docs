@@ -16,7 +16,9 @@ Represents a video or slideshow post on a social media account.
 | `type` | `'video' \| 'slideshow'` | Type of post content |
 | `status` | `string` | Current status: `'draft'`, `'scheduled'`, `'pending'`, `'complete'`, or `'failed'` |
 | `social_id` | `string \| null` | Platform-specific post ID (TikTok video ID or Instagram reel code, available after posting) |
-| `caption` | `string \| null` | Post caption/description text (max 500 characters) |
+| `caption` | `string \| null` | Post caption/description text (max 4000 characters) |
+| `tag` | `string \| null` | Custom tag for categorization. Set via the `post_tag` parameter on create/update endpoints. |
+| `caption_overlays` | `CaptionOverlay[] \| null` | Text overlays to display on the video. Each is `{ text, x, y, fontSize }` — `x`/`y` are the overlay center as a fraction (0-1) of the video width/height, `fontSize` is a fraction (0-1) of the video height. Only used for video posts. |
 | `media_urls` | `string[] \| null` | Array of URLs to video/image files used in the post |
 | `thumbnail_url` | `string \| null` | URL of a JPEG thumbnail image generated from the first frame of a video post. Only present for video posts. |
 | `music_post_id` | `string \| null` | ID of the music/audio track used in the post |

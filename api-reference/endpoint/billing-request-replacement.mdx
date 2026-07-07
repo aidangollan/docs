@@ -11,7 +11,7 @@ POST https://api.ugc.inc/billing/request-replacement
 
 ## Overview
 
-Request a replacement for an account. The first replacement for any account is **auto-approved** — the old account is reclaimed and a new uninitialized account is created immediately. Subsequent replacement requests require manual admin review.
+Request a replacement for an account. All replacement requests require manual admin review. When the request is submitted, the account's status is updated to `needs_replacement`. Once approved, the old account is reclaimed and a new uninitialized account is created in its place.
 
 ## Request Body
 
@@ -28,7 +28,7 @@ Request a replacement for an account. The first replacement for any account is *
 <ResponseField name="data" type="object">
   <Expandable title="Response properties">
     <ResponseField name="message" type="string">
-      Status message indicating if the replacement was auto-approved or submitted for review
+      Confirmation message
     </ResponseField>
 
     <ResponseField name="request" type="object | null">
@@ -43,14 +43,10 @@ Request a replacement for an account. The first replacement for any account is *
           Request type
         </ResponseField>
 
-        <ResponseField name="status" type="'pending' | 'approved'">
-          Request status
+        <ResponseField name="status" type="'pending'">
+          Request status (always `pending` on creation)
         </ResponseField>
       </Expandable>
-    </ResponseField>
-
-    <ResponseField name="new_account_id" type="string | null">
-      ID of the new replacement account (only set when auto-approved)
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -75,9 +71,6 @@ const response = await client.billing.requestReplacement({
 
 if (response.ok) {
   console.log(response.data.message);
-  if (response.data.new_account_id) {
-    console.log(`New account: ${response.data.new_account_id}`);
-  }
 }
 ```
 
@@ -85,29 +78,7 @@ if (response.ok) {
 
 <ResponseExample>
 
-```json Auto-Approved (First Replacement)
-{
-  "ok": true,
-  "code": 200,
-  "message": "Success",
-  "data": {
-    "message": "Replacement auto-approved. New account created.",
-    "request": {
-      "id": "req_123",
-      "org_id": "org_123",
-      "account_id": "acc_123",
-      "type": "replacement",
-      "status": "approved",
-      "reason": "Account was banned",
-      "created_at": "2025-01-15T10:00:00.000Z",
-      "resolved_at": "2025-01-15T10:00:00.000Z"
-    },
-    "new_account_id": "acc_456"
-  }
-}
-```
-
-```json Pending Review (Subsequent Replacement)
+```json Success Response
 {
   "ok": true,
   "code": 200,
@@ -120,11 +91,10 @@ if (response.ok) {
       "account_id": "acc_456",
       "type": "replacement",
       "status": "pending",
-      "reason": "Account was banned again",
-      "created_at": "2025-01-20T10:00:00.000Z",
+      "reason": "Account was banned",
+      "created_at": "2026-04-18T10:00:00.000Z",
       "resolved_at": null
-    },
-    "new_account_id": null
+    }
   }
 }
 ```

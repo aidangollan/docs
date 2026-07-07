@@ -30,7 +30,7 @@ Create a draft post that is saved but not assigned to an account or scheduled fo
 </ParamField>
 
 <ParamField body="caption" type="string">
-  Post caption/description (max 500 characters)
+  Post caption/description (max 4000 characters)
 </ParamField>
 
 <ParamField body="title" type="string">
@@ -39,6 +39,10 @@ Create a draft post that is saved but not assigned to an account or scheduled fo
 
 <ParamField body="socialAudioId" type="string">
   ID of a social audio record to attach to the post
+</ParamField>
+
+<ParamField body="post_tag" type="string">
+  Custom tag stored on the created post (returned as `tag` on the Post object)
 </ParamField>
 
 ## Response
@@ -65,6 +69,10 @@ Create a draft post that is saved but not assigned to an account or scheduled fo
 
     <ResponseField name="caption" type="string | null">
       Post caption
+    </ResponseField>
+
+    <ResponseField name="tag" type="string | null">
+      Custom tag stored on the post (from `post_tag`)
     </ResponseField>
 
     <ResponseField name="title" type="string | null">

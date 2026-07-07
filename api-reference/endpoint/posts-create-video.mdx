@@ -37,6 +37,10 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
   Filter accounts by organization group (only used when `accountId` is `null`)
 </ParamField>
 
+<ParamField body="post_tag" type="string">
+  Custom tag stored on the created post itself (returned as `tag` on the Post object). Distinct from `tag`, which filters account auto-selection.
+</ParamField>
+
 <ParamField body="videoUrl" type="string" required>
   URL to the video file (must be publicly accessible)
   
@@ -53,7 +57,19 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
   
   Can include hashtags and emojis
   
-  **Limit:** Maximum 500 characters
+  **Limit:** Maximum 4000 characters
+</ParamField>
+
+<ParamField body="captionOverlays" type="CaptionOverlay[]">
+  Text overlays to display on the video
+
+  Each overlay is an object:
+  - `text` (string) — the overlay text
+  - `x` (number) — horizontal center of the overlay as a fraction (0-1) of the video width
+  - `y` (number) — vertical center of the overlay as a fraction (0-1) of the video height
+  - `fontSize` (number) — text size as a fraction (0-1) of the video height
+
+  Example: `[{ "text": "Wait for it...", "x": 0.5, "y": 0.2, "fontSize": 0.04 }]`
 </ParamField>
 
 <ParamField body="socialAudioId" type="string">
@@ -146,6 +162,14 @@ Create and schedule a video post to be published on TikTok or Instagram. The vid
     
     <ResponseField name="caption" type="string | null">
       Post caption
+    </ResponseField>
+    
+    <ResponseField name="tag" type="string | null">
+      Custom tag stored on the post (from `post_tag`)
+    </ResponseField>
+    
+    <ResponseField name="caption_overlays" type="CaptionOverlay[] | null">
+      Text overlays to display on the video (`{ text, x, y, fontSize }` each; positions/size are fractions of the video dimensions)
     </ResponseField>
     
     <ResponseField name="media_urls" type="string[]">

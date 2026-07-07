@@ -13,6 +13,9 @@ POST https://api.ugc.inc/accounts
 
 Retrieve a list of accounts with optional filtering by tag, organization group, or user group. If no filters are provided, returns all accounts for your organization.
 
+Supports keyset pagination via `limit`/`cursor` — pass `limit` to page through results
+newest-first, using each response's `nextCursor` to fetch the next page.
+
 ## Request Body
 
 <ParamField body="tag" type="string">
@@ -29,6 +32,15 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
 
 <ParamField body="status" type="'pending' | 'initialized' | 'setup' | 'error'">
   Filter accounts by status
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Max rows to return. Omit to fetch all matching accounts (no pagination).
+</ParamField>
+
+<ParamField body="cursor" type="string">
+  Opaque cursor from a previous response's `nextCursor`, to fetch the next page. Results are
+  ordered newest-first.
 </ParamField>
 
 ## Response
@@ -97,14 +109,19 @@ Retrieve a list of accounts with optional filtering by tag, organization group, 
       Account bio text
     </ResponseField>
     
-    <ResponseField name="post_version" type="'original' | 'v1_custom' | null">
-      Post flow version. `original` uses standard posting flow, `v1_custom` uses customized posting flow
+    <ResponseField name="post_version" type="'original' | 'v1_custom' | 'manual_posting' | null">
+      Post flow version. `original` uses standard posting flow, `v1_custom` uses customized posting flow, `manual_posting` skips automated posting
     </ResponseField>
     
     <ResponseField name="status" type="string">
       Account status: `pending`, `initialized`, `setup`, or `error`
     </ResponseField>
   </Expandable>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Present when `limit` was passed. Pass back as `cursor` to fetch the next page; `null` means
+  there are no more pages.
 </ResponseField>
 
 <RequestExample>
@@ -226,7 +243,8 @@ if (response.ok) {
       "keywords": null,
       "profiles": null
     }
-  ]
+  ],
+  "nextCursor": null
 }
 ```
 

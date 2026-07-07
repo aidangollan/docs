@@ -13,6 +13,9 @@ POST https://api.ugc.inc/post
 
 Retrieve a list of posts (videos and slideshows) with optional filtering by account IDs and date range. Use this endpoint to monitor and track all posts across your accounts.
 
+Supports keyset pagination via `limit`/`cursor` — pass `limit` to page through results
+newest-first, using each response's `nextCursor` to fetch the next page.
+
 ## Request Body
 
 <ParamField body="accountIds" type="string[]">
@@ -29,6 +32,15 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
 
 <ParamField body="endDate" type="string">
   End date in ISO 8601 format (e.g., `2024-12-31T23:59:59Z`)
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Max rows to return. Omit to fetch all matching posts (no pagination).
+</ParamField>
+
+<ParamField body="cursor" type="string">
+  Opaque cursor from a previous response's `nextCursor`, to fetch the next page. Results are
+  ordered newest-first.
 </ParamField>
 
 ## Response
@@ -58,7 +70,11 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
     </ResponseField>
     
     <ResponseField name="caption" type="string | null">
-      Post caption/description text (max 500 characters)
+      Post caption/description text (max 4000 characters)
+    </ResponseField>
+    
+    <ResponseField name="tag" type="string | null">
+      Custom tag stored on the post (set via `post_tag` on create/update endpoints)
     </ResponseField>
     
     <ResponseField name="media_urls" type="string[] | null">
@@ -79,6 +95,11 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
       - **Instagram**: `https://www.instagram.com/p/{social_id}/`
     </ResponseField>
   </Expandable>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Present when `limit` was passed. Pass back as `cursor` to fetch the next page; `null` means
+  there are no more pages.
 </ResponseField>
 
 <RequestExample>
@@ -213,7 +234,8 @@ if (response.ok) {
       "music_post_id": "audio_abc123",
       "scheduled_at": "2024-01-20T10:00:00Z"
     }
-  ]
+  ],
+  "nextCursor": null
 }
 ```
 
