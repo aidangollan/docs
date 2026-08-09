@@ -18,7 +18,20 @@ Check the current status of a specific post. Use this endpoint to monitor whethe
 - **`scheduled`** - Post is scheduled to be published at a future time
 - **`pending`** - Post is currently being processed/published
 - **`complete`** - Post was successfully published to the platform
-- **`failed`** - Post failed to publish (check error logs for details)
+- **`failed`** - Post failed to publish; see `fail_category` for why
+
+## Failure Categories
+
+When `status` is `failed`, `fail_category` explains why:
+
+- **`device_error`** - The posting device was unavailable or did not respond
+- **`network_error`** - The connection dropped while posting
+- **`upload_interrupted`** - The upload started but could not be confirmed as finished
+- **`account_issue`** - The social account was not in a usable state
+- **`capacity_deferred`** - No posting capacity was available; the post will be retried
+- **`platform_change`** - The social app's interface changed and the post could not complete
+- **`unconfirmed`** - Posting finished but publication could not be confirmed
+- **`unknown`** - The post failed for an unrecognized reason
 
 ## Request Body
 
@@ -38,6 +51,13 @@ Check the current status of a specific post. Use this endpoint to monitor whethe
     
     <ResponseField name="status" type="string">
       Current status of the post
+    </ResponseField>
+    
+    <ResponseField name="fail_category" type="string | null">
+      Why the post failed. Set when `status` is `failed`, otherwise `null`.
+      One of `device_error`, `network_error`, `upload_interrupted`,
+      `account_issue`, `capacity_deferred`, `platform_change`, `unconfirmed`,
+      `unknown`.
     </ResponseField>
     
     <ResponseField name="postUrl" type="string | undefined">
@@ -142,7 +162,7 @@ if (response.ok) {
       }
       break;
     case 'failed':
-      console.log('Post failed to publish');
+      console.log(`Post failed to publish: ${response.data.fail_category}`);
       break;
   }
 }
@@ -198,6 +218,19 @@ if (response.ok) {
   "data": {
     "post_id": "post_abc123",
     "status": "scheduled"
+  }
+}
+```
+
+```json Success Response (Failed)
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "post_id": "post_abc123",
+    "status": "failed",
+    "fail_category": "capacity_deferred"
   }
 }
 ```
