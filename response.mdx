@@ -83,7 +83,8 @@ Common status codes you may encounter:
 
 - **200** - Success
 - **400** - Bad Request (invalid parameters)
-- **401** - Unauthorized (invalid or missing API key)
+- **401** - Unauthorized (invalid, missing, or expired API key)
+- **403** - Forbidden (the key is valid but lacks the required scope, or is not bound to that resource)
 - **404** - Not Found (resource doesn't exist)
 - **500** - Internal Server Error
 

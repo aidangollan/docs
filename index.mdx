@@ -35,6 +35,22 @@ To access accounts and receive an API key:
   **Keep your API key secure!** Never commit it to version control or expose it in client-side code.
 </Warning>
 
+### Restricted Keys
+
+A key can be issued with restrictions, so that an integration only holds the
+access it actually needs. A standard key has none of these and works across
+your whole organization.
+
+| Restriction | Effect |
+|---|---|
+| Expiry | The key stops working at a fixed time. Requests after it return `401`. |
+| Scopes | The key may only perform specific operations. Anything else returns `403`. |
+| Resource binding | The key may only act on named accounts or posts. Other resources return `403`, even within your own organization. |
+
+If a request fails with `403`, the key is valid but is not permitted for that
+operation or that resource — request a key with the access you need rather than
+retrying.
+
 ## Installation
 
 ### NPM Package (Recommended)
