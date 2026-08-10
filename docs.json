@@ -12,7 +12,10 @@
     "pages": [
       {
         "group": "Getting Started",
-        "pages": ["index", "response"]
+        "pages": [
+          "index",
+          "response"
+        ]
       },
       {
         "group": "Data Structures",
@@ -62,6 +65,7 @@
           "api-reference/endpoint/accounts-status",
           "api-reference/endpoint/accounts-profile-sync-status",
           "api-reference/endpoint/accounts-update-info",
+          "api-reference/endpoint/accounts-quarantine",
           "api-reference/endpoint/accounts-update-social",
           "api-reference/endpoint/accounts-niche-switch",
           "api-reference/endpoint/accounts-reset-warmup",

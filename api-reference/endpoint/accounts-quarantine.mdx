@@ -1,0 +1,114 @@
+---
+title: "Quarantine Account"
+description: "Pause an account so it stops posting, or release a paused account back into rotation"
+---
+
+## Endpoint
+
+```
+POST https://api.ugc.inc/accounts/quarantine
+```
+
+## Overview
+
+Quarantine pauses an account: it stays exactly as it is, but no scheduled post
+is dispatched for it. Use it when the platform has blocked the account — a
+human-verification prompt, a signed-out session, content strikes — so its
+scheduled posts stop failing while the block is unresolved.
+
+Nothing is torn down and no post is lost. Posts remain scheduled and become
+eligible again the moment the account is released. Releasing restores the
+status the account held before it was quarantined.
+
+## Request Body
+
+<ParamField body="accountId" type="string" required>
+  Account to quarantine or release
+</ParamField>
+
+<ParamField body="action" type="string" required>
+  Either `"quarantine"` or `"release"`
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Why the account is being quarantined. Required when `action` is
+  `"quarantine"`; stored on the account and shown to whoever resolves it.
+</ParamField>
+
+## Response
+
+<ResponseField name="accountId" type="string">
+  The account that was updated
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  `"quarantined"` after quarantining, or the restored prior status after release
+</ResponseField>
+
+<ResponseField name="reason" type="string">
+  Echo of the reason recorded (quarantine only)
+</ResponseField>
+
+<ResponseField name="alreadyQuarantined" type="boolean">
+  Present and `true` when the account was already quarantined — the call is
+  safe to repeat
+</ResponseField>
+
+<ResponseField name="released" type="boolean">
+  Present and `true` after a successful release
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.ugc.inc/accounts/quarantine \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "acc_123456",
+    "action": "quarantine",
+    "reason": "Platform is asking the account to verify it is human"
+  }'
+```
+
+```typescript TypeScript
+import { UGCInc } from "ugcinc";
+
+const ugc = new UGCInc({ apiKey: process.env.UGC_API_KEY! });
+
+await ugc.accounts.quarantine({
+  accountId: "acc_123456",
+  reason: "Platform is asking the account to verify it is human",
+});
+
+// Once resolved, put it back into rotation
+await ugc.accounts.release({ accountId: "acc_123456" });
+```
+
+</CodeGroup>
+
+## Response Example
+
+```json
+{
+  "ok": true,
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "accountId": "acc_123456",
+    "status": "quarantined",
+    "reason": "Platform is asking the account to verify it is human"
+  }
+}
+```
+
+## Notes
+
+- Quarantining is idempotent — repeating it returns `alreadyQuarantined: true`
+  rather than overwriting the original reason.
+- Releasing an account that is not quarantined returns `400`.
+- A key restricted to the `account:quarantine` scope may call this endpoint;
+  a key bound to specific accounts may only act on those. See
+  [Restricted Keys](/index#restricted-keys).

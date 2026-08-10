@@ -26,7 +26,7 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `profiles` | `string \| null` | Profile usernames to search for warmup tasks (comma-separated) |
 | `phone_type` | `string \| null` | Account hosting type: `'physical_iphone'`, `'physical_android'`, `'emulated_android'`, `'social_api'`, or `'tracking'`. Tracking accounts are read-only and cannot be used for posting |
 | `approved` | `boolean` | Whether the account configuration follows recommended best practices. Defaults to `true`. Set to `false` when a user overrides guidelines. |
-| `status` | `string` | Account status: `'pending'`, `'initialized'`, `'setup'`, `'warming'`, `'warmed'`, `'needs_replacement'`, or `'replacing'` |
+| `status` | `string` | Account status: `'pending'`, `'initialized'`, `'setup'`, `'warming'`, `'warmed'`, `'needs_replacement'`, `'replacing'`, or `'quarantined'` |
 
 ## Account Organization
 
@@ -79,6 +79,7 @@ The `status` field indicates the current lifecycle stage of an account:
 | `warmed` | Account has completed warmup and is ready for posting |
 | `needs_replacement` | Account needs to be replaced with a new one |
 | `replacing` | Account is being replaced |
+| `quarantined` | Account is paused and will not post. Set when the platform has blocked it — for example a human-verification prompt, a signed-out session, or content strikes — so scheduled posts stop failing until the block is cleared. Nothing is deleted: releasing the account returns it to the status it held before. |
 
 ## Example Response
 
