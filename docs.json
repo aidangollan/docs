@@ -120,6 +120,7 @@
           "api-reference/endpoint/media-create-url",
           "api-reference/endpoint/media-use",
           "api-reference/endpoint/media-filter",
+          "api-reference/endpoint/media-pfp-search",
           "api-reference/endpoint/media-update-tag",
           "api-reference/endpoint/media-update-name",
           "api-reference/endpoint/media-delete"

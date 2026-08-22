@@ -24,6 +24,8 @@ Represents a social media account (TikTok or Instagram) that you can manage thro
 | `description` | `string \| null` | Description/interest area for the account. Used by v1_smart warmup for browse tasks |
 | `keywords` | `string \| null` | Search keywords used for warmup tasks (comma-separated) |
 | `profiles` | `string \| null` | Profile usernames to search for warmup tasks (comma-separated) |
+| `age_range` | `string \| null` | Age band the account's persona presents as (e.g. `'18-24'`) |
+| `sex` | `string \| null` | Gender the account's persona presents as |
 | `phone_type` | `string \| null` | Account hosting type: `'physical_iphone'`, `'physical_android'`, `'emulated_android'`, `'social_api'`, or `'tracking'`. Tracking accounts are read-only and cannot be used for posting |
 | `approved` | `boolean` | Whether the account configuration follows recommended best practices. Defaults to `true`. Set to `false` when a user overrides guidelines. |
 | `status` | `string` | Account status: `'pending'`, `'initialized'`, `'setup'`, `'warming'`, `'warmed'`, `'needs_replacement'`, `'replacing'`, or `'quarantined'` |
@@ -98,6 +100,8 @@ The `status` field indicates the current lifecycle stage of an account:
   "description": "health and wellness content",
   "keywords": "fitness,workout,health",
   "profiles": "fitnessguru,healthcoach",
+  "age_range": "18-24",
+  "sex": "female",
   "approved": true,
   "status": "warmed"
 }

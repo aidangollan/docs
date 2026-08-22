@@ -1,0 +1,68 @@
+---
+title: "Search Profile Pictures"
+description: "Find profile-picture candidates for a search term, excluding pictures already in use"
+---
+
+## Endpoint
+
+```bash
+POST https://api.ugc.inc/media/pfp-search
+```
+
+Returns profile-picture candidates matching a search term. Pictures already in
+use as a profile picture are removed before the response is built, so two
+accounts cannot end up with the same picture.
+
+Sourcing and filtering are a single call for that reason — a caller who searched
+and forgot to filter would create duplicate faces across their accounts and only
+notice much later.
+
+<Note>
+Restricted API keys need the `media:search` scope to call this endpoint.
+</Note>
+
+## Request Body
+
+<ParamField body="search_term" type="string" required>
+  What to search for. Terms that pair an identity with a style keyword work best — for example `black girl selfie`, `asian woman aesthetic`, `hispanic guy selfie`.
+</ParamField>
+
+<ParamField body="count" type="number">
+  How many pictures to return. Defaults to `12`, capped at `40`.
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="{ pictures: PfpCandidate[]; search_term: string; count: number }">
+  The candidates that survived the already-used filter. `count` is how many are
+  in `pictures`, which can be fewer than requested — or zero, if the term found
+  nothing or everything it found is already in use. An empty result is a signal
+  to try a different term, not an error.
+</ResponseField>
+
+<ResponseField name="PfpCandidate.source_id" type="string">
+  Stable identifier for this picture. Pass it to <a href="/api-reference/endpoint/media-filter">Filter Media by Usage</a> or record it against a use to keep the picture out of later searches.
+</ResponseField>
+
+<ResponseField name="PfpCandidate.url" type="string">
+  Full-resolution image — the one to set as an account's profile picture.
+</ResponseField>
+
+<ResponseField name="PfpCandidate.preview_url" type="string">
+  Smaller variant, for rendering a grid of options.
+</ResponseField>
+
+## TypeScript
+
+```typescript
+const res = await client.media.pfpSearch({
+  search_term: 'black girl selfie',
+  count: 5,
+});
+
+if (res.ok) {
+  for (const picture of res.data.pictures) {
+    console.log(picture.source_id, picture.url);
+  }
+}
+```

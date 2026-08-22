@@ -22,6 +22,10 @@ newest-first, using each response's `nextCursor` to fetch the next page.
   Filter accounts by tag
 </ParamField>
 
+<ParamField body="type" type="'tiktok' | 'instagram'">
+  Filter accounts by platform
+</ParamField>
+
 <ParamField body="org_group" type="string">
   Filter accounts by organization group
 </ParamField>
@@ -107,6 +111,14 @@ newest-first, using each response's `nextCursor` to fetch the next page.
     
     <ResponseField name="bio" type="string | null">
       Account bio text
+    </ResponseField>
+    
+    <ResponseField name="age_range" type="string | null">
+      Age band the account's persona presents as (e.g. `18-24`)
+    </ResponseField>
+    
+    <ResponseField name="sex" type="string | null">
+      Gender the account's persona presents as
     </ResponseField>
     
     <ResponseField name="post_version" type="'original' | 'v1_custom' | 'manual_posting' | null">
@@ -225,7 +237,9 @@ if (response.ok) {
       "warmup_version": "original",
       "description": "health and wellness content",
       "keywords": "fitness,workout,health",
-      "profiles": "fitnessguru,healthcoach"
+      "profiles": "fitnessguru,healthcoach",
+      "age_range": "18-24",
+      "sex": "female"
     },
     {
       "id": "acc_789012",
@@ -241,7 +255,9 @@ if (response.ok) {
       "warmup_version": null,
       "description": null,
       "keywords": null,
-      "profiles": null
+      "profiles": null,
+      "age_range": null,
+      "sex": null
     }
   ],
   "nextCursor": null
