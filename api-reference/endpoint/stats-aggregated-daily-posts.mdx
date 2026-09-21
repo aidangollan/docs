@@ -50,7 +50,7 @@ POST https://api.ugc.inc/stats/aggregated/daily-posts
 ## Response
 
 <ResponseField name="data" type="DailyPostStat[]">
-  Daily per-post stats and delta fields.
+  Daily per-post stats and delta fields. Each `*_change` value is measured against the post's previous stats row, which may be earlier than `startDate`, so a one-day range (`startDate` equal to `endDate`) returns that day's real changes. A post's first-ever stats row has a change of 0.
 </ResponseField>
 
 ## TypeScript
