@@ -1,6 +1,6 @@
 ---
 title: "Create Comment"
-description: "Create a comment on a TikTok post"
+description: "Create a comment on a TikTok video or Instagram post or Reel"
 ---
 
 ## Endpoint
@@ -11,24 +11,59 @@ POST https://api.ugc.inc/comment/create
 
 ## Overview
 
-Create a comment on a TikTok video using one of your accounts. Use the returned `commentId` to check the status of the comment.
+Create a comment on a TikTok video or an Instagram post or Reel using one of your accounts. The account determines which platform is used; the post URL must match that platform.
+
+| Platform | Supported phone types | Post URL |
+| --- | --- | --- |
+| TikTok | Physical or emulated Android | `https://www.tiktok.com/@username/video/VIDEO_ID` |
+| Instagram | Physical Android only | `https://www.instagram.com/p/SHORTCODE/` or `https://www.instagram.com/reel/SHORTCODE/` |
+
+The account must belong to your organization, have a configured phone and username, and already be logged in on that phone. Instagram commenting does not support emulated Android or iPhone accounts.
+
+A successful response means the comment task has started, not that the comment is already published. Use the returned `commentId` with [Get Comments](/api-reference/endpoint/comments-list) to check for `completed` or `failed`. A completed comment may have a null `commentUrl`.
+
+## Instagram example
+
+Use an Instagram account ID and the full HTTPS URL of the target post or Reel:
+
+```bash
+curl -X POST https://api.ugc.inc/comment/create \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "YOUR_INSTAGRAM_ACCOUNT_ID",
+    "postUrl": "https://www.instagram.com/reel/SHORTCODE/",
+    "commentText": "Great video! 🔥"
+  }'
+```
+
+For a regular Instagram post, use `https://www.instagram.com/p/SHORTCODE/` instead. Replace `SHORTCODE` with the code from the post's share link.
 
 ## Request Body
 
 <ParamField body="accountId" type="string" required>
-  Account ID to use for commenting The account must: - Be in `setup` status -
-  Belong to your organization
+  Account ID to use for commenting. The account must belong to your organization
+  and meet the platform and phone requirements above.
 </ParamField>
 
 <ParamField body="postUrl" type="string" required>
-  Full URL to the TikTok post to comment on **Format:**
-  `https://www.tiktok.com/@username/video/{video_id}` **Example:**
-  `https://www.tiktok.com/@creator/video/7234567890123456789`
+  Full URL to a post on the account's platform:
+
+  - TikTok: `https://www.tiktok.com/@username/video/VIDEO_ID`
+  - Instagram post: `https://www.instagram.com/p/SHORTCODE/`
+  - Instagram Reel: `https://www.instagram.com/reel/SHORTCODE/`
+
+  Instagram URLs must use HTTPS and the `instagram.com` or `www.instagram.com`
+  host. Profile, Story, and shortened share URLs are not supported. Query parameters
+  on supported post and Reel URLs are accepted.
 </ParamField>
 
 <ParamField body="commentText" type="string" required>
-  The text content of the comment - Can include emojis - Maximum length: 150
-  characters (TikTok limit) - Cannot be empty
+  The comment text, including any emojis. Cannot be empty.
+
+  Instagram accepts 1–150 Unicode code points, including spaces and emojis, and
+  rejects whitespace-only text. This is the UGC Inc product limit for Instagram
+  commenting, not Instagram's native comment limit.
 </ParamField>
 
 ## Response
@@ -44,7 +79,7 @@ Create a comment on a TikTok video using one of your accounts. Use the returned 
 
 <RequestExample>
 
-```bash cURL
+```bash cURL (TikTok)
 curl -X POST https://api.ugc.inc/comment/create \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \

@@ -11,7 +11,7 @@ POST https://api.ugc.inc/comment
 
 ## Overview
 
-Retrieve comments for your organization. You can filter by specific comment IDs, account IDs, or account tag.
+Retrieve TikTok and Instagram comment tasks for your organization. You can filter by specific comment IDs, account IDs, or account tag.
 
 ## Request Body
 
@@ -35,10 +35,10 @@ Retrieve comments for your organization. You can filter by specific comment IDs,
   Each comment includes:
   - `id`: Unique comment identifier
   - `accountId`: Account ID used for the comment
-  - `postUrl`: URL of the TikTok post
+  - `postUrl`: URL of the TikTok video or Instagram post or Reel
   - `commentText`: The comment text
-  - `status`: Current status (`pending`, `running`, `completed`, `failed`)
-  - `commentUrl`: URL to the posted comment (if completed)
+  - `status`: Current status (`scheduled`, `pending`, `verifying`, `completed`, `failed`)
+  - `commentUrl`: URL to the posted comment, when available; may be null even when completed
   - `error`: Error message (if failed)
   - `createdAt`: When the comment was created
   - `completedAt`: When the comment completed (if applicable)
