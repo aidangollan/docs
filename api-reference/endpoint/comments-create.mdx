@@ -15,10 +15,10 @@ Create a comment on a TikTok video or an Instagram post or Reel using one of you
 
 | Platform | Supported phone types | Post URL |
 | --- | --- | --- |
-| TikTok | Physical or emulated Android | `https://www.tiktok.com/@username/video/VIDEO_ID` |
+| TikTok | Physical Android only | `https://www.tiktok.com/@username/video/VIDEO_ID` |
 | Instagram | Physical Android only | `https://www.instagram.com/p/SHORTCODE/` or `https://www.instagram.com/reel/SHORTCODE/` |
 
-The account must belong to your organization, have a configured phone and username, and already be logged in on that phone. Instagram commenting does not support emulated Android or iPhone accounts.
+The account must belong to your organization, have a configured phone and username, and already be logged in on that phone. Commenting on either platform does not support emulated Android or iPhone accounts.
 
 A successful response means the comment task has started, not that the comment is already published. Use the returned `commentId` with [Get Comments](/api-reference/endpoint/comments-list) to check for `completed` or `failed`. A completed comment may have a null `commentUrl`.
 
