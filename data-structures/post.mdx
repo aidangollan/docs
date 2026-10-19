@@ -15,6 +15,7 @@ Represents a video or slideshow post on a social media account.
 | `account_id` | `string \| null` | ID of the account that created this post. `null` for draft posts not yet assigned to an account. |
 | `type` | `'video' \| 'slideshow'` | Type of post content |
 | `status` | `string` | Current status: `'draft'`, `'scheduled'`, `'pending'`, `'complete'`, or `'failed'` |
+| `failure` | `object \| null` | Returned by list responses. Current posting explanation with `code`, `message`, `recovery`, and `next_action`; `null` when there is no current issue. See [Posting Explanations](/api-reference/endpoint/posts-status#posting-explanations). |
 | `social_id` | `string \| null` | Platform-specific post ID (TikTok video ID or Instagram reel code, available after posting) |
 | `caption` | `string \| null` | Post caption/description text (max 4000 characters) |
 | `tag` | `string \| null` | Custom tag for categorization. Set via the `post_tag` parameter on create/update endpoints. |
@@ -33,7 +34,7 @@ Represents a video or slideshow post on a social media account.
 | `scheduled` | Post is scheduled to be published at a future time | ✅ Yes |
 | `pending` | Post is currently being processed/published | ✅ Yes |
 | `complete` | Post was successfully published to the platform | ❌ No |
-| `failed` | Post failed to publish (check error logs) | ✅ Yes |
+| `failed` | The posting attempt failed; see `failure` for the reason and next action | ✅ Yes |
 | `retrying` | Post is being retried after a previous failure | ✅ Yes |
 
 <Note>

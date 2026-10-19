@@ -20,6 +20,37 @@ Check the current status of a specific post. Use this endpoint to monitor whethe
 - **`complete`** - Post was successfully published to the platform
 - **`failed`** - Post failed to publish; see `fail_category` for why
 
+## Posting Explanations
+
+Status responses and both Get Posts response formats include `failure`. It is `null` when there is no current posting issue. A failed posting attempt still returns HTTP 200 when the status lookup succeeds; request authentication, validation and not-found errors remain separate.
+
+```json
+{
+  "code": "AUDIO_UNAVAILABLE",
+  "message": "The selected sound is unavailable. Choose another sound and retry.",
+  "recovery": "stopped",
+  "next_action": "change_audio"
+}
+```
+
+`recovery` is `retry_pending` (waiting for another attempt, with no guaranteed execution time), `waiting` (paused until a publishing issue is resolved), `verifying_publication` (checking publication before another attempt), or `stopped` (no automatic recovery indicated).
+
+`next_action` is `wait`, `change_audio`, `change_audio_or_contact_support`, or `contact_support`. When it is `wait`, do not submit another copy. A publication check can appear while the post is `pending` or `retrying`; ordinary processing and completed posts return `failure: null`.
+
+| Code | Message |
+|---|---|
+| `AUDIO_UNAVAILABLE` | The selected sound is unavailable. Choose another sound and retry. |
+| `BACKUP_AUDIO_RETRY_PENDING` | The selected sound was unavailable. Your post is waiting to be retried with its backup sound. |
+| `AUDIO_RETRY_PENDING` | The selected sound could not be loaded. Your post is waiting to be retried. |
+| `AUDIO_PREPARATION_FAILED` | The selected sound could not be prepared for this post. Choose another sound or contact support before retrying. |
+| `PUBLISHING_RETRY_PENDING` | Publishing was temporarily interrupted. Your post is waiting to be retried. No action is needed. |
+| `PUBLISHING_BLOCKED` | A publishing issue prevented this post from proceeding. Contact support for help with this post. |
+| `POST_PROCESSING_FAILED` | A processing error prevented this posting attempt from completing. Contact support before retrying. |
+| `PUBLICATION_CHECK_IN_PROGRESS` | We’re checking whether your post published. Please wait before submitting it again to avoid a duplicate. |
+| `PUBLICATION_UNCONFIRMED` | We couldn’t confirm whether your post published. Contact support before submitting it again to avoid a duplicate. |
+| `POST_RETRY_PENDING` | The previous posting attempt did not complete. Your post is waiting to be retried. No action is needed. |
+| `POST_FAILED` | The posting attempt failed, but we couldn’t determine the cause. Contact support before submitting it again. |
+
 ## Failure Categories
 
 When `status` is `failed`, `fail_category` explains why:
@@ -53,6 +84,10 @@ When `status` is `failed`, `fail_category` explains why:
       Current status of the post
     </ResponseField>
     
+    <ResponseField name="failure" type="object | null">
+      Current posting explanation with `code`, `message`, `recovery` and `next_action`. See Posting Explanations above.
+    </ResponseField>
+
     <ResponseField name="fail_category" type="string | null">
       Why the post failed. Set when `status` is `failed`, otherwise `null`.
       One of `device_error`, `network_error`, `upload_interrupted`,

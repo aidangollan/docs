@@ -16,6 +16,10 @@ Retrieve a list of posts (videos and slideshows) with optional filtering by acco
 Supports keyset pagination via `limit`/`cursor` — pass `limit` to page through results
 newest-first, using each response's `nextCursor` to fetch the next page.
 
+## Posting Explanations
+
+Every returned post includes `failure`, either `null` or an object with `code`, `message`, `recovery` and `next_action`. This applies to both the array response and `data.posts` when `includePageMeta` is true. See [Posting Explanations](/api-reference/endpoint/posts-status#posting-explanations) for the complete message catalog and recovery guidance.
+
 ## Request Body
 
 <ParamField body="accountIds" type="string[]">

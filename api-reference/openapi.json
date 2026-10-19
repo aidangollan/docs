@@ -900,9 +900,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "account_id": { "type": "string" }
+                  "account_id": {
+                    "type": "string"
+                  }
                 },
-                "required": ["account_id"]
+                "required": [
+                  "account_id"
+                ]
               }
             }
           }
@@ -933,9 +937,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "account_id": { "type": "string" }
+                  "account_id": {
+                    "type": "string"
+                  }
                 },
-                "required": ["account_id"]
+                "required": [
+                  "account_id"
+                ]
               }
             }
           }
@@ -1715,11 +1723,37 @@
         "description": "Retrieve posts with optional filters",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Success. Each post includes failure (PublicPostFailure or null), in either the data array or data.posts for the page response.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PostWithFailure"
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "posts"
+                          ],
+                          "properties": {
+                            "posts": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/PostWithFailure"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -1864,7 +1898,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "failure": {
+                          "$ref": "#/components/schemas/PublicPostFailure"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1915,7 +1959,7 @@
       "post": {
         "operationId": "posts_create_video_post",
         "summary": "Create Video Post",
-        "description": "Create a video post. Optionally accepts captionOverlays — text overlays to display on the video, each { text, x, y, fontSize } with x/y as the overlay center as a fraction (0-1) of the video width/height and fontSize as a fraction (0-1) of the video height. Returned on the post as caption_overlays.",
+        "description": "Create a video post. Optionally accepts captionOverlays \u2014 text overlays to display on the video, each { text, x, y, fontSize } with x/y as the overlay center as a fraction (0-1) of the video width/height and fontSize as a fraction (0-1) of the video height. Returned on the post as caption_overlays.",
         "responses": {
           "200": {
             "description": "Success",
@@ -2197,7 +2241,9 @@
             "description": "Set to `true` to receive newline-delimited JSON progress events instead of the standard JSON summary response.",
             "schema": {
               "type": "string",
-              "enum": ["true"]
+              "enum": [
+                "true"
+              ]
             }
           }
         ],
@@ -2306,6 +2352,79 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "PublicPostFailure": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "recovery",
+          "next_action"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "AUDIO_UNAVAILABLE",
+              "BACKUP_AUDIO_RETRY_PENDING",
+              "AUDIO_RETRY_PENDING",
+              "AUDIO_PREPARATION_FAILED",
+              "PUBLISHING_RETRY_PENDING",
+              "PUBLISHING_BLOCKED",
+              "POST_PROCESSING_FAILED",
+              "PUBLICATION_CHECK_IN_PROGRESS",
+              "PUBLICATION_UNCONFIRMED",
+              "POST_RETRY_PENDING",
+              "POST_FAILED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "recovery": {
+            "type": "string",
+            "enum": [
+              "retry_pending",
+              "waiting",
+              "verifying_publication",
+              "stopped"
+            ]
+          },
+          "next_action": {
+            "type": "string",
+            "enum": [
+              "wait",
+              "change_audio",
+              "change_audio_or_contact_support",
+              "contact_support"
+            ]
+          }
+        }
+      },
+      "PostWithFailure": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "failure"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "failure": {
+            "$ref": "#/components/schemas/PublicPostFailure"
+          }
+        }
       }
     }
   }
