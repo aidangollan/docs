@@ -127,6 +127,16 @@
         ]
       },
       {
+        "group": "Native iMessage",
+        "pages": [
+          "guides/imessage-conversations",
+          "data-structures/imessage-conversation",
+          "api-reference/endpoint/imessage-render",
+          "api-reference/endpoint/imessage-status",
+          "api-reference/endpoint/imessage-cancel"
+        ]
+      },
+      {
         "group": "Billing",
         "pages": [
           "api-reference/endpoint/billing-get",

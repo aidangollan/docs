@@ -27,6 +27,12 @@ All public TypeScript data structures exported by `ugcinc` are listed below, gro
 
 `UserMedia`, `MediaUse`, `SocialAudio`, `Media`, `GetMediaParams`, `GetSocialAudioParams`, `UploadMediaParams`, `UploadMediaResponse`, `MediaTagUpdate`, `UpdateMediaTagsParams`, `MediaTagUpdateResult`, `UpdateMediaTagsResponse`, `UpdateMediaTagParams`, `UpdateMediaNameParams`, `DeleteMediaParams`, `DeleteMediaResponse`, `CreateSocialAudioParams`, `ImportTextParams`, `ImportTextResponse`, `CreateMediaFromUrlParams`, `GetMediaUseParams`, `GetMediaUseResponse`, `FilterMediaParams`, `FilterMediaResponse`, `GetUploadTokenParams`, `UploadTokenResponse`
 
+## `./imessage-conversation`
+
+`IMessageConversationInput`, `IMessageConversationSettings`, `IMessageTiming`, `IMessageConversationEvent`, `IMessageConversationPlan`, `IMessageConversationJob`
+
+Use the [native iMessage guide](/guides/imessage-conversations) to submit videos or PNG snapshots, and the [full conversation contract](/data-structures/imessage-conversation) for all input fields, defaults, limits, and job states. The package exports `compileIMessageConversation`, `iMessageConversationSchema`, and `iMessageConversationJobSchema` for local planning and validation. High-level native jobs use `client.media.renderIMessageConversation`, `getIMessageConversation`, and `cancelIMessageConversation`.
+
 ## `./stats`
 
 `RefreshStatsParams`, `RefreshStatsError`, `RefreshStatsResponse`, `RefreshStartEvent`, `RefreshProgressEvent`, `RefreshDoneEvent`, `RefreshStreamEvent`, `DailyAggregatedStat`, `GetDailyAggregatedStatsParams`, `DailyAccountStat`, `GetDailyAccountStatsParams`, `DailyPostStat`, `GetDailyPostStatsParams`, `DashboardDailyStat`, `GetDashboardDailyStatsParams`, `TopAccount`, `GetTopAccountsParams`, `TopPost`, `GetTopPostsParams`

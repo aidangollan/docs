@@ -1,0 +1,265 @@
+---
+title: "iMessage conversation"
+description: "Complete public input, timing, participant, message, reaction, snapshot, and job-result contracts"
+---
+
+`IMessageConversationInput` is accepted by
+`client.media.renderIMessageConversation(input)` and by the native conversation
+mode of the Create DM workflow node. Use
+`compileIMessageConversation(input)` to validate authoring settings and inspect
+the generated timing plan locally. See [Create iMessage videos](/guides/imessage-conversations)
+for complete examples and the submit/poll/download flow.
+
+All time and duration fields ending in `Ms` use milliseconds. Input objects are
+strict: unsupported properties reject. Display strings must contain valid,
+printable Unicode; IDs use only letters, digits, `_`, and `-`.
+
+## Top-level input
+
+| Field | Type | Default and rules |
+| --- | --- | --- |
+| `contact` | Contact object | Required for a direct conversation. Provide exactly one of `contact` or `group`. |
+| `group` | Group object | Required for a group conversation. Mutually exclusive with `contact`. |
+| `messages` | Message array | Required; 1–30 messages in display/arrival order. |
+| `profile` | String literal | Only `iphone-xs-ios18.6.2`; also the default. |
+| `theme` | `light` or `dark` | Default `dark`. |
+| `keyboard` | Boolean | Default `true`; local animated emoji and replies require the visible keyboard. |
+| `statusBar` | Status bar object | Optional; individual defaults are listed below. |
+| `unreadCount` | Integer | Default `0`; 0–9999. Sets the native back-button badge, not the number of rendered messages. |
+| `timestampText` | String | Optional; 1–80 characters after trimming. Sets the first conversation date separator independently of the phone clock. |
+| `timing` | Timing object | Optional global pacing defaults; overridden field-by-field by message timing. |
+| `showIncomingTyping` | Boolean | Default `true`; a remote message may override with `showTyping`. |
+| `endHoldMs` | Integer | Default `1500`; 350–10000. Holds the final scene. |
+| `seed` | Integer | Default `0`; 0–4294967295. Seeds pacing variation. It does not guarantee identical reaction pixels. |
+| `output` | Output object | Default `{kind: 'video'}`. |
+| `fps` | Number literal | Only `60`; also the default. |
+| `threads` | Thread-view array | Default `[]`; at most 10 nonoverlapping expanded read-only thread views. |
+| `idempotencyKey` | String | Optional; 1–128 characters. Same body/key within one organization reuses the job; a changed body with the same key returns 409. |
+
+The complete request must fit within 16 MiB. The compiled conversation cannot
+exceed 120,000 ms, 6,000 animated grapheme clusters, or 6,100 events. Image
+payloads have additional decoded-image limits below.
+
+## Contact and group
+
+### Contact
+
+| Field | Type | Rules |
+| --- | --- | --- |
+| `name` | String | Required; 1–80 characters after trimming. The displayed other-person name/username. |
+| `avatarPngBase64` | String | Optional PNG avatar, base64 without a data-URL prefix. |
+
+Direct chats use `sender: 'user'` for the local person and
+`sender: 'recipient'` for the contact. Reaction actors use the same IDs.
+
+### Group
+
+| Field | Type | Default and rules |
+| --- | --- | --- |
+| `name` | String | Required; 1–80 characters after trimming. |
+| `localParticipantId` | ID string | Default `user`; must identify one of the supplied participants. |
+| `participants` | Participant array | Required; 3–20 people including the local person, with unique IDs. |
+| `avatarPngBase64` | String | Optional group PNG avatar. |
+
+Each participant has required `id` and `name`, plus optional
+`avatarPngBase64`. IDs are 1–80 characters using `[A-Za-z0-9_-]`; names are
+1–80 characters after trimming. A message's `sender` and each reaction's `actor`
+must name a supplied participant.
+
+All avatar PNGs must be single-frame images no larger than 512 × 512, with at
+most 65,536 base64 characters. Native ContactsUI performs the avatar crop. These
+inputs do not save or modify a real contact.
+
+## Status bar
+
+These options configure the rendered phone, not the host device's actual clock,
+network, or battery settings.
+
+| Field | Type | Default | Accepted values |
+| --- | --- | --- | --- |
+| `time` | String | `9:41` | `H:mm` or `HH:mm` in 24-hour notation, from `0:00` to `23:59`. |
+| `wifiEnabled` | Boolean | `true` | Shows/hides Wi-Fi. |
+| `wifiBars` | Integer | `3` | 0–3. |
+| `cellularEnabled` | Boolean | `true` | Shows/hides cellular signal. |
+| `cellularBars` | Integer | `4` | 0–4. |
+| `batteryPercent` | Integer | `100` | 0–100; controls fill, not a numerical percentage label. |
+| `charging` | Boolean | `false` | Charging appearance. |
+| `lowPowerMode` | Boolean | `false` | Low-power appearance. |
+
+There is no carrier-name or network-type selector.
+
+## Messages
+
+| Field | Type | Default and rules |
+| --- | --- | --- |
+| `id` | ID string | Optional; generated as `message-1`, `message-2`, etc. when omitted. All resolved IDs must be unique. |
+| `sender` | ID string | Required; direct-chat `user`/`recipient` or a group participant ID. |
+| `text` | String | Either this field or `imagePngBase64` is required, exclusively. 1–2000 UTF-16 code units. Includes Unicode emoji. |
+| `imagePngBase64` | String | Single-frame PNG, base64 without a data-URL prefix; see image limits below. |
+| `initial` | Boolean | Default `false`. Preexisting history must be a contiguous prefix before animated messages. |
+| `timing` | Timing object | Optional per-message overrides of the global settings. |
+| `showTyping` | Boolean | Remote messages only. Overrides `showIncomingTyping`; outgoing text always appears in the composer. |
+| `receipt` | `none`, `delivered`, or `read` | Default `none`; only outgoing messages can show receipts. |
+| `readAt` | ISO timestamp | Required exactly when `receipt` is `read`. Must include `Z` or an explicit timezone offset. |
+| `receiptDelayMs` | Integer | Default `500`; 0–30000 after message arrival. History receipts are present initially. |
+| `replyTo` | ID string | Optional; must identify an earlier message. Replies to replies retain the original thread while the local gesture targets this exact message. |
+| `sentAt` | ISO timestamp | Optional conversation chronology. If any message sets it, every message must set it, in nondecreasing order, with a timezone. |
+| `timestampText` | String | Optional; 1–80 characters after trimming. Forces a date separator before this message with the supplied text. |
+| `reactions` | Reaction array | Default `[]`; at most 20 events per message. |
+
+Message images must fit within 2048 × 2048 and 8 MiB of base64 characters.
+Across all message images, decoded area may not exceed 16,777,216 pixels. PNGs
+are decoded and validated by the worker; local compilation is not a complete
+image decoder. Animated PNGs, captions, and combined text/image bodies reject.
+
+The latest outgoing message owns the visible native delivery/read label. Earlier
+labels disappear when a newer outgoing message is sent. Receipt transitions can
+extend the compiled duration. Conversation timestamps remain separate from
+playback timing and `statusBar.time`.
+
+## Timing
+
+All fields are optional. The same object shape is used for global `timing` and
+each message's `timing`. Explicit zero values are preserved where allowed.
+
+| Field | Type | Default | Range and behavior |
+| --- | --- | --- | --- |
+| `charactersPerSecond` | Number | `8` | 0.5–60 complete visible grapheme clusters per second. |
+| `pauseBeforeMs` | Integer | `450` | 0–30000 before this message begins. |
+| `pauseBeforeSendMs` | Integer | `180` | 0–10000 after typing completes. |
+| `punctuationPauseMs` | Integer | `160` | 0–2000 after `. ! ? , ; :` or a newline. |
+| `variation` | Number | `0.15` | 0–0.75; seeded variation in per-grapheme typing delays. |
+| `incomingTypingDurationMs` | Integer | Calculated | 0–30000. Exact remote typing-start-to-arrival interval, replacing calculated incoming duration. Per-message use on an outgoing message rejects. |
+| `keyboardSwitchPauseMs` | Integer | `450` | 350–10000 after changing letters/emoji keyboard mode. |
+| `emojiSelectionDelayMs` | Integer | `350` | 100–10000 before selecting a focused outgoing emoji. |
+
+The compiler reserves native transition time around sends, local replies,
+attachment insertion, and reaction menus. Requested pauses do not override
+those native transition requirements. When incoming typing is hidden, its
+calculated or explicit delay still applies.
+
+## Reactions
+
+| Field | Type | Default and rules |
+| --- | --- | --- |
+| `actor` | Participant ID | Required; direct-chat `user`/`recipient` or a group participant. |
+| `action` | `set` or `remove` | Default `set`. Remove requires a prior reaction from this actor on this message. |
+| `reaction` | Classic reaction | For `set`, provide exactly one of `reaction` or `emoji`. Values: `love`, `like`, `dislike`, `laugh`, `emphasize`, `question`. |
+| `emoji` | String | One complete emoji grapheme, at most 32 UTF-16 code units; remote actors only. |
+| `delayMs` | Integer | Default `700`; 0–60000 after message arrival, or video start for initial history. |
+| `menuDurationMs` | Integer | Default `700`; 400–10000. Visible local picker pause before selection. |
+
+Local `set` opens the native menu and selects a classic reaction. Local
+`remove` reselects the actor's current reaction through that menu; omit both
+`reaction` and `emoji` for removal. A second `set` replaces the same actor's
+previous reaction. Remote updates appear without operating the local menu.
+
+Local picker opening is scheduled no earlier than `delayMs`, message/native
+transition completion, and any prior local interaction. Remote updates remain
+relative to their target's arrival. Some reaction frames can differ at the pixel
+level between independent renders; seeded timing is not a full pixel-identity
+guarantee.
+
+## Expanded thread views
+
+Each entry in `threads` contains:
+
+| Field | Type | Rules |
+| --- | --- | --- |
+| `messageId` | ID string | Required; identifies a message in this conversation. |
+| `openAtMs` | Integer | Required; 0–120000, and after conversation events and reserved native transitions settle. |
+| `durationMs` | Integer | Required; 600–30000. |
+
+At most 10 views are allowed, with no overlap. The native expanded thread opens
+for reading, then closes back to the conversation. Typing/sending during these
+explicit views is unsupported. Local `replyTo` composition has its own automatic
+open/type/send/close flow and does not require a `threads` entry. The full output,
+including thread views and `endHoldMs`, must remain within 120 seconds.
+
+## Output
+
+Choose one strict object shape:
+
+```typescript
+type Output =
+  | { kind: 'video' }
+  | { kind: 'png'; atMs?: number };
+```
+
+- Video is 60 fps H264 MP4 at 1126 × 2436. It contains one background-colored
+  padding column for codec compatibility. Encoded video is deliberately lossy.
+- PNG is the original 1125 × 2436 native frame. `atMs` is an integer from 0
+  through the compiled `durationMs`; omit it for the final authored frame.
+- PNG output does not resize or extract a frame from MP4. It renders the same
+  native scene at the chosen time.
+- Audio/music, custom resolution, alternative device profiles, and other video
+  frame rates are not options in this contract.
+
+## Limits and validation
+
+- At most 30 messages, 6,000 animated grapheme clusters, 6,100 generated events,
+  and 120,000 ms including native transition allowances and the final hold.
+- At most 20 reaction events per message and 10 expanded thread views.
+- The request must fit within 16 MiB. Avatar and message PNGs must meet the
+  encoded-size, decoded-size, and single-frame rules above.
+- Initial history must precede animated messages. Reply targets must exist
+  earlier in the array. All senders and reaction actors must belong to the chat.
+- Set `sentAt` on every message or none, in chronological order. A Read receipt
+  requires `readAt`; other receipt states must omit it.
+- Animated local replies and emoji entry require the visible keyboard. Custom
+  emoji reactions are accepted only for remote participants.
+- Unknown fields, nonfinite numbers, unsupported profile/frame-rate values,
+  invalid Unicode, overlapping thread views, and out-of-range values reject.
+- Full-screen and bubble-send effects, image captions, custom fonts/coordinates,
+  carrier/network-type controls, and low-level event scripts are unsupported.
+
+Local compilation validates the authoring contract. The worker additionally
+validates decoded PNG data and native interaction availability. A successful
+compile is not a guarantee that later rendering or download will succeed.
+
+## Compiled timing plan
+
+`compileIMessageConversation(input)` returns `IMessageConversationPlan` locally,
+without a network request. It resolves defaults and adds these timing fields:
+
+| Field | Meaning |
+| --- | --- |
+| `durationMs` | Planned authored duration including the final hold. |
+| `durationInFrames` | Canonical 60 Hz sample count: `ceil(durationMs × 60 / 1000) + 1`. |
+| `schedule` | Animated messages' `messageId`, `typingStartMs`, `arrivalMs`, and `visibleCharacters`. |
+| `events` | Generated typed events with their `atMs`, useful for inspecting pacing. |
+
+Other resolved fields include `version: 1`, `profile`, `contact`, optional
+`group`, appearance, output settings, and normalized message records. The plan
+is for timing inspection. Submit the authoring input, not the compiled plan;
+arbitrary low-level event scripts are not accepted by the public endpoint.
+
+## Job result
+
+The SDK's submission, status, and cancellation methods return
+`ApiResponse<IMessageConversationJob>`. On success, read `response.data` after
+checking `response.ok`. The normalized job contains:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `jobId` | UUID string | Use for status and cancellation. |
+| `status` | String | `pending`, `processing`, `completed`, `failed`, or `cancelled`. |
+| `progress` | Number | 0–100. |
+| `fps` | `60` | Profile sample rate. |
+| `durationMs` | Positive integer | Planned authored duration. |
+| `durationInFrames` | Positive integer | Video frame count, or `1` for PNG output. |
+| `output` | Output object, optional | Resolved output kind; PNG output includes the chosen `atMs`. |
+| `contentType` | String, optional | `video/mp4` or `image/png`. |
+| `url` | HTTPS URL, optional | Present for completed jobs; downloadable media. |
+| `cancelRequested` | Boolean, optional | May be present while cancellation is being processed. Poll for a terminal status. |
+| `error` | Error object, optional | Failed/cancelled job details: `code`, safe `message`, and `retryable`. |
+
+The compiler's canonical sample count and a PNG job's `durationInFrames` serve
+different purposes: a PNG job returns one image while `durationMs` still
+describes the conversation. Runtime failures can occur after local compilation,
+including invalid decoded images, unavailable native rendering, or unsupported
+native emoji interactions. Honor the returned error and retryability instead
+of assuming local validation guarantees a successful render.
+
+For raw HTTP envelopes, authentication, organization selection, response codes,
+and examples, use the [endpoint reference](/api-reference/endpoint/imessage-render).

@@ -2345,6 +2345,345 @@
           }
         }
       }
+    },
+    "/media/render/imessage": {
+      "post": {
+        "operationId": "renderIMessageConversation",
+        "summary": "Render iMessage conversation",
+        "tags": [
+          "Native iMessage"
+        ],
+        "description": "Requires content:render for scoped keys. Submission queues work and does not wait for completion. Reuse the same body and idempotencyKey to recover a job.",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional organization selection for a key authorized for that organization. Usually derived from the bearer key; never grants access to another organization."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IMessageConversationInput"
+              },
+              "example": {
+                "contact": {
+                  "name": "Alex"
+                },
+                "theme": "dark",
+                "timing": {
+                  "charactersPerSecond": 8,
+                  "incomingTypingDurationMs": 2400
+                },
+                "messages": [
+                  {
+                    "id": "hello",
+                    "sender": "recipient",
+                    "text": "Ready?",
+                    "initial": true
+                  },
+                  {
+                    "id": "answer",
+                    "sender": "user",
+                    "text": "On my way \ud83d\udc4b",
+                    "receipt": "delivered"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job accepted or current job state. A completed, failed or cancelled render is also an HTTP 200 job-state response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageConversationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key lacks content:render permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency key already used with different request content.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Invalid result from rendering service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Rendering temporarily unavailable; retryable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/render/imessage/status": {
+      "post": {
+        "operationId": "getIMessageConversation",
+        "summary": "Get iMessage render status",
+        "tags": [
+          "Native iMessage"
+        ],
+        "description": "Requires content:render for scoped keys. Only jobs belonging to the selected organization are accessible. Poll pending/processing jobs; completed output includes a public HTTPS URL.",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional organization selection for a key authorized for that organization. Usually derived from the bearer key; never grants access to another organization."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IMessageJobRequest"
+              },
+              "example": {
+                "jobId": "7f840d59-6c9d-4b58-9f7c-21b953579069"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job accepted or current job state. A completed, failed or cancelled render is also an HTTP 200 job-state response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageConversationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key lacks content:render permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job is not owned by this organization or has expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Invalid result from rendering service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Rendering temporarily unavailable; retryable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/render/imessage/cancel": {
+      "post": {
+        "operationId": "cancelIMessageConversation",
+        "summary": "Cancel iMessage render",
+        "tags": [
+          "Native iMessage"
+        ],
+        "description": "Requires content:render for scoped keys. Only jobs belonging to the selected organization are accessible. Requests cooperative cancellation; poll until terminal. Completed work is retained if cancellation arrives too late.",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional organization selection for a key authorized for that organization. Usually derived from the bearer key; never grants access to another organization."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IMessageJobRequest"
+              },
+              "example": {
+                "jobId": "7f840d59-6c9d-4b58-9f7c-21b953579069"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job accepted or current job state. A completed, failed or cancelled render is also an HTTP 200 job-state response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageConversationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key lacks content:render permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job is not owned by this organization or has expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Invalid result from rendering service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Rendering temporarily unavailable; retryable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IMessageRequestError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2425,6 +2764,799 @@
             "$ref": "#/components/schemas/PublicPostFailure"
           }
         }
+      },
+      "IMessageTiming": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "charactersPerSecond": {
+            "type": "number",
+            "minimum": 0.5,
+            "maximum": 60,
+            "default": 8,
+            "description": "Complete visible grapheme clusters per second."
+          },
+          "pauseBeforeMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30000,
+            "description": "Pause before typing or the local reply gesture; follows reserved native transition completion.",
+            "default": 450
+          },
+          "pauseBeforeSendMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "Pause between the completed local composition and sending.",
+            "default": 180
+          },
+          "punctuationPauseMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2000,
+            "default": 160
+          },
+          "variation": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 0.75,
+            "default": 0.15,
+            "description": "Seeded proportional variation in character delay."
+          },
+          "incomingTypingDurationMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30000,
+            "description": "Explicit remote response duration; overrides calculated incoming typing duration. May be global or on incoming messages only."
+          },
+          "keyboardSwitchPauseMs": {
+            "type": "integer",
+            "minimum": 350,
+            "maximum": 10000,
+            "default": 450
+          },
+          "emojiSelectionDelayMs": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 10000,
+            "default": 350
+          }
+        },
+        "description": "Every field is optional. Per-message timing takes precedence over global timing. Defaults shown apply after both levels are checked."
+      },
+      "IMessageReaction": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "set",
+              "remove"
+            ],
+            "default": "set"
+          },
+          "reaction": {
+            "type": "string",
+            "enum": [
+              "love",
+              "like",
+              "dislike",
+              "laugh",
+              "emphasize",
+              "question"
+            ]
+          },
+          "emoji": {
+            "type": "string",
+            "description": "Exactly one complete emoji grapheme. Available for remote participants only.",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "delayMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60000,
+            "description": "From target message arrival, or video start for initial history. Earliest picker-open time for local actions; exact arrival time for remote actions.",
+            "default": 700
+          },
+          "menuDurationMs": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 10000,
+            "description": "Local picker hold before selection. Remote reactions do not open a local picker.",
+            "default": 700
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "remove"
+                }
+              },
+              "required": [
+                "action"
+              ]
+            },
+            "then": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "reaction"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "emoji"
+                    ]
+                  }
+                ]
+              }
+            },
+            "else": {
+              "oneOf": [
+                {
+                  "required": [
+                    "reaction"
+                  ],
+                  "not": {
+                    "required": [
+                      "emoji"
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "emoji"
+                  ],
+                  "not": {
+                    "required": [
+                      "reaction"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "description": "Setting again replaces that actor\u2019s prior reaction. Remove requires an existing reaction from the same actor. Local actions accept only the six classic reactions and use the visible native menu."
+      },
+      "IMessageMessage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sender"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "sender": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$",
+            "description": "user or recipient for direct chats; a participant ID for groups."
+          },
+          "text": {
+            "type": "string",
+            "description": "Nonempty printable Unicode, at most 2,000 UTF-16 code units. Supply exactly one of text or imagePngBase64.",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "imagePngBase64": {
+            "type": "string",
+            "description": "Base64 single-frame PNG without data URL prefix; decoded size at most 2048\u00d72048. Mixed image/text captions are unsupported.",
+            "maxLength": 8388608,
+            "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
+          },
+          "initial": {
+            "type": "boolean",
+            "default": false,
+            "description": "Preexisting history; initial messages must be a prefix."
+          },
+          "showTyping": {
+            "type": "boolean",
+            "description": "Incoming indicator override. Not accepted on outgoing messages."
+          },
+          "receipt": {
+            "type": "string",
+            "enum": [
+              "none",
+              "delivered",
+              "read"
+            ],
+            "default": "none",
+            "description": "Outgoing messages only; read requires readAt."
+          },
+          "readAt": {
+            "type": "string",
+            "description": "ISO 8601 timestamp with an explicit timezone.",
+            "format": "date-time"
+          },
+          "receiptDelayMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30000,
+            "default": 500
+          },
+          "timing": {
+            "$ref": "#/components/schemas/IMessageTiming"
+          },
+          "replyTo": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$",
+            "description": "An earlier message ID; never a forward reference."
+          },
+          "sentAt": {
+            "type": "string",
+            "description": "ISO 8601 timestamp with an explicit timezone.",
+            "format": "date-time"
+          },
+          "timestampText": {
+            "type": "string",
+            "description": "Trimmed nonempty printable Unicode.",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "reactions": {
+            "type": "array",
+            "maxItems": 20,
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/IMessageReaction"
+            }
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "text"
+            ],
+            "not": {
+              "required": [
+                "imagePngBase64"
+              ]
+            }
+          },
+          {
+            "required": [
+              "imagePngBase64"
+            ],
+            "not": {
+              "required": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "receipt": {
+                  "const": "read"
+                }
+              },
+              "required": [
+                "receipt"
+              ]
+            },
+            "then": {
+              "required": [
+                "readAt"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "readAt"
+                ]
+              }
+            }
+          }
+        ],
+        "description": "IDs must be unique; omitted IDs become message-1, message-2, etc. If any message sets sentAt, all must set it in chronological order. timestampText forces a separator before this message."
+      },
+      "IMessageStatusBar": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "time": {
+            "type": "string",
+            "description": "Clock independent of conversation timestamps.",
+            "pattern": "^(?:[01]?\\d|2[0-3]):[0-5]\\d$",
+            "default": "9:41"
+          },
+          "wifiBars": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3,
+            "default": 3
+          },
+          "wifiEnabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "cellularBars": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4,
+            "default": 4
+          },
+          "cellularEnabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "batteryPercent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Native battery fill, not a numerical percentage label.",
+            "default": 100
+          },
+          "charging": {
+            "type": "boolean",
+            "default": false
+          },
+          "lowPowerMode": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "IMessageContact": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Trimmed nonempty printable Unicode.",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "avatarPngBase64": {
+            "type": "string",
+            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512\u00d7512 pixels. Native ContactsUI crops the avatar.",
+            "maxLength": 65536,
+            "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
+          }
+        }
+      },
+      "IMessageParticipant": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Trimmed nonempty printable Unicode.",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "avatarPngBase64": {
+            "type": "string",
+            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512\u00d7512 pixels. Native ContactsUI crops the avatar.",
+            "maxLength": 65536,
+            "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
+          }
+        }
+      },
+      "IMessageGroup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "participants"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Trimmed nonempty printable Unicode.",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "avatarPngBase64": {
+            "type": "string",
+            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512\u00d7512 pixels. Native ContactsUI crops the avatar.",
+            "maxLength": 65536,
+            "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
+          },
+          "localParticipantId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,80}$",
+            "default": "user"
+          },
+          "participants": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/IMessageParticipant"
+            },
+            "description": "Unique IDs; must include localParticipantId."
+          }
+        }
+      },
+      "IMessageConversationOutput": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "const": "video"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "const": "png"
+              },
+              "atMs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 120000,
+                "description": "Exact requested millisecond timestamp; omission chooses the final authored frame. Must not exceed compiled duration."
+              }
+            }
+          }
+        ],
+        "default": {
+          "kind": "video"
+        },
+        "description": "Video is 60 fps H264 at 1126\u00d72436. PNG is 1125\u00d72436; no crop, resolution or codec control."
+      },
+      "IMessageConversationInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "messages"
+        ],
+        "properties": {
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Organization-scoped retry key. Reusing it with changed input returns 409.",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "profile": {
+            "type": "string",
+            "const": "iphone-xs-ios18.6.2",
+            "default": "iphone-xs-ios18.6.2"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/IMessageContact"
+          },
+          "group": {
+            "$ref": "#/components/schemas/IMessageGroup"
+          },
+          "statusBar": {
+            "$ref": "#/components/schemas/IMessageStatusBar"
+          },
+          "unreadCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999,
+            "description": "Back-button badge; message count is messages.length.",
+            "default": 0
+          },
+          "timestampText": {
+            "type": "string",
+            "description": "Trimmed nonempty printable Unicode.",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "light",
+              "dark"
+            ],
+            "default": "dark"
+          },
+          "fps": {
+            "type": "integer",
+            "const": 60,
+            "default": 60
+          },
+          "output": {
+            "$ref": "#/components/schemas/IMessageConversationOutput"
+          },
+          "keyboard": {
+            "type": "boolean",
+            "default": true,
+            "description": "Hide/show keyboard; outgoing emoji selection and local replies require true."
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "default": 0
+          },
+          "timing": {
+            "$ref": "#/components/schemas/IMessageTiming"
+          },
+          "showIncomingTyping": {
+            "type": "boolean",
+            "default": true
+          },
+          "endHoldMs": {
+            "type": "integer",
+            "minimum": 350,
+            "maximum": 10000,
+            "default": 1500
+          },
+          "messages": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 30,
+            "items": {
+              "$ref": "#/components/schemas/IMessageMessage"
+            }
+          },
+          "threads": {
+            "type": "array",
+            "maxItems": 10,
+            "default": [],
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "messageId",
+                "openAtMs",
+                "durationMs"
+              ],
+              "properties": {
+                "messageId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,80}$"
+                },
+                "openAtMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 120000
+                },
+                "durationMs": {
+                  "type": "integer",
+                  "minimum": 600,
+                  "maximum": 30000
+                }
+              }
+            },
+            "description": "Explicit read-only expanded reply views. Open after conversation/native transitions settle; views cannot overlap."
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "contact"
+            ],
+            "not": {
+              "required": [
+                "group"
+              ]
+            }
+          },
+          {
+            "required": [
+              "group"
+            ],
+            "not": {
+              "required": [
+                "contact"
+              ]
+            }
+          }
+        ],
+        "description": "Synthetic conversation authoring only; no real message delivery. Total request limit 16 MiB, 6,000 animated graphemes,120-second compiled duration, and 16,777,216 aggregate message-image pixels. Unknown fields reject. Cross-field/native availability constraints are also validated; see full contract."
+      },
+      "IMessageConversationJob": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jobId",
+          "status",
+          "progress",
+          "fps",
+          "output",
+          "contentType",
+          "durationInFrames",
+          "durationMs"
+        ],
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "cancelRequested": {
+            "type": "boolean",
+            "description": "Cancellation requested; not proof cleanup has finished. Poll to terminal status."
+          },
+          "progress": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "fps": {
+            "type": "integer",
+            "const": 60
+          },
+          "output": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "video"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "atMs"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "png"
+                  },
+                  "atMs": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 120000
+                  }
+                }
+              }
+            ]
+          },
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "image/png",
+              "video/mp4"
+            ]
+          },
+          "durationInFrames": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7201,
+            "description": "Output frame count; PNG output is 1."
+          },
+          "durationMs": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 120000,
+            "description": "Compiled conversation duration, even forPNG jobs."
+          },
+          "url": {
+            "type": "string",
+            "description": "Present on completion: publicly downloadable owned HTTPS media URL.",
+            "format": "uri"
+          },
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "message",
+              "retryable"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "IMessageJobRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jobId"
+        ],
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "IMessageConversationResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "data"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "const": 200
+          },
+          "data": {
+            "$ref": "#/components/schemas/IMessageConversationJob"
+          }
+        },
+        "description": "Raw HTTP response. SDK normalizes this to ApiResponse with ok:true and a message."
+      },
+      "IMessageRequestError": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "ok": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "description": "Error shape varies between authentication middleware and renderer. errorCode/retryable are provided for native conversation request failures."
       }
     }
   }

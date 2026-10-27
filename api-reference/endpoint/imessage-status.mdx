@@ -1,0 +1,111 @@
+---
+title: "Get iMessage Render Status"
+description: "Poll an organization-owned native conversation render and download its completed output"
+---
+
+## Endpoint
+
+```http
+POST https://api.ugc.inc/media/render/imessage/status
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+```
+
+Requires `content:render` for scoped keys. The bearer key selects the organization;
+an optional `?orgId=YOUR_ORG_ID` query must identify an authorized organization.
+Only jobs owned by that organization can be queried.
+
+## Request body
+
+<ParamField body="jobId" type="string" required>
+  The UUID returned by [Render iMessage Conversation](/api-reference/endpoint/imessage-render).
+  Unknown fields are rejected.
+</ParamField>
+
+### TypeScript
+
+```typescript
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const status = await client.media.getIMessageConversation({
+  jobId: '7f840d59-6c9d-4b58-9f7c-21b953579069',
+});
+if (!status.ok) throw new Error(status.message);
+
+if (status.data.status === 'completed') {
+  console.log(status.data.url, status.data.contentType);
+} else if (status.data.status === 'failed' || status.data.status === 'cancelled') {
+  console.error(status.data.error);
+} else {
+  console.log(status.data.status, status.data.progress);
+}
+```
+
+### HTTP
+
+```bash
+curl --request POST 'https://api.ugc.inc/media/render/imessage/status' \
+  --header "Authorization: Bearer $UGC_API_KEY" \
+  --header 'Content-Type: application/json' \
+  --data '{"jobId":"7f840d59-6c9d-4b58-9f7c-21b953579069"}'
+```
+
+## Job lifecycle
+
+| Status | Caller action |
+| --- | --- |
+| `pending` | Queued; keep polling. |
+| `processing` | Rendering; keep polling. `progress` is 0–100. |
+| `completed` | Download the public HTTPS `url`. |
+| `failed` | Read `error`; submit a new job to retry if appropriate. |
+| `cancelled` | Rendering stopped; no completed output is promised. |
+
+Use a bounded polling loop with a delay, rather than continuously requesting
+status. The [usage guide](/guides/imessage-conversations#generate-and-download-a-video)
+shows a complete example that handles failure and cancellation. Add a caller-side
+deadline if your application needs to stop polling after a set interval.
+A successful status request is HTTP `200` even when the job itself is `failed`
+or `cancelled`; inspect `data.status`.
+
+## Response
+
+Raw HTTP returns `{ "code": 200, "data": { ... } }`; the SDK normalizes that to
+an `ApiResponse` with `ok: true` and `message`. The `data` object is the same
+[IMessageConversationJob](/data-structures/imessage-conversation#job-result)
+returned by submission and cancellation.
+
+```json
+{
+  "code": 200,
+  "data": {
+    "jobId": "7f840d59-6c9d-4b58-9f7c-21b953579069",
+    "status": "completed",
+    "progress": 100,
+    "fps": 60,
+    "output": {"kind": "video"},
+    "contentType": "video/mp4",
+    "durationMs": 1000,
+    "durationInFrames": 61,
+    "url": "https://media.ugc.inc/owned-uploads/render/7f840d59-6c9d-4b58-9f7c-21b953579069/7f840d59-6c9d-4b58-9f7c-21b953579069.mp4"
+  }
+}
+```
+
+The example UUID and URL are illustrative, not an existing download.
+`durationMs` describes the authored timeline. For PNG output,
+`durationInFrames` is `1`, while `durationMs` still describes the conversation.
+
+## Errors
+
+| HTTP status | Meaning |
+| --- | --- |
+| `400` | Invalid job UUID or unsupported request fields. |
+| `401` | Missing, invalid, or expired API key. |
+| `403` | The key lacks `content:render`. |
+| `404` | Job is unknown, belongs to another organization, or its ownership record expired. |
+| `502` | The renderer returned an invalid output. |
+| `503` | Status service temporarily unavailable; retryable request failure. |
+
+Ownership records expire after seven days. A `404` intentionally does not reveal
+whether a job exists in another organization.

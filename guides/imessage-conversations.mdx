@@ -1,0 +1,390 @@
+---
+title: "Create iMessage videos"
+description: "Generate native iMessage conversations with configurable participants, typing, replies, reactions, receipts, and phone appearance"
+---
+
+Generate a conversation from message content and pacing settings. The service
+renders the native iPhone XS / iOS 18.6.2 interface, including its keyboard,
+bubbles, emoji input, replies, and reactions. It returns a downloadable video or
+a lossless PNG at a chosen point in the same conversation.
+
+Use `ugcinc` version **4.27.0 or later**. Restricted API keys need
+`content:render`. Set your organization in the client configuration. This
+creates a synthetic rendering; it does not send messages to anyone.
+
+## Generate and download a video
+
+```bash
+npm install ugcinc
+```
+
+```typescript
+import { writeFile } from 'node:fs/promises';
+import {
+  UGCClient,
+  compileIMessageConversation,
+  type IMessageConversationInput,
+  type IMessageConversationJob,
+} from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: process.env.UGC_API_KEY!,
+  orgId: process.env.UGC_ORG_ID!,
+});
+
+const conversation = {
+  contact: { name: 'Alex' },
+  theme: 'dark',
+  statusBar: { time: '9:41', batteryPercent: 85 },
+  timestampText: 'Today 8:30 AM',
+  timing: {
+    charactersPerSecond: 8,
+    pauseBeforeMs: 1200,
+    incomingTypingDurationMs: 2400,
+  },
+  endHoldMs: 2500,
+  seed: 42,
+  messages: [
+    { id: 'question', sender: 'recipient', text: 'Ready?', initial: true },
+    { id: 'answer', sender: 'user', text: 'On my way 👋', receipt: 'delivered' },
+    {
+      sender: 'recipient',
+      text: 'See you soon!',
+      timing: { incomingTypingDurationMs: 3200 },
+    },
+  ],
+} satisfies IMessageConversationInput;
+
+// Local validation and timing inspection; this does not submit a render.
+const plan = compileIMessageConversation(conversation);
+console.log(plan.durationMs, plan.durationInFrames, plan.schedule);
+
+const submission = await client.media.renderIMessageConversation(conversation);
+if (!submission.ok) throw new Error(submission.message);
+
+async function waitForConversation(jobId: string): Promise<IMessageConversationJob> {
+  for (;;) {
+    const response = await client.media.getIMessageConversation({ jobId });
+    if (!response.ok) throw new Error(response.message);
+    const job = response.data;
+    if (job.status === 'completed') return job;
+    if (job.status === 'failed' || job.status === 'cancelled') {
+      throw new Error(job.error?.message ?? `Render ${job.status}`);
+    }
+    console.log(`${job.status}: ${job.progress}%`);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+}
+
+const completed = await waitForConversation(submission.data.jobId);
+if (!completed.url) throw new Error('Completed render has no download URL.');
+const download = await fetch(completed.url);
+if (!download.ok) throw new Error(`Download failed: ${download.status}`);
+await writeFile('conversation.mp4', Buffer.from(await download.arrayBuffer()));
+console.log(completed.url); // The HTTPS URL can also be used in a browser.
+```
+
+Submission is asynchronous. The initial response contains a job ID, not a
+finished video. Poll until `completed`, `failed`, or `cancelled`; only a completed
+job has an output URL. Production clients can add their own polling deadline or
+abort controls.
+
+The contract is described in the [complete input and result reference](/data-structures/imessage-conversation).
+For direct HTTP clients, see [submit a render](/api-reference/endpoint/imessage-render),
+[read status](/api-reference/endpoint/imessage-status), and
+[cancel a render](/api-reference/endpoint/imessage-cancel).
+
+## Choose message content and pacing
+
+For a direct chat, `user` is the person operating the phone and `recipient` is
+the other person. Messages render in array order. Put preexisting messages first
+with `initial: true`; they are already visible when the video begins.
+
+`timing` supplies defaults for the conversation. A message's own `timing`
+overrides only the fields it contains. `charactersPerSecond` counts complete
+visible grapheme clusters, so typing never splits a compound emoji or combining
+character. `variation` and `seed` control reproducible pacing variation.
+
+`pauseBeforeMs` controls the wait before the next message begins. Use it to leave
+more breathing room after an exchange. `pauseBeforeSendMs` pauses after typing
+finishes. Native send, reply, and picker transitions also reserve time; a zero
+pause does not remove those transitions. `endHoldMs` holds the finished scene.
+
+For incoming replies, `incomingTypingDurationMs` controls the interval from the
+typing indicator starting to the message arriving. It replaces the calculated
+incoming duration. `showIncomingTyping: false`, or a message's `showTyping: false`,
+hides the indicator while retaining the response delay.
+
+Outgoing emoji automatically open the native emoji keyboard, select the emoji,
+and return to letters when subsequent text needs it. Use
+`keyboardSwitchPauseMs` and `emojiSelectionDelayMs` to control those pauses.
+Outgoing emoji and animated local replies require `keyboard: true`.
+
+## Add replies, receipts, and reactions
+
+Give messages stable IDs and set `replyTo` to an earlier ID. A local reply shows
+the native long-press menu, selects Reply, and types in the reply view. Incoming
+and initial-history replies preserve the association without operating the
+local controls.
+
+```typescript
+import { compileIMessageConversation, type IMessageConversationInput } from 'ugcinc';
+
+const conversation = {
+  contact: { name: 'Alex' },
+  messages: [
+    { id: 'plan', sender: 'recipient', text: 'Meet at the park?', initial: true },
+    {
+      id: 'reply', sender: 'user', text: 'Yes, see you there!', replyTo: 'plan',
+      receipt: 'read', readAt: '2026-10-27T09:32:00-07:00', receiptDelayMs: 1000,
+      reactions: [{ actor: 'recipient', emoji: '☀️', delayMs: 1600 }],
+    },
+    {
+      sender: 'recipient', text: 'Perfect.',
+      reactions: [
+        { actor: 'user', reaction: 'like', delayMs: 700, menuDurationMs: 1000 },
+        { actor: 'user', action: 'remove', delayMs: 3000, menuDurationMs: 800 },
+      ],
+    },
+  ],
+} satisfies IMessageConversationInput;
+
+const plan = compileIMessageConversation(conversation);
+console.log(plan.schedule);
+```
+
+Receipts belong to outgoing messages. `receipt: 'read'` requires `readAt`; do
+not send `readAt` for other receipt states. `receiptDelayMs` controls the delay
+after arrival. The visible native receipt belongs to the latest outgoing
+message, so an older receipt disappears when a newer outgoing message is sent.
+
+Reaction `delayMs` is relative to its message's arrival, or video start for
+initial history. Local actors open the native picker and choose one of six
+classic reactions: `love`, `like`, `dislike`, `laugh`, `emphasize`, or `question`.
+`menuDurationMs` controls the visible selection pause. Native transitions can
+push a local picker later than its requested earliest opening time. Remote
+reactions arrive without opening a local menu and also support custom emoji.
+Use `action: 'remove'` without a reaction value to remove that actor's existing
+reaction; another `set` replaces it.
+
+To display an expanded reply thread for reading, add a `threads` entry after the
+conversation has settled. Use `plan.events` to inspect the last event first;
+`openAtMs` must be at least 600 ms after every conversation event and after the
+conversation's own reserved transitions. Thread windows cannot overlap. These
+read-only views do not support simultaneous typing or sending.
+
+```typescript
+import { compileIMessageConversation, type IMessageConversationInput } from 'ugcinc';
+
+const base = {
+  contact: { name: 'Alex' },
+  messages: [
+    { id: 'question', sender: 'recipient', text: 'Which park?', initial: true },
+    { sender: 'user', text: 'The one by the station.', replyTo: 'question' },
+  ],
+} satisfies IMessageConversationInput;
+const basePlan = compileIMessageConversation(base);
+const withThread = {
+  ...base,
+  threads: [{ messageId: 'question', openAtMs: basePlan.durationMs, durationMs: 1800 }],
+} satisfies IMessageConversationInput;
+
+compileIMessageConversation(withThread);
+```
+
+## Create a group conversation
+
+Provide `group` instead of `contact`. Participant IDs identify both message
+senders and reaction actors; include the local participant in the group.
+
+```typescript
+import { compileIMessageConversation, type IMessageConversationInput } from 'ugcinc';
+
+const conversation = {
+  group: {
+    name: 'Weekend plans',
+    localParticipantId: 'me',
+    participants: [
+      { id: 'me', name: 'You' },
+      { id: 'alex', name: 'Alex' },
+      { id: 'sam', name: 'Sam' },
+    ],
+  },
+  messages: [
+    { id: 'start', sender: 'alex', text: 'Where should we meet?', initial: true },
+    { sender: 'sam', text: 'The park works for me.' },
+    { sender: 'me', text: 'Same!', replyTo: 'start', receipt: 'delivered' },
+  ],
+} satisfies IMessageConversationInput;
+
+const plan = compileIMessageConversation(conversation);
+console.log(plan.durationMs);
+```
+
+Set `avatarPngBase64` on the contact, group, or individual participants to use a
+PNG avatar. These are render inputs; they do not create or modify real contacts.
+
+## Change the phone appearance and conversation dates
+
+`statusBar` controls the phone clock, Wi-Fi and cellular visibility/strength,
+battery fill, charging, and low-power appearance. Battery percentage controls
+the fill level; it does not enable a numerical percentage label.
+
+`unreadCount` controls the back-button badge. The conversation's message count
+comes from `messages.length`.
+
+The phone clock and message dates are independent. `timestampText` sets the first
+conversation separator. Use each message's `sentAt` for actual chronology;
+when used, every message needs a chronological ISO timestamp with a timezone.
+Native date-gap rules insert later separators. Set a message's `timestampText`
+to force a separator before it with explicit text. Message dates do not make
+playback wait through that real-world time gap.
+
+```typescript
+import { compileIMessageConversation, type IMessageConversationInput } from 'ugcinc';
+
+const conversation = {
+  contact: { name: 'Alex' },
+  theme: 'light',
+  statusBar: {
+    time: '17:42', wifiEnabled: true, wifiBars: 2,
+    cellularEnabled: true, cellularBars: 3,
+    batteryPercent: 24, charging: false, lowPowerMode: true,
+  },
+  unreadCount: 12,
+  timestampText: 'Yesterday 8:30 PM',
+  messages: [
+    {
+      sender: 'recipient', text: 'Are we still on?', initial: true,
+      sentAt: '2026-10-26T20:30:00-07:00',
+    },
+    {
+      sender: 'user', text: 'Yes!', sentAt: '2026-10-27T09:00:00-07:00',
+      timestampText: 'Today 9:00 AM',
+    },
+  ],
+} satisfies IMessageConversationInput;
+
+compileIMessageConversation(conversation);
+```
+
+## Include image messages
+
+An individual message contains either `text` or `imagePngBase64`. Load a PNG as
+base64 without the `data:image/png;base64,` prefix. Image captions and mixed
+text/image message bodies are rejected.
+
+```typescript
+import { readFile } from 'node:fs/promises';
+import { compileIMessageConversation, type IMessageConversationInput } from 'ugcinc';
+
+const avatarPngBase64 = (await readFile('./avatar.png')).toString('base64');
+const imagePngBase64 = (await readFile('./photo.png')).toString('base64');
+const conversation = {
+  contact: { name: 'Alex', avatarPngBase64 },
+  messages: [
+    { sender: 'recipient', text: 'What does it look like?', initial: true },
+    { sender: 'user', imagePngBase64, receipt: 'delivered' },
+  ],
+} satisfies IMessageConversationInput;
+
+compileIMessageConversation(conversation);
+```
+
+Avatars must fit within 512 × 512 and 65,536 base64 characters. Message images
+must fit within 2048 × 2048 and 8 MiB of base64 characters. PNGs must be valid,
+single-frame images. The total request is limited to 16 MiB, with a combined
+message-image budget of 16,777,216 pixels. The worker validates decoded images
+in addition to the SDK's local input validation.
+
+## Export a PNG from the same scene
+
+Select an exact millisecond with `output: {kind: 'png', atMs: ...}`. Omit `atMs`
+to select the final authored frame. The timestamp must fit within the locally
+compiled `durationMs`.
+
+```typescript
+import { UGCClient, type IMessageConversationInput } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: process.env.UGC_API_KEY!, orgId: process.env.UGC_ORG_ID!,
+});
+const conversation = {
+  contact: { name: 'Alex' },
+  messages: [{ sender: 'recipient', text: 'Ready?', initial: true }],
+} satisfies IMessageConversationInput;
+
+const midpointJob = await client.media.renderIMessageConversation({
+  ...conversation, output: { kind: 'png', atMs: 500 },
+});
+const finalJob = await client.media.renderIMessageConversation({
+  ...conversation, output: { kind: 'png' },
+});
+```
+
+Poll each job exactly as for video. PNG uses the native scene directly; it is not
+extracted from a lossy MP4. Video is 60 fps H264 at 1126 × 2436; PNG is
+1125 × 2436. The video has one background-colored padding column for codec
+compatibility. Neither output accepts a custom resolution or frame rate.
+
+## Cancel or retry a job
+
+```typescript
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: process.env.UGC_API_KEY!, orgId: process.env.UGC_ORG_ID!,
+});
+const result = await client.media.cancelIMessageConversation({
+  jobId: '00000000-0000-4000-8000-000000000001', // Your submitted job ID.
+});
+if (!result.ok) throw new Error(result.message);
+console.log(result.data.status, result.data.cancelRequested);
+```
+
+Cancellation can be asynchronous. Continue polling until a terminal status;
+`cancelRequested: true` alone does not mean cleanup is complete. If the render
+already completed, its result is retained.
+
+For safe submission retries, supply an `idempotencyKey`. Repeating the same body
+and key in the same organization returns the same job. Changing any part of the
+body while reusing that key returns HTTP 409. Use a different key when changing
+the output kind or timestamp, or when requesting a fresh retry of a failed job.
+Job ownership records are retained for seven days.
+
+## Use Create DM in a workflow
+
+In the [automation builder](https://app.ugc.inc/automations), add **Create DM**,
+choose iMessage and its native conversation mode, and enter the conversation.
+The editor exposes common controls; **Advanced JSON** accepts the complete
+`IMessageConversationInput` object described here. Apply the JSON, verify the
+visible fields, and use the native preview before saving or running.
+
+For programmatic workflow definitions, configure the existing Create DM node
+with static `platform: 'imessage'`, `platformInputType: 'static'`,
+`imessageRenderMode: 'conversation'`, and `imessageConversation` containing the
+input. Use `imessageConversationInputType: 'variable'` to connect the
+`conversation` object input instead. The output port is `output`: static video
+settings produce video, static PNG settings produce an image, and variable
+conversation settings expose an image-or-video output.
+
+The older still-image mode remains available for existing iMessage and Instagram
+workflows. Native conversation mode uses the same native service for preview
+and export. See the [automation data structure](/data-structures/automation)
+for workflow graph fields and [run an automation](/api-reference/endpoint/automations-run)
+for submission.
+
+## Current boundaries
+
+- This profile provides the iPhone XS / iOS 18.6.2 appearance, not a newer iOS design.
+- Up to 30 messages, 6,000 animated grapheme clusters, 6,100 compiled events, and
+  120,000 ms of authored duration. Long content or slow pacing can exceed the limit.
+- No full-screen or bubble-send effects, custom fonts or coordinates, carrier
+  name/network-type selection, numerical battery label, custom output dimensions,
+  non-60fps video, or arbitrary low-level animation scripts.
+- Local reaction selection currently supports the six classic picker options;
+  custom emoji reactions are for remote participants. Unsupported emoji input
+  sequences reject instead of silently substituting another emoji.
+- Seeded timing plans are repeatable. Some reaction animation frames can still
+  differ at the pixel level across independent renders; full pixel-identical
+  reaction replay is not guaranteed.

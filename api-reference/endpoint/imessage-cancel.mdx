@@ -1,0 +1,78 @@
+---
+title: "Cancel iMessage Render"
+description: "Request cooperative cancellation and native cleanup for an organization-owned conversation render"
+---
+
+## Endpoint
+
+```http
+POST https://api.ugc.inc/media/render/imessage/cancel
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+```
+
+Requires `content:render` for scoped keys. The bearer key selects the organization;
+an optional `?orgId=YOUR_ORG_ID` query must identify an authorized organization.
+A caller can cancel only jobs owned by that organization.
+
+## Request body
+
+<ParamField body="jobId" type="string" required>
+  The UUID returned by [Render iMessage Conversation](/api-reference/endpoint/imessage-render).
+  Unknown fields are rejected.
+</ParamField>
+
+### TypeScript
+
+```typescript
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const cancellation = await client.media.cancelIMessageConversation({
+  jobId: '7f840d59-6c9d-4b58-9f7c-21b953579069',
+});
+if (!cancellation.ok) throw new Error(cancellation.message);
+console.log(cancellation.data.status, cancellation.data.cancelRequested);
+// Continue polling getIMessageConversation until a terminal status is returned.
+```
+
+### HTTP
+
+```bash
+curl --request POST 'https://api.ugc.inc/media/render/imessage/cancel' \
+  --header "Authorization: Bearer $UGC_API_KEY" \
+  --header 'Content-Type: application/json' \
+  --data '{"jobId":"7f840d59-6c9d-4b58-9f7c-21b953579069"}'
+```
+
+## Response and completion
+
+The response is the current
+[IMessageConversationJob](/data-structures/imessage-conversation#job-result),
+wrapped as `{ "code": 200, "data": { ... } }` in raw HTTP or the normalized
+`ApiResponse` in the SDK.
+
+Cancellation is cooperative. A response with `cancelRequested: true` means the
+request was recorded; it does **not** prove native cleanup is complete. Keep
+[polling status](/api-reference/endpoint/imessage-status) until `cancelled`,
+`failed`, or `completed`.
+
+A terminal `cancelled` job has an error object with `code: "CANCELLED"` and
+`retryable: false`. If the render completes before cancellation takes effect,
+its `completed` state and downloadable result are retained. Cancellation does
+not delete an already completed output.
+
+To start a replacement render, submit a new job with a new `idempotencyKey` or
+omit that key. Reusing the same request/key returns the same job, including a
+previously cancelled job.
+
+## Errors
+
+| HTTP status | Meaning |
+| --- | --- |
+| `400` | Invalid job UUID or unsupported request fields. |
+| `401` | Missing, invalid, or expired API key. |
+| `403` | The key lacks `content:render`. |
+| `404` | Job is unknown, belongs to another organization, or its ownership record expired. |
+| `502` | The renderer returned an invalid output. |
+| `503` | Cancellation service temporarily unavailable; retryable request failure. |

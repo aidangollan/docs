@@ -1,0 +1,142 @@
+---
+title: "Render iMessage Conversation"
+description: "Generate a native iMessage conversation as a 60fps video or a lossless PNG snapshot"
+---
+
+## Endpoint
+
+```http
+POST https://api.ugc.inc/media/render/imessage
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+```
+
+Queue a synthetic iMessage conversation. Submission returns a job immediately;
+[poll its status](/api-reference/endpoint/imessage-status) until it completes.
+The service renders original iMessage UI without sending real messages.
+
+<Note>
+Scoped keys require `content:render`. The bearer key selects the organization.
+If you use an explicit organization, set the SDK's `orgId` or the HTTP query
+parameter `?orgId=YOUR_ORG_ID`; it must be an organization your key can access.
+</Note>
+
+Start with the [usage guide](/guides/imessage-conversations). The
+[full input and result contract](/data-structures/imessage-conversation) lists
+all nested fields, limits, defaults, and validation rules. The downloadable
+[OpenAPI specification](/api-reference/openapi.json) includes these endpoints
+and schemas.
+
+## Request body
+
+The body is an `IMessageConversationInput`. Supply exactly one of `contact` or
+`group`, plus `messages`. All other top-level fields are optional.
+
+| Field | Purpose |
+| --- | --- |
+| `contact` / `group` | Names, avatars, and direct or group conversation participants. |
+| `messages` | Ordered text/emoji or PNG messages; history, sender, receipts, replies, dates, and reactions. |
+| `timing` | Global typing speed, pauses, incoming typing duration, and emoji-selection timing. Each message can override timing. |
+| `theme`, `keyboard` | Light/dark appearance and keyboard visibility. |
+| `statusBar`, `unreadCount` | Independent clock, signals, battery appearance, and back-button unread badge. |
+| `timestampText` | First conversation date separator; separate from `statusBar.time`. |
+| `showIncomingTyping`, `endHoldMs`, `seed` | Typing-indicator default, final hold, and deterministic pacing seed. |
+| `threads` | Timed expanded reply-thread views after the conversation settles. |
+| `output` | `{ "kind": "video" }` by default, or `{ "kind": "png", "atMs": 500 }`. Omit PNG `atMs` for the final frame. |
+| `profile`, `fps` | Currently only `iphone-xs-ios18.6.2` and `60`; these are defaults. |
+| `idempotencyKey` | Optional organization-scoped duplicate-submission key. |
+
+### TypeScript
+
+Requires `ugcinc@4.27.0` or later.
+
+```typescript
+import { UGCClient, type IMessageConversationInput } from 'ugcinc';
+
+const client = new UGCClient({ apiKey: 'YOUR_API_KEY' });
+const input = {
+  contact: { name: 'Alex' },
+  theme: 'dark',
+  timing: { charactersPerSecond: 8, incomingTypingDurationMs: 2400 },
+  messages: [
+    { id: 'hello', sender: 'recipient', text: 'Ready?', initial: true },
+    { id: 'answer', sender: 'user', text: 'On my way 👋', receipt: 'delivered' },
+  ],
+} satisfies IMessageConversationInput;
+
+const submitted = await client.media.renderIMessageConversation(input);
+if (!submitted.ok) throw new Error(submitted.message);
+console.log(submitted.data.jobId, submitted.data.status);
+```
+
+The SDK does **not** wait for this render to finish. See the
+[complete polling example](/guides/imessage-conversations#generate-and-download-a-video).
+
+### HTTP
+
+```bash
+curl --request POST 'https://api.ugc.inc/media/render/imessage' \
+  --header "Authorization: Bearer $UGC_API_KEY" \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "contact": {"name": "Alex"},
+    "theme": "dark",
+    "timing": {"charactersPerSecond": 8, "incomingTypingDurationMs": 2400},
+    "messages": [
+      {"id": "hello", "sender": "recipient", "text": "Ready?", "initial": true},
+      {"id": "answer", "sender": "user", "text": "On my way 👋", "receipt": "delivered"}
+    ]
+  }'
+```
+
+## Response
+
+HTTP `200` means the request was accepted or the existing idempotent job was
+returned. It does not mean rendering has finished. Raw HTTP returns
+`{ "code": 200, "data": { ... } }`. The SDK adds `ok: true` and a `message` to
+its normalized `ApiResponse`.
+
+`data` is an [IMessageConversationJob](/data-structures/imessage-conversation#job-result):
+`jobId`, `status`, `progress`, `fps`, `output`, `contentType`, `durationMs`, and
+`durationInFrames`. A completed job includes a public HTTPS `url`. Failed or
+cancelled jobs include an `error` object. Render failures appear as a terminal
+job state; request failures use the HTTP errors below.
+
+## Idempotency and retry
+
+An `idempotencyKey` is 1–128 characters. Within an organization, retry the **same
+body with the same key** to recover the same job. Object-key ordering does not
+matter; changing the body with that key returns `409 IDEMPOTENCY_CONFLICT`.
+Omitting the key creates a new job. To rerender a failed or cancelled job, use
+a new key or omit it. Job-ownership records are retained for seven days.
+
+## Errors and limits
+
+| HTTP status | Meaning |
+| --- | --- |
+| `400` | Invalid input, unsupported options, invalid organization, or exceeded content/timing limits. |
+| `401` | Missing, invalid, or expired API key. |
+| `403` | The key lacks `content:render` permission. |
+| `409` | The same idempotency key was already used for a different body. |
+| `502` | The renderer returned an invalid output. |
+| `503` | Rendering is temporarily unavailable; request error has `retryable: true`. |
+
+Native request errors include `code`, `message`, `errorCode`, and `retryable`.
+Authentication errors may omit the last two fields. Do not automatically retry
+an invalid body or reuse a conflicting idempotency key.
+
+The contract accepts at most 30 messages, 6,000 animated visible grapheme
+clusters, a 120-second compiled timeline, and a 16 MiB request. Image and avatar
+constraints also apply. See [all validation rules](/data-structures/imessage-conversation#limits-and-validation).
+
+## Output profile
+
+Video is H264 MP4 at 60fps, 1126×2436. Native PNGs are 1125×2436. The video adds
+one background-colored column for the codec's even-width requirement. MP4 is
+lossy; a PNG snapshot is rendered from the original native scene, not extracted
+from compressed video. No audio track is generated by this endpoint.
+
+The current renderer uses the iPhone XS / iOS 18.6.2 appearance. Other device
+profiles, arbitrary fonts/layouts, effects, and image captions are not supported.
+Some reaction-animation frames can differ between independent renders;
+exact pixel-repeatability for those frames is not guaranteed.
