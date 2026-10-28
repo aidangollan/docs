@@ -263,3 +263,16 @@ of assuming local validation guarantees a successful render.
 
 For raw HTTP envelopes, authentication, organization selection, response codes,
 and examples, use the [endpoint reference](/api-reference/endpoint/imessage-render).
+
+
+## URL-backed images (SDK 5)
+
+As an alternative to `avatarPngBase64`, contact, group and participants accept
+`avatarUrl`. As an alternative to text/base64 message bodies, messages accept
+`imageUrl`. Both are public HTTPS PNG/JPEG/WebP URLs, without credentials, explicit
+ports or fragments. Supplying both avatar sources, or more than one message body,
+rejects. URL downloads are limited to 12 MiB each and converted to native PNGs with
+bounded dimensions (avatars fit 96 px, message images fit 2048 px). Native encoded and
+decoded image/request budgets still apply. Private addresses, unsafe redirects,
+invalid images and oversized outputs reject. PNG base64 inputs retain their
+original contract and bypass this URL conversion.

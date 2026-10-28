@@ -8,7 +8,7 @@ renders the native iPhone XS / iOS 18.6.2 interface, including its keyboard,
 bubbles, emoji input, replies, and reactions. It returns a downloadable video or
 a lossless PNG at a chosen point in the same conversation.
 
-Use `ugcinc` version **4.27.0 or later**. Restricted API keys need
+Use `ugcinc` version **5.0.3 or later**. Restricted API keys need
 `content:render`. Set your organization in the client configuration. This
 creates a synthetic rendering; it does not send messages to anyone.
 
@@ -362,15 +362,16 @@ visible fields, and use the native preview before saving or running.
 
 For programmatic workflow definitions, configure the existing Create DM node
 with static `platform: 'imessage'`, `platformInputType: 'static'`,
-`imessageRenderMode: 'conversation'`, and `imessageConversation` containing the
+`imessageRenderMode: 'conversation'`, `imessageOutputType: 'image'` or `'video'`, and `imessageConversation` containing the
 input. Use `imessageConversationInputType: 'variable'` to connect the
-`conversation` object input instead. The output port is `output`: static video
-settings produce video, static PNG settings produce an image, and variable
-conversation settings expose an image-or-video output.
+`conversation` object input instead. The output port is `output`: the explicit `imessageOutputType` fixes the image or video port even when the
+conversation is connected. A connected input requesting the opposite kind rejects.
 
-The older still-image mode remains available for existing iMessage and Instagram
-workflows. Native conversation mode uses the same native service for preview
-and export. See the [automation data structure](/data-structures/automation)
+All iMessage image/video nodes now use the native service for preview and export.
+Saved screenshot nodes preserve their existing input connections and translate to
+fully populated native PNGs; there is no Remotion iMessage fallback. Unsupported
+legacy bubble colors, message-based cropping and free-text read receipts need
+explicit correction. Instagram retains its screenshot implementation. See the [automation data structure](/data-structures/automation)
 for workflow graph fields and [run an automation](/api-reference/endpoint/automations-run)
 for submission.
 
@@ -388,3 +389,23 @@ for submission.
 - Seeded timing plans are repeatable. Some reaction animation frames can still
   differ at the pixel level across independent renders; full pixel-identical
   reaction replay is not guaranteed.
+
+
+## Connect workflow media
+
+Set `profilePicInputType: 'variable'` and connect `profile-pic` to supply a direct-chat
+avatar. Set `imageAttachmentInputType: 'variable'`, connect `image-attachment`, and
+set `imessageAttachmentMessageId` to the ID of the message to replace. Inputs use
+normal workflow image values (`{url}`). You can also supply `contact.avatarUrl`,
+group/participant `avatarUrl` or message `imageUrl` in authoring JSON. These must
+be public HTTPS PNG/JPEG/WebP files; the API downloads them with a 12 MiB limit and
+converts them to native PNG payloads. Avatar conversion fits 96 px and attachment
+conversion fits 2048 px. Use one source per avatar and one body per message; base64
+inputs remain supported. Audio is composed separately downstream.
+
+For a populated image, mark every message `initial: true` and select image output.
+For a screenshot from an animation, keep animated messages and set PNG `atMs`.
+Agents can install the `imessage` skill and use `compile_imessage_conversation`,
+`render_imessage_conversation`, `get_imessage_conversation` and
+`cancel_imessage_conversation`. Compilation is local and needs no API key; render
+jobs require `content:render` and are separate from media-analysis jobs.
