@@ -48,6 +48,7 @@ payloads have additional decoded-image limits below.
 | --- | --- | --- |
 | `name` | String | Required; 1–80 characters after trimming. The displayed other-person name/username. |
 | `avatarPngBase64` | String | Optional PNG avatar, base64 without a data-URL prefix. |
+| `avatarUrl` | String | Optional public HTTPS image URL instead of `avatarPngBase64`; see URL-backed images below. |
 
 Direct chats use `sender: 'user'` for the local person and
 `sender: 'recipient'` for the contact. Reaction actors use the same IDs.
@@ -60,9 +61,10 @@ Direct chats use `sender: 'user'` for the local person and
 | `localParticipantId` | ID string | Default `user`; must identify one of the supplied participants. |
 | `participants` | Participant array | Required; 3–20 people including the local person, with unique IDs. |
 | `avatarPngBase64` | String | Optional group PNG avatar. |
+| `avatarUrl` | String | Optional public HTTPS group image URL instead of `avatarPngBase64`. |
 
 Each participant has required `id` and `name`, plus optional
-`avatarPngBase64`. IDs are 1–80 characters using `[A-Za-z0-9_-]`; names are
+`avatarPngBase64` or `avatarUrl` (never both). IDs are 1–80 characters using `[A-Za-z0-9_-]`; names are
 1–80 characters after trimming. A message's `sender` and each reaction's `actor`
 must name a supplied participant.
 
@@ -94,8 +96,9 @@ There is no carrier-name or network-type selector.
 | --- | --- | --- |
 | `id` | ID string | Optional; generated as `message-1`, `message-2`, etc. when omitted. All resolved IDs must be unique. |
 | `sender` | ID string | Required; direct-chat `user`/`recipient` or a group participant ID. |
-| `text` | String | Either this field or `imagePngBase64` is required, exclusively. 1–2000 UTF-16 code units. Includes Unicode emoji. |
+| `text` | String | Exactly one of `text`, `imagePngBase64`, or `imageUrl` is required. 1–2000 UTF-16 code units. Includes Unicode emoji. |
 | `imagePngBase64` | String | Single-frame PNG, base64 without a data-URL prefix; see image limits below. |
+| `imageUrl` | String | Public HTTPS image URL instead of a text/base64 body; converted to native PNG. |
 | `initial` | Boolean | Default `false`. Preexisting history must be a contiguous prefix before animated messages. |
 | `timing` | Timing object | Optional per-message overrides of the global settings. |
 | `showTyping` | Boolean | Remote messages only. Overrides `showIncomingTyping`; outgoing text always appears in the composer. |
