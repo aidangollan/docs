@@ -1,0 +1,99 @@
+---
+title: "Match text in a reference image"
+description: "Fit supported text styles and obtain reusable settings or a native transparent caption sticker"
+---
+
+Use `client.media.matchTextStyle` with `ugcinc` **4.28.0**. Restricted
+API keys need `content:analyze`. The image URL must be publicly downloadable.
+Coordinates refer to the displayed image in pixels, after EXIF orientation.
+
+## Match a TikTok caption
+
+```typescript
+import { UGCClient } from 'ugcinc';
+
+const client = new UGCClient({
+  apiKey: process.env.UGC_API_KEY!,
+  orgId: process.env.UGC_ORG_ID!,
+});
+
+const response = await client.media.matchTextStyle({
+  url: 'https://example.com/reference.png',
+  box: { x: 70, y: 214, width: 436, height: 122 },
+  renderer: 'tiktok-native',
+  text: 'I could LITERALLY KISS the\nflight attendant that showed\nme this🫣🤭',
+});
+
+if (!response.ok) throw new Error(response.message);
+const job = response.data;
+// The SDK polls automatically. A transient polling failure can leave a job
+// pending or processing; resume with getMediaAnalysis({ jobId: job.jobId }).
+if (job.status === 'completed' && job.result?.operation === 'match_text_style') {
+  const result = job.result;
+  if (result.status === 'fitted' && result.nativeResult) {
+    console.log(result.nativeResult.stickerUrl); // Transparent PNG
+    console.log(result.nativeResult.composition); // Placement in source pixels
+    console.log(result.nativeResult.settings); // Reproducible native inputs
+    console.log(result.previewUrl); // Reference / fit / segmented difference
+  } else {
+    console.log(result.reasonCode, result.nextActions, result.fitAttempted);
+  }
+}
+```
+
+Include the complete caption and its outline inside the box, with some margin.
+Supply text explicitly when emoji or precise line breaks matter. Native fitting
+supports the `tiktok-classic-ios-47` profile: white letters with a dark outline,
+including supported emoji. It can fit captions over photographs. Other colors,
+unoutlined text, ambiguous backgrounds, or unsupported scripts can return
+`unavailable`. This is a bounded profile matcher, not a universal font identifier.
+
+## Inputs
+
+| Field | Meaning |
+| --- | --- |
+| `url` | Image URL. |
+| `box` | Integer `x`, `y`, `width`, `height`. Width 16–1536; height 16–512; coordinates and box extent at most 4096. The box must fit the source image. |
+| `renderer` | Optional: `image-editor`, `tiktok-native`, or `auto`. Omission preserves the existing `image-editor` behavior. |
+| `text` | Optional caption; 1–160 UTF-16 code units, at most four lines. Omission uses OCR. Native mode accepts supported Unicode/emoji; generic mode requires printable ASCII. Empty native paragraphs and control characters are unsupported. |
+
+`image-editor` fits the existing image-editor text settings on a plain,
+approximately uniform background. It returns up to three `candidates` containing
+an `element` and `previewConfig`. `auto` tries that path for ASCII and falls back
+to native fitting when it is unavailable; Unicode text goes directly to native.
+
+## Interpret the result
+
+Native results use `version: 2`, `surface: 'native-text-sticker'`, and an empty
+`candidates` array. A fitted result contains `nativeResult`:
+
+- `stickerUrl`: clean native RGBA PNG, without pixels copied from the reference.
+- `settings`: native points and renderer profile; the native output uses three
+  pixels per point.
+- `composition`: top-left `x`, `y`, displayed `width`, `height`, and `scale`.
+  Scale applies to the PNG's intrinsic pixel dimensions. Place the whole PNG at
+  these coordinates; do not trim its transparent margins without adjusting them.
+- `maskIoU`: white letter-fill overlap, separately from outline overlap in
+  `diagnostics.outlineIoU`.
+- `foregroundMae`: residual against an estimated background composite.
+- `quality`: `close` or `approximate`; `fontIdentity` remains `unverified`.
+
+The comparison difference is restricted to segmented text, outline, and supported
+warm-colored emoji evidence. It does not measure every background pixel or prove
+pixel identity against a compressed reference. Inspect the preview alongside the
+metrics. Approximate results are usable candidates, not exact font claims.
+
+Generic results retain `version: 1` and `surface: 'image-editor-element'`.
+Both paths include `renders`, `fitAttempted`, `reasonCode`, and `nextActions`.
+`renders: 0` means a preprocessing or support check rejected the input before
+any candidate was fitted. Follow the suggested action rather than repeatedly
+resubmitting smaller crops that clip the caption.
+
+## HTTP and agent tools
+
+Send the same input JSON to `POST /media/analysis/match-text-style` at
+`https://api.ugc.inc`. Poll `POST /media/analysis/status` with `{ "jobId": "…" }`
+until `completed` or `failed`. Responses use the standard `{ code, data }`
+envelope. Use your API key as a bearer token and provide your organization in the
+`orgId` query parameter. The agent tools are `match_text_style` and
+`get_media_analysis`; the matching tool accepts the same input fields.

@@ -111,6 +111,7 @@
       {
         "group": "Media",
         "pages": [
+          "guides/match-text-style",
           "api-reference/endpoint/media-get",
           "api-reference/endpoint/media-file",
           "api-reference/endpoint/media-social-audio-get",
