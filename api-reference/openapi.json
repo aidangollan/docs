@@ -3538,6 +3538,47 @@
                 "type": "boolean"
               }
             }
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "waiting",
+              "preparing",
+              "capturing",
+              "validating",
+              "encoding",
+              "uploading",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "framesCompleted": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7201
+          },
+          "framesTotal": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7201
+          },
+          "lastProgressAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "heartbeatAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "waitingReason": {
+            "type": "string",
+            "enum": [
+              "capacity",
+              "device_unavailable",
+              "relay_unavailable"
+            ]
           }
         }
       },

@@ -247,7 +247,13 @@ checking `response.ok`. The normalized job contains:
 | --- | --- | --- |
 | `jobId` | UUID string | Use for status and cancellation. |
 | `status` | String | `pending`, `processing`, `completed`, `failed`, or `cancelled`. |
-| `progress` | Number | 0–100. |
+| `progress` | Number | 0–100, phase-weighted estimate. |
+| `phase` | String, optional | `queued`, `waiting`, `preparing`, `capturing`, `validating`, `encoding`, `uploading`, `completed`, `failed`, or `cancelled`. |
+| `framesCompleted` | Integer, optional | Captured output frames, from 0 through `framesTotal`. |
+| `framesTotal` | Integer, optional | Planned output frame count; 1 for PNG. |
+| `lastProgressAt` | ISO timestamp, optional | Last phase, frame count, or waiting-reason change. |
+| `heartbeatAt` | ISO timestamp, optional | Last observed renderer heartbeat; not proof of forward progress. |
+| `waitingReason` | String, optional | `capacity`, `device_unavailable`, or `relay_unavailable`, when known. |
 | `fps` | `60` | Profile sample rate. |
 | `durationMs` | Positive integer | Planned authored duration. |
 | `durationInFrames` | Positive integer | Video frame count, or `1` for PNG output. |

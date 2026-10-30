@@ -38,7 +38,7 @@ if (status.data.status === 'completed') {
 } else if (status.data.status === 'failed' || status.data.status === 'cancelled') {
   console.error(status.data.error);
 } else {
-  console.log(status.data.status, status.data.progress);
+  console.log(status.data.phase ?? status.data.status, status.data.framesCompleted, status.data.framesTotal);
 }
 ```
 
@@ -67,6 +67,21 @@ shows a complete example that handles failure and cancellation. Add a caller-sid
 deadline if your application needs to stop polling after a set interval.
 A successful status request is HTTP `200` even when the job itself is `failed`
 or `cancelled`; inspect `data.status`.
+
+## Live render progress
+
+New native jobs expose optional `phase`, `framesCompleted`, `framesTotal`,
+`lastProgressAt`, `heartbeatAt`, and `waitingReason` fields (SDK 5.2.0+).
+Frames count captured output samples, not seconds of video. `phase` identifies
+queued, waiting, preparing, capturing, validating, encoding, uploading, or a
+terminal state. While `capturing`, use the frame counts to show actual progress.
+
+`lastProgressAt` changes when the phase, frame count, or waiting reason advances.
+`heartbeatAt` indicates that the render service was reachable; a fresh heartbeat
+does not establish that capture advanced. Known waiting reasons are `capacity`,
+`device_unavailable`, and `relay_unavailable`. These fields can be absent on older
+jobs. Overall `progress` remains a phase-weighted estimate, not a time estimate.
+Do not automatically submit another job when one poll shows no change.
 
 ## Response
 
