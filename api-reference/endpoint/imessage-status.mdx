@@ -124,3 +124,21 @@ The example UUID and URL are illustrative, not an existing download.
 
 Ownership records expire after seven days. A `404` intentionally does not reveal
 whether a job exists in another organization.
+
+### Measured progress
+
+Status can include `submittedAt`, `startedAt`, `elapsedMs`, `phaseStartedAt`,
+`phaseElapsedMs`, `progressAgeMs`, and `heartbeatAgeMs`.
+
+`progressState` distinguishes `queued`, `waiting`, `active`, `unreachable`,
+`no_recent_progress`, `unknown`, `completed`, `failed`, and `cancelled`.
+`unreachable` means the last relay heartbeat is older than 15 seconds during preparation or capture.
+`no_recent_progress` means the reachable job has not advanced for 30 seconds.
+Neither state automatically cancels or fails a job.
+
+`estimatedCaptureRemainingMs` estimates capture time from observed frame throughput.
+It is `null` before enough samples, outside capture, or when progress is stale.
+It excludes queueing, encoding and upload. It is not a completion guarantee.
+`elapsedMs` includes queueing and freezes at terminal completion.
+
+These fields are additive; older jobs or servers can omit them. SDK 5.3 preserves them.

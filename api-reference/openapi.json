@@ -1959,7 +1959,7 @@
       "post": {
         "operationId": "posts_create_video_post",
         "summary": "Create Video Post",
-        "description": "Create a video post. Optionally accepts captionOverlays — text overlays to display on the video, each { text, x, y, fontSize } with x/y as the overlay center as a fraction (0-1) of the video width/height and fontSize as a fraction (0-1) of the video height. Returned on the post as caption_overlays.",
+        "description": "Create a video post. Optionally accepts captionOverlays \u2014 text overlays to display on the video, each { text, x, y, fontSize } with x/y as the overlay center as a fraction (0-1) of the video width/height and fontSize as a fraction (0-1) of the video height. Returned on the post as caption_overlays.",
         "responses": {
           "200": {
             "description": "Success",
@@ -2391,7 +2391,7 @@
                   {
                     "id": "answer",
                     "sender": "user",
-                    "text": "On my way 👋",
+                    "text": "On my way \ud83d\udc4b",
                     "receipt": "delivered"
                   }
                 ]
@@ -2929,7 +2929,7 @@
             }
           }
         ],
-        "description": "Setting again replaces that actor’s prior reaction. Remove requires an existing reaction from the same actor. Local actions accept only the six classic reactions and use the visible native menu."
+        "description": "Setting again replaces that actor\u2019s prior reaction. Remove requires an existing reaction from the same actor. Local actions accept only the six classic reactions and use the visible native menu."
       },
       "IMessageMessage": {
         "type": "object",
@@ -2955,7 +2955,7 @@
           },
           "imagePngBase64": {
             "type": "string",
-            "description": "Base64 single-frame PNG without data URL prefix; decoded size at most 2048×2048. Mixed image/text captions are unsupported.",
+            "description": "Base64 single-frame PNG without data URL prefix; decoded size at most 2048\u00d72048. Mixed image/text captions are unsupported.",
             "maxLength": 8388608,
             "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
           },
@@ -3131,7 +3131,7 @@
           },
           "avatarPngBase64": {
             "type": "string",
-            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512×512 pixels. Native ContactsUI crops the avatar.",
+            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512\u00d7512 pixels. Native ContactsUI crops the avatar.",
             "maxLength": 65536,
             "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
           },
@@ -3170,7 +3170,7 @@
           },
           "avatarPngBase64": {
             "type": "string",
-            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512×512 pixels. Native ContactsUI crops the avatar.",
+            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512\u00d7512 pixels. Native ContactsUI crops the avatar.",
             "maxLength": 65536,
             "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
           },
@@ -3205,7 +3205,7 @@
           },
           "avatarPngBase64": {
             "type": "string",
-            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512×512 pixels. Native ContactsUI crops the avatar.",
+            "description": "Base64 PNG bytes, without a data URL prefix. Decoded image must be a single-frame PNG, at most 512\u00d7512 pixels. Native ContactsUI crops the avatar.",
             "maxLength": 65536,
             "pattern": "^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$"
           },
@@ -3274,7 +3274,7 @@
         "default": {
           "kind": "video"
         },
-        "description": "Video is 60 fps H264 at 1126×2436. PNG is 1125×2436; no crop, resolution or codec control."
+        "description": "Video is 60 fps H264 at 1126\u00d72436. PNG is 1125\u00d72436; no crop, resolution or codec control."
       },
       "IMessageConversationInput": {
         "type": "object",
@@ -3579,6 +3579,60 @@
               "device_unavailable",
               "relay_unavailable"
             ]
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "phaseStartedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "captureStartedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "elapsedMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "phaseElapsedMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "progressAgeMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "heartbeatAgeMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "progressState": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "waiting",
+              "active",
+              "unreachable",
+              "no_recent_progress",
+              "unknown",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "estimatedCaptureRemainingMs": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "Observed-rate estimate for capture only. Null before sufficient samples, outside capture, or when stale; excludes queue, encoding, and upload."
           }
         }
       },
